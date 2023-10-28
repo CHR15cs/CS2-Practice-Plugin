@@ -17,5 +17,17 @@ namespace CSPracc.DataModules
             molotov,
             incendiary
         }
+
+        public enum match_state
+        {
+            warmup,
+            live
+        }
+        public enum PluginMode
+        {
+            Standard,
+            Pracc,
+            Match
+        }
     }
 }

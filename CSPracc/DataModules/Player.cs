@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Memory;
 using System;
 using System.Collections.Generic;
@@ -15,9 +16,27 @@ namespace CSPracc.DataModules
     /// </summary>
     public class Player
     {
-        private nint PawnHandle = -1;
+        public int clientindex = -1;
         private ulong _steamid = 0xff;
 
+
+        public CCSPlayerController? CCSPlayerController
+        {
+            get
+            {
+                if (clientindex == 0) return null;
+                return new CCSPlayerController(NativeAPI.GetEntityFromIndex(clientindex + 1));
+            }
+        }
+
+        public CBasePlayerPawn? CBasePlayerPawn
+        {
+            get
+            {
+                if (clientindex == 0) return null;
+                return this.CCSPlayerController?.Pawn.Value;
+            }
+        }
         /// <summary>
         /// Get Player SteamID
         /// </summary>
@@ -27,8 +46,7 @@ namespace CSPracc.DataModules
             {
                 if(_steamid == 0xff)
                 {
-                    _steamid = NativeAPI.GetSchemaValueByName<ulong>(PawnHandle,(int)DataType.DATA_TYPE_ULONG_LONG, "CBasePlayerController", "m_steamID");
-
+                    _steamid = CCSPlayerController.SteamID;
                 }
                 return _steamid;
             }
@@ -41,11 +59,7 @@ namespace CSPracc.DataModules
         {
             get
             {
-                return  NativeAPI.GetSchemaValueByName<string>(PawnHandle, (int)DataType.DATA_TYPE_STRING, "CBasePlayerController", "m_iszPlayerName"); ;
-            }
-            set
-            {
-                NativeAPI.SetSchemaValueByName<string>(PawnHandle, (int)DataType.DATA_TYPE_INT, "CBasePlayerController", "m_iszPlayerName", value);
+                return this.CCSPlayerController.PlayerName;
             }
         }
 
@@ -55,12 +69,27 @@ namespace CSPracc.DataModules
         public int Health
         {
             get 
-            { 
-                return NativeAPI.GetSchemaValueByName<int>(PawnHandle,(int) DataType.DATA_TYPE_INT, "CBaseEntity", "m_iHealth");; 
+            {              
+                return CCSPlayerController.Health;
             }
             set 
             {
-                NativeAPI.SetSchemaValueByName<int>(PawnHandle, (int)DataType.DATA_TYPE_INT, "CBaseEntity", "m_iHealth", value);
+                CCSPlayerController.Health = value;
+            }
+        }
+
+        /// <summary>
+        /// Get Player Money
+        /// </summary>
+        public int Money
+        {
+            get
+            {
+                return this.CCSPlayerController.InGameMoneyServices.Account;
+            }
+            set
+            {
+                this.CCSPlayerController.InGameMoneyServices.Account = value;
             }
         }
 
@@ -71,7 +100,21 @@ namespace CSPracc.DataModules
         {
             get
             {
-                return Color.White;
+                switch(this.CCSPlayerController.CompTeammateColor)
+                {
+                    case 1:
+                        return Color.Green;
+                    case 2:
+                        return Color.Yellow;
+                    case 3:
+                        return Color.Orange; 
+                    case 4:
+                        return Color.Pink;
+                    case 5:
+                        return Color.LightBlue;
+                    default :
+                        return Color.Red;
+                }
             }
         }
         private List<SavedNade> _savedNade = new List<SavedNade>();
@@ -84,10 +127,10 @@ namespace CSPracc.DataModules
         /// Initializes Object with required informations
         /// </summary>
         /// <param name="userid">id of user</param>
-        public Player(int userid)
+        public Player(int handle)
         {
             //ToDo initialize player with current values such as SteamID, Name etc.
-            PawnHandle = userid;
+            clientindex = handle;
         }
 
         public void AddSavedNade(SavedNade savedNade)
@@ -100,7 +143,7 @@ namespace CSPracc.DataModules
         /// </summary>
         public void Kick()
         {
-            Server.ExecuteCommand($"kickid {PawnHandle}");
+            Server.ExecuteCommand($"kickid {clientindex}");
         }
 
         /// <summary>
@@ -108,7 +151,12 @@ namespace CSPracc.DataModules
         /// </summary>
         public void Kill()
         {
-            Server.ExecuteCommand($"slay {PawnHandle}");
+            CCSPlayerController.PlayerPawn.Value.CommitSuicide(true, true);          
+        }
+
+        private void IssueCommand(string command)
+        {
+            NativeAPI.IssueClientCommand(clientindex, command);
         }
     }
 

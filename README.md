@@ -1,7 +1,11 @@
 # CS2-Practice-Plugin
-Open Source Plugin for Counterstrike 2 based on CounterStrikeSharp
+Open Source Plugin for Counterstrike 2 based on [CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp)
 
-# Commands available
+## Important
+Currently in an early stage of development.
+Plugin might be unstable or not working.
+
+## Commands available
         !menu - Opens small chat menu, current options pracc, match or help
         !pause - Pauses the game during a match
         !unpause - Unpause the game during a match

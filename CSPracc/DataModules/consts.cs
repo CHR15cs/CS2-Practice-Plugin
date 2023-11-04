@@ -19,17 +19,22 @@ namespace CSPracc.DataModules.consts
 
     public class PRACC_COMMAND
     {
-        public const  string MODE = "!menu";
-        public const string PAUSE = "!pause";
-        public const  string UNPAUSE = "!unpause";
-        public const string READY = "!ready";
-        public const string UNREADY = "!unready";
-        public const string FORCEREADY = "!forceready";
-        public const string STOP = "!stop";
-        public const string WARMUP = "!warmup";
-        public const string HELP = "!help";
-        public const string RESTART = "!restart";
-        public const string SPAWN = "!spawn";
+        public const  string MODE = ".menu";
+        public const string PAUSE = ".pause";
+        public const  string UNPAUSE = ".unpause";
+        public const string READY = ".ready";
+        public const string UNREADY = ".unready";
+        public const string FORCEREADY = ".forceready";
+        public const string STOP = ".stop";
+        public const string WARMUP = ".warmup";
+        public const string HELP = ".help";
+        public const string RESTART = ".restart";
+        public const string SPAWN = ".spawn";
+        public const string COACH = ".coach";
+        public const string STOPCOACH = ".stopcoach";
+        public const string FAKERCON = ".rcon";
+        public const string BACKUPMENU = ".backup";
+        public const string NADES = ".nades";
     }
     public class Strings
     {

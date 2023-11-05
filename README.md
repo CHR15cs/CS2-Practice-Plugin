@@ -28,7 +28,11 @@ Plugin might be unstable or not working.
 - [x] warmup 
 - [ ] coach slot
 - [ ] demo recording incl. upload of demo file to media server for easy sharing
-
+### Retake Mode
+- [ ] Setting custom spawns
+- [ ] Setting random amount or fixed hp
+- [ ] custom weapon pools
+- [ ] 
 ## Files
         configmanager.xml
                 Stores list of admins, rcon password, list of saved grenades etc.

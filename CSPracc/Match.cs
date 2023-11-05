@@ -8,6 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CounterStrikeSharp.API.Modules.Utils;
+using System.Text.RegularExpressions;
+using CSPracc.DataModules;
+using System.IO;
 
 namespace CSPracc
 {
@@ -45,14 +48,25 @@ namespace CSPracc
             Server.ExecuteCommand(DataModules.consts.COMMANDS.RESTART_GAME);
         }
 
-        public void Rewarmup()
+        public void Rewarmup(CCSPlayerController? player)
         {
+            if (player == null) return;
+            if (!player.PlayerPawn.IsValid) return;
+            if (!player.IsAdmin())
+            {
+                player.PrintToCenter("Only admins can execute this command!");
+                return;
+            }
             if (state == DataModules.enums.match_state.warmup || currentMode != DataModules.enums.PluginMode.Match) { return; }
             Server.ExecuteCommand(DataModules.consts.COMMANDS.START_WARMUP);
         }
 
-        public void Start()
+        public void Start(CCSPlayerController? player)
         {
+            if(player == null) { return; }
+            if(!player.IsValid) { return; }
+            if(!player.IsAdmin()) { player.PrintToCenter("Only admins can execute this command!"); return; }
+
             if (state == DataModules.enums.match_state.live || currentMode != DataModules.enums.PluginMode.Match) { return; }
             state = DataModules.enums.match_state.live;
             Server.ExecuteCommand(DataModules.consts.COMMANDS.START_MATCH);
@@ -60,6 +74,7 @@ namespace CSPracc
 
         public void StopCoach(CCSPlayerController playerController)
         {
+            if (CurrentMode != enums.PluginMode.Match) return;
             if (playerController == null) return;
 
             if (playerController.PlayerPawn.Value.TeamNum == (byte)CsTeam.Terrorist)
@@ -90,8 +105,9 @@ namespace CSPracc
 
         public void AddCoach(CCSPlayerController playerController)
         {
+            if (CurrentMode != enums.PluginMode.Match) return;
             if (playerController == null) return;
-
+            if (!playerController.PlayerPawn.IsValid) return;
             if(playerController.PlayerPawn.Value.TeamNum == (byte)CsTeam.Terrorist)
             {
                 if(CoachTeam1 == null)

@@ -23,11 +23,9 @@ using System.Xml.Serialization;
 
 public class CSPraccPlugin : BasePlugin
 {
-
-    List<Position> SpawnsCT;
-    List<Position> SpawnsT;
+    Dictionary<byte,List<Position>> SpawnPositions;
     List<CSPracc.DataModules.Player>? Players;
-    List<CSPracc.DataModules.SavedNade>? Nades;
+    
     private Match match;
     private FileInfo GrenadeFile;
     private static FileInfo adminFile;
@@ -103,26 +101,9 @@ public class CSPraccPlugin : BasePlugin
         }
     }
 
-    ChatMenu _nadeMenu = null;
-    ChatMenu NadeMenu
-    {
-        get
-        {
-            var NadesMenu = new ChatMenu("Nade Menu");
-            var handleGive = (CCSPlayerController player, ChatMenuOption option) => TeleportPlayer(player, option.Text);
+    private static FileInfo configManagerFile = null;
 
-            foreach (var nade in Nades)
-            {
-                if (nade.Map == Server.MapName)
-                {
-                    NadesMenu.AddMenuOption(nade.Title, handleGive);
-                }
-            }
-            return NadesMenu;
-        }
-    }
-
-    ConfigManager ConfigManager;
+    public static ConfigManager Config;
     #endregion
 
     public override void Load(bool hotReload)      
@@ -131,39 +112,43 @@ public class CSPraccPlugin : BasePlugin
         _moduleDir = new DirectoryInfo(ModuleDirectory);
         Logging logging = new Logging(new FileInfo(Path.Combine(ModuleDir.FullName, "Logging.txt")));
         adminFile = new FileInfo(Path.Combine(CSPraccPlugin.ModuleDir.FullName, "admin.ini"));
+        configManagerFile = new FileInfo(Path.Combine(ModuleDir.FullName, "configmanager.xml"));
         Players = new List<CSPracc.DataModules.Player>();
-        Nades = new List<SavedNade>();
-        SpawnsCT = new List<Position>();
-        SpawnsT = new List<Position>();
+        SpawnPositions = new Dictionary<byte, List<Position>>();
         match = new Match();
         XmlSerializer serializer = new XmlSerializer(typeof(ConfigManager));
-        FileInfo configManagerFile = new FileInfo(Path.Combine(ModuleDir.FullName, "configmanager.xml"));
-        if(configManagerFile.Exists)
+        if (configManagerFile.Exists)
         {
-            ConfigManager = (ConfigManager)serializer.Deserialize(File.OpenRead(configManagerFile.FullName));
+            Config = (ConfigManager)serializer.Deserialize(File.OpenRead(configManagerFile.FullName));
         }
         else
         {
-            ConfigManager = new ConfigManager();
-            ConfigManager.RconPassword = "geheim";
-            ConfigManager.LoggingFile = "Logging.txt";
-            ConfigManager.Admins = new List<string>();
-            ConfigManager.SavedNades = new List<SavedNade>();
-            ConfigManager.Admins.Add("steamid1234");
-            ConfigManager.SavedNades.Add(new SavedNade(new Vector(0,0,0),new QAngle(0,0,0),new Vector(0,0,0),"test nade","test","de_test"));
-            if(configManagerFile.Exists)
-            {
-                configManagerFile.Delete();
-            }
-            serializer.Serialize(File.OpenWrite(configManagerFile.FullName), ConfigManager);
+            Config = new ConfigManager();
+            Config.RconPassword = "geheim";
+            Config.LoggingFile = "Logging.txt";
+            Config.Admins = new List<string>();
+            Config.SavedNades = new List<SavedNade>();
+            Config.Admins.Add("steamid1234");
+            Config.SavedNades.Add(new SavedNade(new Vector(0, 0, 0), new QAngle(0, 0, 0), new Vector(0, 0, 0), "test nade", "test", "de_test"));
+            WriteConfig(Config);
         }
-        
-        
+
+
         LoadFiles();
         RegisterListener<Listeners.OnMapStart>((mapName) =>
         {
             Reset();
         });
+    }
+
+    public static void WriteConfig(ConfigManager config)
+    {
+        XmlSerializer serializer = new XmlSerializer(typeof(ConfigManager));
+        if (configManagerFile.Exists)
+        {
+            configManagerFile.Delete();
+        }
+        serializer.Serialize(File.OpenWrite(configManagerFile.FullName), config);
     }
 
     [ConsoleCommand("css_rcon_password", "allow temporary admin control")]
@@ -208,9 +193,7 @@ public class CSPraccPlugin : BasePlugin
                 command = commandWithArgs.Substring(0, commandWithArgs.IndexOf(" "));
                 if(command.IndexOf(' ') != commandWithArgs.Length -1)
                 {
-                    args = commandWithArgs.Substring(commandWithArgs.IndexOf(' ') + 1);
-                    Server.ExecuteCommand("say command: " + command);
-                    Server.ExecuteCommand("say args: " + args);              
+                    args = commandWithArgs.Substring(commandWithArgs.IndexOf(' ') + 1);          
                 }
                 else
                 {
@@ -220,7 +203,6 @@ public class CSPraccPlugin : BasePlugin
             else
             {
                 command = commandWithArgs;
-                Server.ExecuteCommand("say command: " + command);
             }
         }
         catch(Exception ex)
@@ -242,37 +224,38 @@ public class CSPraccPlugin : BasePlugin
                 }
             case PRACC_COMMAND.SPAWN:
                 {
-                        OnSpawn(player, args);
+                    if (match.CurrentMode != enums.PluginMode.Pracc) break;
+                    SpawnManager.TeleportToSpawn(player, args);
                     break;
                 }
             case PRACC_COMMAND.WARMUP:
                 {
-                    OnWarmup(player);
+                    match.Rewarmup(player);
                     break;
                 }
             case PRACC_COMMAND.PAUSE:
                 {
-                    OnPause(player);
+                    match.Pause();
                     break;
                 }
             case PRACC_COMMAND.UNPAUSE:
                 {
-                    OnUnPause(player);
+                    match.Unpause();
                     break;
                 }
             case PRACC_COMMAND.FORCEREADY:
                 {
-                    OnForceReady(player); 
+                    match.Start(player); 
                     break;
                 }
             case PRACC_COMMAND.COACH:
                 {
-                    OnCoaching(player); 
+                    match.AddCoach(player);
                     break;
                 }
             case PRACC_COMMAND.STOPCOACH:
                 {
-                    OnStopCoaching(player);
+                    match.StopCoach(player);
                     break;
                 }
             case PRACC_COMMAND.FAKERCON:
@@ -287,11 +270,15 @@ public class CSPraccPlugin : BasePlugin
                 }
             case PRACC_COMMAND.NADES:
                 {
-                    OnNades(player);
+                    if (match.CurrentMode != enums.PluginMode.Pracc) break;
+                    ChatMenus.OpenMenu(player, NadeManager.NadeMenu);
                     break;
                 }
-
-
+            case PRACC_COMMAND.SAVE:
+                {
+                    NadeManager.AddGrenade(player, args);
+                    break;
+                }
         }
 
         return HookResult.Changed;
@@ -319,137 +306,6 @@ public class CSPraccPlugin : BasePlugin
         }
         ChatMenus.OpenMenu(player, ModeMenu); 
     }
-    public void OnSpawn(CCSPlayerController? player, string args)
-    {
-        if(match.CurrentMode != enums.PluginMode.Pracc) return;
-        if(SpawnsT.Count == 0) GetSpawns();
-        if (player == null) return;
-        if (!player.PlayerPawn.IsValid) return;
-        int number = -1;
-
-        try
-        {
-            number = Convert.ToInt32(args);
-            number--;
-        }
-        catch (Exception ex)
-        {
-            player.PrintToCenter("invalid parameter");
-            return;
-        }
-      
-        if(player.TeamNum == (byte)CsTeam.CounterTerrorist)
-        {
-            if(SpawnsCT.Count <= number)
-            {
-                Server.ExecuteCommand($"say insufficient number of spawns found. spawns {SpawnsCT.Count} - {number}");
-                return;
-            }
-            player.PlayerPawn.Value.Teleport(SpawnsCT[number].PlayerPosition, SpawnsCT[number].PlayerAngle, new Vector(0, 0, 0));
-            player.PrintToCenter($"Teleporting to {number}");
-        }
-        if (player.TeamNum == (byte)CsTeam.Terrorist)
-        {
-            if (SpawnsT.Count <= number)
-            {
-                Server.ExecuteCommand($"say insufficient number of spawns found. spawns {SpawnsT.Count} - {number}");
-                return;
-            }
-            player.PrintToCenter($"Teleporting to {number}");
-            player.PlayerPawn.Value.Teleport(SpawnsT[number].PlayerPosition, SpawnsT[number].PlayerAngle, new Vector(0, 0, 0));
-        }
-    }
-
-    public void OnPause(CCSPlayerController? player)
-    {
-        if (match.CurrentMode != enums.PluginMode.Match) return;
-        if (player == null) return;
-        if (!player.PlayerPawn.IsValid) return;
-        match.Pause();
-    }
-    public void OnUnPause(CCSPlayerController? player)
-    {
-        if (match.CurrentMode != enums.PluginMode.Match) return;
-        if (player == null) return;
-        if (!player.PlayerPawn.IsValid) return;
-        match.Unpause();
-    }
-
-    public void OnForceReady(CCSPlayerController? player)
-    {
-        if (match.CurrentMode != enums.PluginMode.Match) return;
-        if (player == null) return;
-        if (!player.PlayerPawn.IsValid) return;
-        if (!player.IsAdmin())
-        {
-            player.PrintToCenter("Only admins can execute this command!");
-            return;
-        }
-        match.Start();
-    }
-
-    public void OnWarmup(CCSPlayerController? player)
-    {
-        if (match.CurrentMode != enums.PluginMode.Match) return;
-        if (player == null) return;
-        if (!player.PlayerPawn.IsValid) return;
-        if (!player.IsAdmin())
-        {
-            player.PrintToCenter("Only admins can execute this command!");
-            return;
-        }
-        match.Rewarmup();
-    }
-
-    public void OnCoaching(CCSPlayerController? player)
-    {
-        if (match.CurrentMode != enums.PluginMode.Match) return;
-        if (player == null) return;
-        if (!player.PlayerPawn.IsValid) return;
-        match.AddCoach(player);
-    }
-
-    public void OnStopCoaching(CCSPlayerController? player)
-    {
-        if (match.CurrentMode != enums.PluginMode.Match) return;
-        if (player == null) return;
-        if (!player.PlayerPawn.IsValid) return;
-        match.StopCoach(player);
-    }
-
-    public void OnNades(CCSPlayerController? player)
-    {
-        if (match.CurrentMode != enums.PluginMode.Pracc) return;
-        if (player == null) return;
-        if (!player.PlayerPawn.IsValid) return;
-        ChatMenus.OpenMenu(player, NadeMenu);
-    }
-
-    public void OnSave(CCSPlayerController? player,string args)
-    {
-        if (match.CurrentMode != enums.PluginMode.Pracc) return;
-        if (player == null) return;
-        if (!player.PlayerPawn.IsValid) return;
-
-        var absOrigin = player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin;
-        string name = args;
-        Nades.Add(new SavedNade(absOrigin, player.PlayerPawn.Value.EyeAngles, null, name, "", Server.MapName));
-        using (StreamWriter sw = new StreamWriter(File.OpenWrite(GrenadeFile.FullName)))
-        {
-            foreach (var nade in Nades)
-            {
-                sw.WriteLine(nade);
-            }
-        }
-
-    }
-    public void OnHelp(CCSPlayerController? player)
-    {
-        if (player == null) return;
-        if (!player.PlayerPawn.IsValid) return;
-        PrintHelp(player);     
-    }
-
 
     private void rconPassword(CCSPlayerController? player,string password)
     {
@@ -574,44 +430,7 @@ public class CSPraccPlugin : BasePlugin
         }
     }
 
-    private void TeleportPlayer(CCSPlayerController player, string grenadeName)
-    {
-        foreach (var nade in Nades)
-        {
-            if (nade.Map == Server.MapName)
-            {
-                if (nade.Title == grenadeName)
-                {
-                    player.PlayerPawn.Value.Teleport(nade.PlayerPosition, new QAngle(nade.PlayerAngle.X, nade.PlayerAngle.Y, nade.PlayerAngle.Z), nade.Velocity);
-                }
-            }
-        }
-    }
 
-    /// <summary>
-    /// reading out spawns from map
-    /// </summary>
-    public void GetSpawns()
-    {
-        var spawnsct = Utilities.FindAllEntitiesByDesignerName<CBaseEntity>("info_player_counterterrorist");
-
-        foreach (var spawn in spawnsct)
-        {
-            if (spawn.IsValid)
-            {
-                SpawnsCT.Add(new Position(spawn.CBodyComponent!.SceneNode!.AbsOrigin, spawn.CBodyComponent.SceneNode.AbsRotation));
-            }
-        }
-        var spawnst = Utilities.FindAllEntitiesByDesignerName<CBaseEntity>("info_player_terrorist");
-        foreach (var spawn in spawnst)
-        {
-            if (spawn.IsValid)
-            {
-                SpawnsT.Add(new Position(spawn.CBodyComponent!.SceneNode!.AbsOrigin, spawn.CBodyComponent.SceneNode.AbsRotation));
-            }
-        }
-
-    }
     /// <summary>
     /// Load Required Files
     /// </summary>
@@ -627,17 +446,6 @@ public class CSPraccPlugin : BasePlugin
 
             }
         }
-        Nades = new List<SavedNade> { };
-        GrenadeFile = new FileInfo(Path.Combine(ModuleDirectory, "GrenadeFile.cfg"));
-        if (GrenadeFile.Exists)
-        {
-           
-            Logging.LogMessage("GrenadeFile exists");
-            using (StreamReader sr = new StreamReader(File.OpenRead(GrenadeFile.FullName)))
-            {
-                Nades.Add(new SavedNade(sr.ReadLine()));
-            }
-        }
     }
 
     /// <summary>
@@ -645,8 +453,6 @@ public class CSPraccPlugin : BasePlugin
     /// </summary>
     private void Reset()
     {
-        SpawnsCT.Clear();
-        SpawnsT.Clear();
         match.SwitchTo(match.CurrentMode, true);
     }
 

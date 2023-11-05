@@ -14,17 +14,68 @@ namespace CSPracc.DataModules
     public class SavedNade
     {
 
-        [XmlAttribute("PlayerPosition")]
-        public CounterStrikeSharp.API.Modules.Utils.Vector PlayerPosition { get; set; }
+        [XmlIgnore]
+        public CounterStrikeSharp.API.Modules.Utils.Vector PlayerPosition { 
+            get { return new CounterStrikeSharp.API.Modules.Utils.Vector(PlayerPositionX, PlayerPositionY, PlayerPositionZ); } 
+            set { } }
 
-        [XmlAttribute("Velocity")]
-        public CounterStrikeSharp.API.Modules.Utils.Vector Velocity {  get; set; }
+        private float _playerPositionX = 0.0f;
+        [XmlAttribute("PlayerPositionX")]
+        public float PlayerPositionX {
+            get { return _playerPositionX; }
+            set { _playerPositionX = value; }
 
-        [XmlAttribute("GrenadeCoordinates")]
+        }
+        private float _playerPositionY = 0.0f;
+        [XmlAttribute("PlayerPositionY")]
+        public float PlayerPositionY
+        {
+            get { return _playerPositionY; }
+            set { _playerPositionY = value; }
+        }
+        private float _playerPositionZ = 0.0f;
+        [XmlAttribute("PlayerPositionZ")]
+        public float PlayerPositionZ
+        {
+            get { return _playerPositionZ; }
+            set { _playerPositionZ = value; }
+        }
+
+        [XmlIgnore]
+        public CounterStrikeSharp.API.Modules.Utils.Vector Velocity { get { return new CounterStrikeSharp.API.Modules.Utils.Vector(0, 0, 0);  } set { } }
+
+        [XmlIgnore]
         public CounterStrikeSharp.API.Modules.Utils.Vector GrenadeCordinates { get; set; }
 
-        [XmlAttribute("PlayerAngle")]
-        public CounterStrikeSharp.API.Modules.Utils.Vector PlayerAngle { get;set; }
+        [XmlIgnore]
+        public CounterStrikeSharp.API.Modules.Utils.Vector PlayerAngle
+        {
+            get { return new CounterStrikeSharp.API.Modules.Utils.Vector(PlayerAngleX, PlayerAngleY, PlayerAngleZ); }
+            set { }
+        }
+
+        private float _playerAngleX = 0.0f;
+        [XmlAttribute("PlayerAngleX")]
+        public float PlayerAngleX
+        {
+            get { return _playerAngleX; }
+            set { _playerAngleX = value; }
+        }
+        private float _playerAngleY = 0.0f;
+        [XmlAttribute("PlayerAngleY")]
+        public float PlayerAngleY
+        {
+            get { return _playerAngleY; }
+            set { _playerAngleY = value; }
+        }
+        private float _playerAngleZ = 0.0f;
+        [XmlAttribute("PlayerAngleZ")]
+        public float PlayerAngleZ
+        {
+            get { return _playerAngleZ; }
+            set { _playerAngleZ = value; }
+        }
+
 
         [XmlAttribute("Title")]
         public string Title {  get; set; }
@@ -35,39 +86,14 @@ namespace CSPracc.DataModules
         [XmlAttribute("Map")]
         public string Map { get; set; }
 
-        public SavedNade(string configFileLine)
-        {
-            PlayerPosition = new CounterStrikeSharp.API.Modules.Utils.Vector();
-            PlayerAngle = new CounterStrikeSharp.API.Modules.Utils.Vector();
-            Velocity = new CounterStrikeSharp.API.Modules.Utils.Vector(0, 0, 0);
-            List<string> lines = configFileLine.Split(';').ToList();
-            if(lines.Count == 9)
-            {
-                PlayerPosition.X = (float)Convert.ToDouble(lines[0]);
-                PlayerPosition.Y = (float)Convert.ToDouble(lines[1]);
-                PlayerPosition.Z = (float)Convert.ToDouble(lines[2]);
-
-                PlayerAngle.X = (float)Convert.ToDouble(lines[3]);
-                PlayerAngle.Y = (float)Convert.ToDouble(lines[4]);
-                PlayerAngle.Z = (float)Convert.ToDouble(lines[5]);
-
-                Title = lines[6];
-                Description = lines[7];
-                Map = lines[8];
-            }
-
-        }
-
         public SavedNade(CounterStrikeSharp.API.Modules.Utils.Vector palyerPos, CounterStrikeSharp.API.Modules.Utils.QAngle playerangle, CounterStrikeSharp.API.Modules.Utils.Vector grenadeCord,  string title, string description, string map) 
         {
-            PlayerPosition = new CounterStrikeSharp.API.Modules.Utils.Vector();
-            PlayerPosition.X = palyerPos.X;
-            PlayerPosition.Y = palyerPos.Y;
-            PlayerPosition.Z = palyerPos.Z+4;
-            PlayerAngle = new CounterStrikeSharp.API.Modules.Utils.Vector();
-            PlayerAngle.X = playerangle.X;
-            PlayerAngle.Y = playerangle.Y;
-            PlayerAngle.Z = playerangle.Z;
+            PlayerPositionX = palyerPos.X;
+            PlayerPositionY = palyerPos.Y;
+            PlayerPositionZ = palyerPos.Z+4;
+            PlayerAngleX = playerangle.X;
+            PlayerAngleY = playerangle.Y;
+            PlayerAngleZ = playerangle.Z;
             Velocity = new CounterStrikeSharp.API.Modules.Utils.Vector(0,0,0);
             GrenadeCordinates = grenadeCord;
             Title = title;

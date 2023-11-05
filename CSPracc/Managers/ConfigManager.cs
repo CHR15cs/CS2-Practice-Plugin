@@ -20,11 +20,21 @@ namespace CSPracc
         public List<string> Admins;
 
         [XmlElement]
-        public List<SavedNade> SavedNades;
+        public List<SavedNade> SavedNades
+        {
+            get
+            {
+                return NadeManager.Nades;
+            }
+            set
+            {
+                NadeManager.Nades = value;
+            }
+        }
 
         public ConfigManager()
         {
-            SavedNades = new List<SavedNade>();
+            SavedNades = NadeManager.Nades!;
         }
     }
 }

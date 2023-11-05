@@ -35,6 +35,7 @@ namespace CSPracc.DataModules.consts
         public const string FAKERCON = ".rcon";
         public const string BACKUPMENU = ".backup";
         public const string NADES = ".nades";
+        public const string SAVE = ".save";
     }
     public class Strings
     {

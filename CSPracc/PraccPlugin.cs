@@ -23,13 +23,37 @@ using System.Xml.Serialization;
 
 public class CSPraccPlugin : BasePlugin
 {
-    Dictionary<byte,List<Position>> SpawnPositions;
     List<CSPracc.DataModules.Player>? Players;
     
     private Match match;
-    private FileInfo GrenadeFile;
-    private static FileInfo adminFile;
-    public static List<SteamID> AdminList = new List<SteamID>();
+    private static List<SteamID> _adminList = null;
+    public static List<SteamID> AdminList
+    {
+        get
+        {
+            if(_adminList == null)
+            {
+                _adminList = new List<SteamID>();
+                if (Config != null)
+                {
+                    foreach (string admin in Config.Admins)
+                    {
+                        try
+                        {
+                            _adminList.Add(new SteamID(admin));
+                        }
+                        catch 
+                        {
+                            Server.PrintToConsole("ignored admin: " + admin);
+                        }
+                        
+                    }
+                }
+            }
+            return _adminList;
+
+        }
+    }
 
 
     #region properties
@@ -65,8 +89,10 @@ public class CSPraccPlugin : BasePlugin
         {
             if (_rconPassword == String.Empty)
             {
-                //ToDo read out rcon password
-                _rconPassword = "geheim";
+               if(Config != null)
+                {
+                    _rconPassword = Config.RconPassword;
+                }
             }
             return _rconPassword;
         }
@@ -111,10 +137,8 @@ public class CSPraccPlugin : BasePlugin
         base.Load(hotReload);
         _moduleDir = new DirectoryInfo(ModuleDirectory);
         Logging logging = new Logging(new FileInfo(Path.Combine(ModuleDir.FullName, "Logging.txt")));
-        adminFile = new FileInfo(Path.Combine(CSPraccPlugin.ModuleDir.FullName, "admin.ini"));
         configManagerFile = new FileInfo(Path.Combine(ModuleDir.FullName, "configmanager.xml"));
         Players = new List<CSPracc.DataModules.Player>();
-        SpawnPositions = new Dictionary<byte, List<Position>>();
         match = new Match();
         XmlSerializer serializer = new XmlSerializer(typeof(ConfigManager));
         if (configManagerFile.Exists)
@@ -132,9 +156,6 @@ public class CSPraccPlugin : BasePlugin
             Config.SavedNades.Add(new SavedNade(new Vector(0, 0, 0), new QAngle(0, 0, 0), new Vector(0, 0, 0), "test nade", "test", "de_test"));
             WriteConfig(Config);
         }
-
-
-        LoadFiles();
         RegisterListener<Listeners.OnMapStart>((mapName) =>
         {
             Reset();
@@ -427,24 +448,6 @@ public class CSPraccPlugin : BasePlugin
         foreach (FileInfo file in CsgoDir.GetFiles("backup_round*"))
         {
             file.Delete();
-        }
-    }
-
-
-    /// <summary>
-    /// Load Required Files
-    /// </summary>
-    private void LoadFiles()
-    {
-        if (adminFile.Exists)
-        {
-            Logging.LogMessage("PRACC, AdminIni Exsits");
-            List<string> steamIdsAdmin = File.ReadAllLines(adminFile.FullName).ToList();
-            foreach (string steamId in steamIdsAdmin)
-            {
-                AdminList.Add(new SteamID(steamId));
-
-            }
         }
     }
 

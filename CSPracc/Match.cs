@@ -63,8 +63,15 @@ namespace CSPracc
         }
 
 
-        public void Restart()
+        public void Restart(CCSPlayerController player)
         {
+            if (player == null) return;
+            if (!player.PlayerPawn.IsValid) return;
+            if (!player.IsAdmin())
+            {
+                player.PrintToCenter("Only admins can execute this command!");
+                return;
+            }
             if (state == DataModules.enums.match_state.warmup || currentMode != DataModules.enums.PluginMode.Match) { return; }
             Methods.MsgToServer("Restarting game.");
             Server.ExecuteCommand(DataModules.consts.COMMANDS.RESTART_GAME);

@@ -226,6 +226,7 @@ public class CSPraccPlugin : BasePlugin
 
         }
         Logging.LogMessage($"OnPlayerChat found command {commandWithArgs}");
+
         switch (command)
         {
             case PRACC_COMMAND.HELP:
@@ -237,13 +238,64 @@ public class CSPraccPlugin : BasePlugin
                 {
                     ShowModeMenu(player);
                     break;
-                }
+                }          
+            case PRACC_COMMAND.FAKERCON:
+                {
+                    OnFakeRcon(player,args); 
+                    break;
+                }          
+            case PRACC_COMMAND.MAP:
+            {
+                    match.ChangeMap(player,args);
+                    break;
+            }
+            default:
+            {
+                    if(match.CurrentMode == enums.PluginMode.Match)
+                    {
+                        MatchCommands(player,command,args);
+                    }
+                    if(match.CurrentMode == enums.PluginMode.Pracc)
+                    {
+                        PracticeCommands(player,command,args);
+                    }
+                    break;
+            }
+        }
+
+        return HookResult.Changed;
+    }
+
+    private void PracticeCommands(CCSPlayerController player,string command,string args)
+    {
+        Logging.LogMessage($"OnPlayerChat found command {command} args {args}");
+        switch (command)
+        {
             case PRACC_COMMAND.SPAWN:
                 {
                     if (match.CurrentMode != enums.PluginMode.Pracc) break;
                     SpawnManager.TeleportToSpawn(player, args);
                     break;
                 }
+            case PRACC_COMMAND.NADES:
+                {
+                    if (match.CurrentMode != enums.PluginMode.Pracc) break;
+                    ChatMenus.OpenMenu(player, NadeManager.NadeMenu);
+                    break;
+                }
+            case PRACC_COMMAND.SAVE:
+                {
+                    NadeManager.AddGrenade(player, args);
+                    break;
+                }
+        }
+    }
+
+    private void MatchCommands(CCSPlayerController player, string command, string args)
+    {
+        Logging.LogMessage($"OnPlayerChat found command {command} args {args}");
+        switch (command)
+        {
             case PRACC_COMMAND.WARMUP:
                 {
                     match.Rewarmup(player);
@@ -261,7 +313,7 @@ public class CSPraccPlugin : BasePlugin
                 }
             case PRACC_COMMAND.FORCEREADY:
                 {
-                    match.Start(player); 
+                    match.Start(player);
                     break;
                 }
             case PRACC_COMMAND.COACH:
@@ -274,40 +326,22 @@ public class CSPraccPlugin : BasePlugin
                     match.StopCoach(player);
                     break;
                 }
-            case PRACC_COMMAND.FAKERCON:
-                {
-                    OnFakeRcon(player,args); 
-                    break;
-                }
             case PRACC_COMMAND.BACKUPMENU:
                 {
                     match.RestoreBackup(player);
                     break;
                 }
-            case PRACC_COMMAND.NADES:
-                {
-                    if (match.CurrentMode != enums.PluginMode.Pracc) break;
-                    ChatMenus.OpenMenu(player, NadeManager.NadeMenu);
-                    break;
-                }
-            case PRACC_COMMAND.SAVE:
-                {
-                    NadeManager.AddGrenade(player, args);
-                    break;
-                }
-            case PRACC_COMMAND.MAP:
-            {
-                    match.ChangeMap(player,args);
-                    break;
-            }
             case PRACC_COMMAND.FORCEUNPAUSE:
                 {
-                    match.ForceUnpause(player); 
+                    match.ForceUnpause(player);
+                    break;
+                }
+            case PRACC_COMMAND.RESTART:
+                {
+                    match.Restart(player);
                     break;
                 }
         }
-
-        return HookResult.Changed;
     }
     #endregion
 
@@ -352,11 +386,6 @@ public class CSPraccPlugin : BasePlugin
             return;
         }
         Server.ExecuteCommand(args);
-    }
-
-    public void OnLoadBackupMenu(CCSPlayerController? player)
-    {
-        
     }
 
     public void PrintHelp(CCSPlayerController? player)

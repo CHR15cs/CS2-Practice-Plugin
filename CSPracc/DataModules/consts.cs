@@ -37,6 +37,7 @@ namespace CSPracc.DataModules.consts
         public const string NADES = ".nades";
         public const string SAVE = ".save";
         public const string MAP = ".map";
+        public const string RESTORE = ".restore";
     }
     public class Strings
     {

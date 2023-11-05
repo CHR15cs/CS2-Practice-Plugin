@@ -138,7 +138,7 @@ namespace CSPracc
 
         public void SwitchTo(DataModules.enums.PluginMode pluginMode, bool force = false)
         {
-            if(pluginMode == currentMode) { return; }
+            if(pluginMode == currentMode && !force) { return; }
             switch (pluginMode)
             {
                 case DataModules.enums.PluginMode.Standard:

@@ -5,6 +5,30 @@ Open Source Plugin for Counterstrike 2 based on [CounterStrikeSharp](https://git
 Currently in an early stage of development.
 Plugin might be unstable or not working.
 
+## Implemted Features
+### QOL
+- [ ] Defining aliases for commands
+- [ ] .ct .t .spec
+- [x] .rcon
+- [x] !rcon_password for temporary admin rights
+- [x] config file for rcon password and permanent admin list      
+### Practice Mode
+- [x] Practice Config, Infinite Ammo etc             
+- [x] Grenade Practice
+- [x] Spawns
+- [ ] Bot commands
+- [ ] Rethrow
+- [ ] watchme
+### Match Mode
+- [x] Pause
+- [x] Unpause
+- [x] Backup
+- [x] forceready
+- [x] restart
+- [x] warmup 
+- [ ] coach slot
+- [ ] demo recording incl. upload of demo file to media server for easy sharing
+
 ## Files
         configmanager.xml
                 Stores list of admins, rcon password, list of saved grenades etc.

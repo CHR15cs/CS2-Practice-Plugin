@@ -300,6 +300,11 @@ public class CSPraccPlugin : BasePlugin
                     NadeManager.AddGrenade(player, args);
                     break;
                 }
+            case PRACC_COMMAND.MAP:
+            {
+                    match.ChangeMap(player,args);
+                    break;
+            }
         }
 
         return HookResult.Changed;

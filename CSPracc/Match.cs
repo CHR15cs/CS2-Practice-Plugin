@@ -136,6 +136,22 @@ namespace CSPracc
 
         }
 
+        public void ChangeMap(CCSPlayerController player,string mapName)
+        {
+            if (player == null) return;
+            if (!player.PlayerPawn.IsValid) { return; }
+            if (!player.IsAdmin()) { player.PrintToCenter("Only admins can execute this command!"); return; }
+            if (mapName == null) return;
+            if(mapName.Length == 0) return;
+            if(!mapName.StartsWith("de_"))
+            {
+                mapName = "de_" + mapName;
+            }
+            Server.ExecuteCommand($"say Changing map to {mapName}");
+            Server.ExecuteCommand($"changelevel {mapName}");
+
+        }
+
         public void SwitchTo(DataModules.enums.PluginMode pluginMode, bool force = false)
         {
             if(pluginMode == currentMode && !force) { return; }

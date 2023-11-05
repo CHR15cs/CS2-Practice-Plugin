@@ -300,6 +300,11 @@ public class CSPraccPlugin : BasePlugin
                     match.ChangeMap(player,args);
                     break;
             }
+            case PRACC_COMMAND.FORCEUNPAUSE:
+                {
+                    match.ForceUnpause(player); 
+                    break;
+                }
         }
 
         return HookResult.Changed;

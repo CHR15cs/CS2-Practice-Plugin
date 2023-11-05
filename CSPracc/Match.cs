@@ -210,5 +210,16 @@ namespace CSPracc
             Methods.MsgToServer("Admin is using round restore manager.");
             RoundRestoreManager.OpenBackupMenu(player);
         }
+
+        public void ForceUnpause(CCSPlayerController player)
+        {
+            if (CurrentMode != enums.PluginMode.Match) { return; }
+            if (player == null) { return; }
+            if (!player.IsValid) { return; }
+            if (!player.IsAdmin()) { player.PrintToCenter("Only admins can execute this command!"); return; }
+            ReadyTeamCT = true;
+            ReadyTeamT = true;
+            Server.ExecuteCommand(DataModules.consts.COMMANDS.UNPAUSE_MATCH);
+        }
     }
 }

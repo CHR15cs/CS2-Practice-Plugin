@@ -32,7 +32,6 @@ Plugin might be unstable or not working.
 - [ ] Setting custom spawns
 - [ ] Setting random amount or fixed hp
 - [ ] custom weapon pools
-- [ ] 
 ## Files
         configmanager.xml
                 Stores list of admins, rcon password, list of saved grenades etc.

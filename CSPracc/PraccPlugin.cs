@@ -20,6 +20,7 @@ using CSPracc.DataModules;
 using CSPracc.DataModules.consts;
 using System.Xml;
 using System.Xml.Serialization;
+using CSPracc.Managers;
 
 public class CSPraccPlugin : BasePlugin
 {
@@ -75,13 +76,7 @@ public class CSPraccPlugin : BasePlugin
 
     private static DirectoryInfo _moduleDir;
     public static DirectoryInfo ModuleDir => _moduleDir;
-    public static FileInfo AdminIni
-    {
-        get
-        {
-            return new FileInfo(Path.Combine(ModuleDir.FullName, "admin.ini"));
-        }
-    }
+
     private string _rconPassword = String.Empty;
     private string RconPassword
     {
@@ -97,8 +92,8 @@ public class CSPraccPlugin : BasePlugin
             return _rconPassword;
         }
     }
-    DirectoryInfo _csgoDir = null;
-    DirectoryInfo CsgoDir
+   private static DirectoryInfo _csgoDir = null;
+    public static DirectoryInfo Cs2Dir
     {
         get
         {
@@ -261,7 +256,7 @@ public class CSPraccPlugin : BasePlugin
                 }
             case PRACC_COMMAND.UNPAUSE:
                 {
-                    match.Unpause();
+                    match.Unpause(player);
                     break;
                 }
             case PRACC_COMMAND.FORCEREADY:
@@ -286,7 +281,7 @@ public class CSPraccPlugin : BasePlugin
                 }
             case PRACC_COMMAND.BACKUPMENU:
                 {
-                    OnLoadBackupMenu(player); 
+                    match.RestoreBackup(player);
                     break;
                 }
             case PRACC_COMMAND.NADES:
@@ -356,30 +351,7 @@ public class CSPraccPlugin : BasePlugin
 
     public void OnLoadBackupMenu(CCSPlayerController? player)
     {
-        if (player == null) return;
-        if (!player.PlayerPawn.IsValid) return;
-        if (match.CurrentMode != enums.PluginMode.Match)
-        {
-            player?.PrintToCenter("Command can only be used in Match mode.");
-            return;
-        }
-        if (!player.IsAdmin())
-        {
-            player.PrintToCenter("Only admins can execute this command!");
-            return;
-        }
-        var backupMenu = new ChatMenu("Backup Menu");
-        var handleGive = (CCSPlayerController player, ChatMenuOption option) => ModeMenuOption(player, option.Text);
-
-        List<FileInfo> Backupfiles = new List<FileInfo>();
-             
-        Backupfiles = CsgoDir.GetFiles("backup_round*").ToList();
-        foreach(var file in Backupfiles)
-        {
-            string round = file.Name.Substring(file.Name.Length - 6,2);
-            backupMenu.AddMenuOption(round, handleGive);
-        }
-        ChatMenus.OpenMenu(player, backupMenu);
+        
     }
 
     public void PrintHelp(CCSPlayerController? player)
@@ -404,11 +376,6 @@ public class CSPraccPlugin : BasePlugin
     #endregion
 
     #region MenuOptions
-    private void BackupMenuOption(string BackupFile)
-    {
-        //ToDo Load Backup
-    }
-
 
     private void ModeMenuOption(CCSPlayerController player,string optionText)
     {
@@ -418,7 +385,7 @@ public class CSPraccPlugin : BasePlugin
                 this.match.SwitchTo(enums.PluginMode.Pracc);
                 break;
             case "Match":
-                DeleteBackupFiles();
+                RoundRestoreManager.CleanupOldFiles();
                 this.match.SwitchTo(enums.PluginMode.Match);
                 break;
             case "Help":
@@ -447,13 +414,7 @@ public class CSPraccPlugin : BasePlugin
     }
 
 
-    private void DeleteBackupFiles()
-    {
-        foreach (FileInfo file in CsgoDir.GetFiles("backup_round*"))
-        {
-            file.Delete();
-        }
-    }
+
 
     /// <summary>
     /// Resetting plugin settings

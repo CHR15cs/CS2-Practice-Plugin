@@ -11,6 +11,8 @@ using CounterStrikeSharp.API.Modules.Utils;
 using System.Text.RegularExpressions;
 using CSPracc.DataModules;
 using System.IO;
+using CSPracc.Managers;
+using CSPracc.DataModules.consts;
 
 namespace CSPracc
 {
@@ -20,6 +22,9 @@ namespace CSPracc
         private DataModules.enums.PluginMode currentMode = DataModules.enums.PluginMode.Standard;
         private DataModules.enums.match_state state = DataModules.enums.match_state.warmup;
         public DataModules.enums.PluginMode CurrentMode => currentMode;
+
+        bool ReadyTeamCT = false;
+        bool ReadyTeamT = false;
 
         public CCSPlayerController CoachTeam1 { get; set; }
         public CCSPlayerController CoachTeam2 { get; set; }
@@ -32,19 +37,36 @@ namespace CSPracc
         public void Pause()
         {
             if (state == DataModules.enums.match_state.warmup || currentMode != DataModules.enums.PluginMode.Match) { return; }
+            Methods.MsgToServer("Match paused. Waiting for both teams to .unpause");
             Server.ExecuteCommand(DataModules.consts.COMMANDS.PAUSE_MATCH);
         }
 
-        public void Unpause()
+        public void Unpause(CCSPlayerController player)
         {
             if (state == DataModules.enums.match_state.warmup || currentMode != DataModules.enums.PluginMode.Match) { return; }
-            Server.ExecuteCommand(DataModules.consts.COMMANDS.UNPAUSE_MATCH);
+            if(player.TeamNum == (float)CsTeam.CounterTerrorist)
+            {
+                ReadyTeamCT = true;
+                DataModules.consts.Methods.MsgToServer("CT Side is now ready!");
+            }
+            if (player.TeamNum == (float)CsTeam.Terrorist)
+            {
+                ReadyTeamT = true;
+                DataModules.consts.Methods.MsgToServer("T Side is now ready!");
+            }
+            if(ReadyTeamCT && ReadyTeamT) 
+            {
+                Methods.MsgToServer("Both Teams are now ready. Unpausing match!");
+                Server.ExecuteCommand(DataModules.consts.COMMANDS.UNPAUSE_MATCH);
+            }
+            
         }
 
 
         public void Restart()
         {
             if (state == DataModules.enums.match_state.warmup || currentMode != DataModules.enums.PluginMode.Match) { return; }
+            Methods.MsgToServer("Restarting game.");
             Server.ExecuteCommand(DataModules.consts.COMMANDS.RESTART_GAME);
         }
 
@@ -58,6 +80,7 @@ namespace CSPracc
                 return;
             }
             if (state == DataModules.enums.match_state.warmup || currentMode != DataModules.enums.PluginMode.Match) { return; }
+            Methods.MsgToServer("Starting Warmup.");
             Server.ExecuteCommand(DataModules.consts.COMMANDS.START_WARMUP);
         }
 
@@ -69,6 +92,7 @@ namespace CSPracc
 
             if (state == DataModules.enums.match_state.live || currentMode != DataModules.enums.PluginMode.Match) { return; }
             state = DataModules.enums.match_state.live;
+            Methods.MsgToServer("Starting Match!");
             Server.ExecuteCommand(DataModules.consts.COMMANDS.START_MATCH);
         }
 
@@ -113,7 +137,6 @@ namespace CSPracc
                 if(CoachTeam1 == null)
                 {
                     CoachTeam1 = playerController;
-                    Server.ExecuteCommand($"say {CoachTeam1.Clan.Value}");
                     CoachTeam1.PrintToCenter("Your the T coach now.");
                 }
                 else
@@ -175,6 +198,17 @@ namespace CSPracc
                     currentMode = pluginMode;
                     break;
             }
+        }
+
+        public void RestoreBackup(CCSPlayerController player)
+        {
+            if(CurrentMode != enums.PluginMode.Match) { return; }
+            if(player == null) { return; }
+            if(!player.IsValid) { return; }
+            if(!player.IsAdmin()) { player.PrintToCenter("Only admins can execute this command!"); return; }
+            Pause();
+            Methods.MsgToServer("Admin is using round restore manager.");
+            RoundRestoreManager.OpenBackupMenu(player);
         }
     }
 }

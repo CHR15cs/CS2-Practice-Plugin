@@ -314,7 +314,6 @@ public class CSPraccPlugin : BasePlugin
     #region commands
     public void ShowModeMenu(CCSPlayerController? player)
     {
-        Server.ExecuteCommand("say command show mode menu reached");
         if (player == null)
         {
             Server.ExecuteCommand("say player is null");

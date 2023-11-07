@@ -39,6 +39,8 @@ namespace CSPracc.DataModules.consts
         public const string MAP = ".map";
         public const string RESTORE = ".restore";
         public const string FORCEUNPAUSE = ".forceunpause";
+        public const string BOT = ".bot";
+        public const string BOOST = ".boost";
     }
     public class Strings
     {

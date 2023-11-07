@@ -24,6 +24,8 @@ using CSPracc.Managers;
 
 public class CSPraccPlugin : BasePlugin
 {
+   public static CSPraccPlugin Instance { get; private set; }
+
     List<CSPracc.DataModules.Player>? Players;
     
     private Match match;
@@ -56,6 +58,7 @@ public class CSPraccPlugin : BasePlugin
         }
     }
 
+    private BotManager BotManager;
 
     #region properties
     public override string ModuleName
@@ -155,6 +158,8 @@ public class CSPraccPlugin : BasePlugin
         {
             Reset();
         });
+        BotManager = new BotManager();
+        Instance = this;
     }
 
     public static void WriteConfig(ConfigManager config)
@@ -286,6 +291,16 @@ public class CSPraccPlugin : BasePlugin
             case PRACC_COMMAND.SAVE:
                 {
                     NadeManager.AddGrenade(player, args);
+                    break;
+                }
+            case PRACC_COMMAND.BOT:
+                {
+                    BotManager.AddBot(player);
+                    break;
+                }
+            case PRACC_COMMAND.BOOST:
+                {
+                    BotManager.Boost(player);
                     break;
                 }
         }
@@ -460,4 +475,15 @@ public class CSPraccPlugin : BasePlugin
 
     #endregion
 
+    #region events
+    [GameEventHandler]
+    public HookResult OnPlayerSpawn(EventPlayerSpawn @event, GameEventInfo info)
+    {
+        if(match.CurrentMode == enums.PluginMode.Pracc) 
+        { 
+            BotManager.OnPlayerSpawn(@event, info);
+        }
+        return HookResult.Continue;
+    }
+    #endregion
 }

@@ -16,12 +16,12 @@ Plugin might be unstable or not working.
 - [x] Practice Config, Infinite Ammo etc             
 - [x] Grenade Practice
 - [x] Spawns
-- [ ] Bot commands
-        [x] .bot
-        [x] .boot
-        [ ] .crouchbot
 - [ ] Rethrow
 - [ ] watchme
+#### Bot Commands
+- [x] .bot
+- [x] .boost
+- [ ] .crouchbot
 ### Match Mode
 - [x] Pause
 - [x] Unpause

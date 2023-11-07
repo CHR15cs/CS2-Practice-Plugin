@@ -17,6 +17,9 @@ Plugin might be unstable or not working.
 - [x] Grenade Practice
 - [x] Spawns
 - [ ] Bot commands
+        [x] .bot
+        [x] .boot
+        [ ] .crouchbot
 - [ ] Rethrow
 - [ ] watchme
 ### Match Mode

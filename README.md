@@ -1,6 +1,10 @@
 # CS2-Practice-Plugin
 Open Source Plugin for Counterstrike 2 based on [CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp)
 
+## Credits
+For bot command implementation:
+https://github.com/shobhit-pathak/MatchZy/
+
 ## Important
 Currently in an early stage of development.
 Plugin might be unstable or not working.
@@ -21,6 +25,7 @@ Plugin might be unstable or not working.
 #### Bot Commands
 - [x] .bot
 - [x] .boost
+- [ ] .nobot
 - [ ] .crouchbot
 ### Match Mode
 - [x] Pause

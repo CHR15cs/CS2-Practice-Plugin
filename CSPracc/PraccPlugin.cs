@@ -485,5 +485,15 @@ public class CSPraccPlugin : BasePlugin
         }
         return HookResult.Continue;
     }
+
+    [GameEventHandler]
+    public HookResult OnPlayerSpawn(EventPlayerBlind @event, GameEventInfo info)
+    {
+        if (match.CurrentMode == enums.PluginMode.Pracc)
+        {
+            Methods.MsgToServer($"Flash duration: {@event.BlindDuration.ToString("0.00")}s");
+        }
+        return HookResult.Continue;
+    }
     #endregion
 }

@@ -86,7 +86,7 @@ namespace CSPracc
                 player.PrintToCenter("Only admins can execute this command!");
                 return;
             }
-            if (state == DataModules.enums.match_state.warmup || currentMode != DataModules.enums.PluginMode.Match) { return; }
+            if ( currentMode != DataModules.enums.PluginMode.Match) { return; }
             Methods.MsgToServer("Starting Warmup.");
             Server.ExecuteCommand(DataModules.consts.COMMANDS.START_WARMUP);
         }

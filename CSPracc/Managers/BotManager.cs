@@ -51,13 +51,103 @@ namespace CSPracc.Managers
         /// <summary>
         /// Boost player onto bot
         /// </summary>
-        /// <param name="player"></param>
+        /// <param name="player">player called the command</param>
         public static void Boost(CCSPlayerController player)
         {
             AddBot(player);
             Logging.LogMessage("Elevating player");
            CSPraccPlugin.Instance.AddTimer(0.2f, () => ElevatePlayer(player));
         }
+
+        /// <summary>
+        /// Remove closest bot to the player
+        /// </summary>
+        /// <param name="player">player called the command</param>
+        public static void NoBot(CCSPlayerController player)
+        {
+            CCSPlayerController closestBot = null;
+            float Distance = 0;
+            foreach (Dictionary<string, object> botDict in spawnedBots.Values)
+            {
+                
+                CCSPlayerController botOwner = (CCSPlayerController)botDict["owner"];
+                CCSPlayerController bot = (CCSPlayerController)botDict["controller"];
+                if(!bot.IsValid)
+                {
+                    continue;
+                }
+                if (botOwner.UserId == player.UserId)
+                {
+                    Logging.LogMessage("found bot of player");
+                    if (closestBot == null)
+                    {
+                        closestBot = bot;
+                        Distance = absolutDistance(botOwner, bot);
+                    }
+                    float tempDistance = absolutDistance(botOwner, bot);
+                    if(tempDistance< Distance) 
+                    {
+                        Distance = tempDistance;
+                        closestBot = bot;
+                    }
+                }
+            }
+            if(closestBot != null)
+            {
+                Logging.LogMessage($"kickid {closestBot.UserId}");
+                Server.ExecuteCommand($"kickid {closestBot.UserId}");
+                spawnedBots[(int)closestBot.UserId] = null;
+                spawnedBots.Remove((int)closestBot.UserId);
+            }
+        }
+
+        /// <summary>
+        /// Calculate difference in coordinates between a player and a bot
+        /// </summary>
+        /// <param name="player">player</param>
+        /// <param name="bot">bot</param>
+        /// <returns>absolut distance x+y</returns>
+        private static float absolutDistance(CCSPlayerController player, CCSPlayerController bot)
+        {
+            float distanceX = 0;
+            float distanceY = 0;
+            Vector playerPos = player.PlayerPawn!.Value.CBodyComponent!.SceneNode!.AbsOrigin;
+            Vector botPos = bot!.PlayerPawn!.Value.CBodyComponent!.SceneNode!.AbsOrigin;
+            distanceX = playerPos.X - botPos.X;
+            distanceY = playerPos.Y - botPos.Y;
+            if(distanceX < 0)
+            {
+                distanceX *= -1;
+            }
+            if (distanceY < 0)
+            {
+                distanceY *= -1;
+            }
+            Logging.LogMessage($"calculating distance {distanceX + distanceY}");
+            return distanceX + distanceY;
+        }
+
+        /// <summary>
+        /// Remove all bots of the player
+        /// </summary>
+        /// <param name="player"></param>
+        public static void ClearBots(CCSPlayerController player)
+        {
+            foreach(Dictionary<string,object> botDict in spawnedBots.Values)
+            {
+                CCSPlayerController botOwner = (CCSPlayerController)botDict["owner"];
+                CCSPlayerController bot = (CCSPlayerController)botDict["controller"];
+                if (botOwner.UserId == player.UserId)
+                {
+                    Server.ExecuteCommand($"kickid {bot.UserId}");
+                    spawnedBots[(int)bot.UserId] = null;
+                    spawnedBots.Remove((int)bot.UserId);
+                }
+                
+            }
+        }
+
+
 
         private static void ElevatePlayer(CCSPlayerController player)
         {

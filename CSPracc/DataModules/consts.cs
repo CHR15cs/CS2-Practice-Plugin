@@ -41,6 +41,9 @@ namespace CSPracc.DataModules.consts
         public const string FORCEUNPAUSE = ".forceunpause";
         public const string BOT = ".bot";
         public const string BOOST = ".boost";
+        public const string WATCHME = ".watchme";
+        public const string NOBOT = ".nobot";
+        public const string CLEARBOTS = ".clearbots";
     }
     public class Strings
     {

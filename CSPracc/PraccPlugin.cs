@@ -303,6 +303,30 @@ public class CSPraccPlugin : BasePlugin
                     BotManager.Boost(player);
                     break;
                 }
+            case PRACC_COMMAND.NOBOT:
+                {
+                    BotManager.NoBot(player);
+                    break;
+                }
+            case PRACC_COMMAND.CLEARBOTS:
+                {
+                    BotManager.ClearBots(player);
+                    break;
+                }
+            case PRACC_COMMAND.WATCHME:
+                {
+                    //Untestet
+                    var playerEntities = Utilities.FindAllEntitiesByDesignerName<CCSPlayerController>("cs_player_controller");
+                    foreach(var playerEnt in playerEntities)
+                    {
+                        if(playerEnt == null) continue;
+                        if(!playerEnt.IsValid) continue;
+                        //if(playerEnt.UserId == player.UserId) continue;
+                        //if (playerEnt.IsBot) continue;
+                        Logging.LogMessage($"Switching {playerEnt.PlayerName} to spectator");
+                    }
+                    break;
+                }
         }
     }
 

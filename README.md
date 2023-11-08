@@ -25,7 +25,8 @@ Plugin might be unstable or not working.
 #### Bot Commands
 - [x] .bot
 - [x] .boost
-- [ ] .nobot
+- [x] .nobot (removing closest bot)
+- [x] .clearbots (removing all bots of current player)
 - [ ] .crouchbot
 ### Match Mode
 - [x] Pause

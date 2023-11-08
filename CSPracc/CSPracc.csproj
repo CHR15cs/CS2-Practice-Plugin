@@ -9,10 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="7.0.12" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="CounterStrikeSharp.API">
       <HintPath>..\api\CounterStrikeSharp.API.dll</HintPath>
     </Reference>

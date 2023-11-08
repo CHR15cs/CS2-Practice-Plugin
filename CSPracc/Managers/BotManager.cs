@@ -111,11 +111,13 @@ namespace CSPracc.Managers
         {
             float distanceX = 0;
             float distanceY = 0;
+            float distanceZ = 0;
             Vector playerPos = player.PlayerPawn!.Value.CBodyComponent!.SceneNode!.AbsOrigin;
             Vector botPos = bot!.PlayerPawn!.Value.CBodyComponent!.SceneNode!.AbsOrigin;
             distanceX = playerPos.X - botPos.X;
             distanceY = playerPos.Y - botPos.Y;
-            if(distanceX < 0)
+            distanceZ = playerPos.Z - botPos.Z;
+            if (distanceX < 0)
             {
                 distanceX *= -1;
             }
@@ -123,8 +125,12 @@ namespace CSPracc.Managers
             {
                 distanceY *= -1;
             }
-            Logging.LogMessage($"calculating distance {distanceX + distanceY}");
-            return distanceX + distanceY;
+            if (distanceZ < 0)
+            {
+                distanceZ *= -1;
+            }
+            Logging.LogMessage($"calculating distance {distanceX + distanceY + distanceZ}");
+            return distanceX + distanceY + distanceZ;
         }
 
         /// <summary>

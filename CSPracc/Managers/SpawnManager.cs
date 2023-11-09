@@ -16,7 +16,7 @@ namespace CSPracc
     public static class SpawnManager
     {
         private static string lastMap = String.Empty;
-        private static Dictionary<byte, List<Position>> _spawns = null;
+        private static Dictionary<byte, List<Position>>? _spawns = null;
         /// <summary>
         /// Dictionary to store the spawns of the current map in
         /// </summary>
@@ -30,6 +30,7 @@ namespace CSPracc
                     if(lastMap == String.Empty)
                     {
                         lastMap = Server.MapName;
+                        Logging.LogMessage("Map now : " + lastMap);
                     }
                     getSpawns(ref _spawns);
                 }
@@ -37,21 +38,28 @@ namespace CSPracc
                 {
                     getSpawns(ref _spawns);
                 }
+                else
+                {
+                    Logging.LogMessage("Map still : " +  lastMap);  
+                }
                 return _spawns;
             }
+            set { _spawns = value; }
         }
         /// <summary>
         /// Read out the map based spawns and store them in a dictionary
         /// </summary>
         /// <param name="spawns">dictionary to store the spawns in</param>
         private static void getSpawns(ref Dictionary<byte,List<Position>> spawns)
-        {          
-            spawns = new Dictionary<byte, List<Position>>();
-            spawns.Add((byte)CsTeam.CounterTerrorist, new List<Position>());
-            spawns.Add((byte)CsTeam.Terrorist, new List<Position>());
+        {
+            Logging.LogMessage("Getting spawns");
+            _spawns!.Clear();
+            _spawns = new Dictionary<byte, List<Position>>();
+            _spawns.Add((byte)CsTeam.CounterTerrorist, new List<Position>());
+            _spawns.Add((byte)CsTeam.Terrorist, new List<Position>());
             var spawnsct = Utilities.FindAllEntitiesByDesignerName<CBaseEntity>("info_player_counterterrorist");
             foreach (var spawn in spawnsct)
-            {
+            {               
                 if (spawn.IsValid)
                 {
                     spawns[(byte)CsTeam.CounterTerrorist].Add(new Position(spawn.CBodyComponent!.SceneNode!.AbsOrigin, spawn.CBodyComponent.SceneNode.AbsRotation));
@@ -81,6 +89,7 @@ namespace CSPracc
             }
             catch (Exception ex)
             {
+                Logging.LogMessage($"{ex.Message}");
                 player.PrintToCenter("invalid parameter");
                 return;
             }
@@ -90,6 +99,7 @@ namespace CSPracc
                 player.PrintToCenter($"insufficient number of spawns found. spawns {SpawnManager.Spawns[player.TeamNum].Count} - {number}");
                 return;
             }
+            Logging.LogMessage($"teleport to: {SpawnManager.Spawns[player.TeamNum][number].PlayerPosition}");
             player.PlayerPawn.Value.Teleport(SpawnManager.Spawns[player.TeamNum][number].PlayerPosition, SpawnManager.Spawns[player.TeamNum][number].PlayerAngle, new Vector(0, 0, 0));
             player.PrintToCenter($"Teleporting to spawn {number + 1}");
         }

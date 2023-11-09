@@ -13,8 +13,8 @@ namespace CSPracc.DataModules
         public CounterStrikeSharp.API.Modules.Utils.QAngle PlayerAngle { get; private set; }
         public Position(CounterStrikeSharp.API.Modules.Utils.Vector playerPosition, CounterStrikeSharp.API.Modules.Utils.QAngle playerAngle)
         {
-            PlayerPosition = playerPosition;
-            PlayerAngle = playerAngle;
+            PlayerPosition = new CounterStrikeSharp.API.Modules.Utils.Vector(playerPosition.X, playerPosition.Y, playerPosition.Z);
+            PlayerAngle = new CounterStrikeSharp.API.Modules.Utils.QAngle(playerAngle.X, playerAngle.Y, playerAngle.Z);
         }
     }
 }

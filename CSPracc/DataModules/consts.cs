@@ -15,11 +15,14 @@ namespace CSPracc.DataModules.consts
         public static string RESTART_GAME = "mp_restartgame 1";
         public static string START_WARMUP = "exec CSPRACC\\warmup.cfg";
         public static string START_MATCH = "exec CSPRACC\\5on5.cfg";
+        public static string SWAP_TEAMS = "mp_swapteams 1";
     }
 
     public class PRACC_COMMAND
     {
         public const  string MODE = ".menu";
+        public const string PRACC = ".pracc";
+        public const string MATCH = ".match";
         public const string PAUSE = ".pause";
         public const  string UNPAUSE = ".unpause";
         public const string READY = ".ready";
@@ -44,6 +47,12 @@ namespace CSPracc.DataModules.consts
         public const string WATCHME = ".watchme";
         public const string NOBOT = ".nobot";
         public const string CLEARBOTS = ".clearbots";
+        public const string CROUCHBOT = ".crouchbot";
+        public const string CROUCHBOOST = ".crouchboost";
+        public const string GOT = ".t";
+        public const string GOCT = ".ct";
+        public const string GOSPEC = ".spec";
+        public const string SWAP = ".swap";
     }
     public class Strings
     {

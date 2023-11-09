@@ -12,7 +12,8 @@ Plugin might be unstable or not working.
 ## Implemted Features
 ### QOL
 - [ ] Defining aliases for commands
-- [ ] .ct .t .spec
+- [x] .ct .t .spec
+- [x] .swap
 - [x] .rcon
 - [x] !rcon_password for temporary admin rights
 - [x] config file for rcon password and permanent admin list      
@@ -21,13 +22,14 @@ Plugin might be unstable or not working.
 - [x] Grenade Practice
 - [x] Spawns
 - [ ] Rethrow
-- [ ] watchme
+- [x] watchme
 #### Bot Commands
 - [x] .bot
 - [x] .boost
 - [x] .nobot (removing closest bot)
 - [x] .clearbots (removing all bots of current player)
-- [ ] .crouchbot
+- [x] .crouchbot (known issue: if spawned standing up, kill bot and let it respawn)
+- [x] .crouchboost
 ### Match Mode
 - [x] Pause
 - [x] Unpause
@@ -53,6 +55,8 @@ Plugin might be unstable or not working.
         .help - Prints information about plugin usage
         .rcon <Command> - Executing server sided commands 
         .map <mapname>
+        .swap
+        .ct .t .spec
 
 ## Chat Commands available in match mode       
         .pause 
@@ -65,4 +69,9 @@ Plugin might be unstable or not working.
         .spawn <number> 
         .nades - Opens a menu of saved grenade lineups
         .save <name> <description> - Stores the current position and viewangle as grenade lineup used in .nades
+        .bot
+        .crouchbot
+        .boost
+        .crouchboost
+        .watchme
 

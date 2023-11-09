@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CSPracc.DataModules
 {
-    public static class enums
+    public static class Enums
     {
         public enum GRENADE_TYPE
         {

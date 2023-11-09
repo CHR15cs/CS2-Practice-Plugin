@@ -9,10 +9,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CounterStrikeSharp.API.Modules.Timers;
-using CounterStrikeSharp.API.Modules.Utils;
-using CounterStrikeSharp.API.Core;
 using CSPracc.DataModules.consts;
 using CounterStrikeSharp.API.Modules.Entities;
+using System.Net.Http.Headers;
+using CounterStrikeSharp.API.Modules.Memory;
+using System.Numerics;
+using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 
 namespace CSPracc.Managers
 {
@@ -27,7 +29,7 @@ namespace CSPracc.Managers
         /// Following code is heavily inspired by https://github.com/shobhit-pathak/MatchZy/blob/main/PracticeMode.cs
         /// </summary>
         /// <param name="player">play who added the bot</param>
-        public static void AddBot(CCSPlayerController player)
+        public static void AddBot(CCSPlayerController player,bool crouch = false)
         {
             if (player.TeamNum == (byte)CsTeam.Terrorist)
             {
@@ -42,7 +44,7 @@ namespace CSPracc.Managers
 
             // Adding a small timer so that bot can be added in the world
             // Once bot is added, we teleport it to the requested position
-            CSPraccPlugin.Instance.AddTimer(0.1f, () => SpawnBot(player));
+            CSPraccPlugin.Instance!.AddTimer(0.1f, () => SpawnBot(player,crouch));
             Server.ExecuteCommand("bot_stop 1");
             Server.ExecuteCommand("bot_freeze 1");
             Server.ExecuteCommand("bot_zombie 1");            
@@ -56,7 +58,26 @@ namespace CSPracc.Managers
         {
             AddBot(player);
             Logging.LogMessage("Elevating player");
-           CSPraccPlugin.Instance.AddTimer(0.2f, () => ElevatePlayer(player));
+           CSPraccPlugin.Instance!.AddTimer(0.2f, () => ElevatePlayer(player));
+        }
+
+        /// <summary>
+        /// Spawn a crouching bot
+        /// </summary>
+        /// <param name="player">player called the command</param>
+        public static void CrouchBot(CCSPlayerController player)
+        {
+            AddBot(player,true);
+        }
+
+        /// <summary>
+        /// Boost ontop of crouching bot
+        /// </summary>
+        /// <param name="player">player called the command</param>
+        public static void CrouchingBoostBot(CCSPlayerController player)
+        {
+            AddBot(player, true);
+            CSPraccPlugin.Instance!.AddTimer(0.2f, () => ElevatePlayer(player));
         }
 
         /// <summary>
@@ -65,7 +86,7 @@ namespace CSPracc.Managers
         /// <param name="player">player called the command</param>
         public static void NoBot(CCSPlayerController player)
         {
-            CCSPlayerController closestBot = null;
+            CCSPlayerController? closestBot = null;
             float Distance = 0;
             foreach (Dictionary<string, object> botDict in spawnedBots.Values)
             {
@@ -95,9 +116,8 @@ namespace CSPracc.Managers
             if(closestBot != null)
             {
                 Logging.LogMessage($"kickid {closestBot.UserId}");
-                Server.ExecuteCommand($"kickid {closestBot.UserId}");
-                spawnedBots[(int)closestBot.UserId] = null;
-                spawnedBots.Remove((int)closestBot.UserId);
+                Server.ExecuteCommand($"kickid {closestBot.UserId}");            
+                spawnedBots.Remove((int)closestBot.UserId!);
             }
         }
 
@@ -146,8 +166,7 @@ namespace CSPracc.Managers
                 if (botOwner.UserId == player.UserId)
                 {
                     Server.ExecuteCommand($"kickid {bot.UserId}");
-                    spawnedBots[(int)bot.UserId] = null;
-                    spawnedBots.Remove((int)bot.UserId);
+                    spawnedBots.Remove((int)bot.UserId!);
                 }
                 
             }
@@ -161,7 +180,7 @@ namespace CSPracc.Managers
             Logging.LogMessage($"boosting player: {player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.X} - {player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.Y} - {player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.Z + 80.0f}");
         }
 
-        private static void SpawnBot(CCSPlayerController botOwner)
+        private static void SpawnBot(CCSPlayerController botOwner, bool crouch = false)
         {
             var playerEntities = Utilities.FindAllEntitiesByDesignerName<CCSPlayerController>("cs_player_controller");
             bool unusedBotFound = false;
@@ -192,7 +211,15 @@ namespace CSPracc.Managers
                     spawnedBots[tempPlayer.UserId.Value]["controller"] = tempPlayer;
                     spawnedBots[tempPlayer.UserId.Value]["position"] = botOwnerPosition;
                     spawnedBots[tempPlayer.UserId.Value]["owner"] = botOwner;
-                    
+                    spawnedBots[tempPlayer.UserId.Value]["crouchstate"] = crouch;
+                    CCSPlayer_MovementServices movementService = new CCSPlayer_MovementServices(tempPlayer.PlayerPawn.Value.MovementServices!.Handle);
+                    if ((bool)spawnedBots[tempPlayer.UserId.Value]["crouchstate"])
+                    {
+                        CSPraccPlugin.Instance!.AddTimer(0.1f, () => movementService.DuckAmount = 9999999);
+                        movementService.Ducked = true;
+                        movementService.Ducking = true;
+                        movementService.CrouchState = (byte)ForcedCrouchState_t.FORCEDCROUCH_CROUCHED;
+                    }
                     tempPlayer.PlayerPawn.Value.Teleport(botOwnerPosition.PlayerPosition, botOwnerPosition.PlayerAngle, new Vector(0, 0, 0));
                     unusedBotFound = true;
                 }
@@ -214,8 +241,17 @@ namespace CSPracc.Managers
                 if (spawnedBots.ContainsKey(player.UserId.Value))
                 {
                     if (spawnedBots[player.UserId.Value]["position"] is Position botPosition)
-                    {                       
-                        player.PlayerPawn.Value.Teleport(botPosition.PlayerPosition, botPosition.PlayerAngle, new Vector(0, 0, 0));                     
+                    {                   
+                        CCSBot bot = player.PlayerPawn.Value.Bot!;
+                        CCSPlayer_MovementServices movementService = new CCSPlayer_MovementServices(player.PlayerPawn.Value.MovementServices!.Handle);
+                        if((bool)spawnedBots[player.UserId.Value]["crouchstate"])
+                        {
+                            CSPraccPlugin.Instance!.AddTimer(0.1f, () => movementService.DuckAmount = 9999999);
+                            movementService.Ducked = true;
+                            movementService.Ducking = true;
+                            movementService.CrouchState = (byte)ForcedCrouchState_t.FORCEDCROUCH_CROUCHED;
+                        }                       
+                        player.PlayerPawn.Value.Teleport(botPosition.PlayerPosition, botPosition.PlayerAngle, new Vector(0, 0, 0));                                                         
                     }
                 }
             }

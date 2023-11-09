@@ -21,15 +21,17 @@ using CSPracc.DataModules.consts;
 using System.Xml;
 using System.Xml.Serialization;
 using CSPracc.Managers;
+using static System.Formats.Asn1.AsnWriter;
+using System.Drawing;
 
 public class CSPraccPlugin : BasePlugin
 {
-   public static CSPraccPlugin Instance { get; private set; }
+   public static CSPraccPlugin? Instance { get; private set; }
 
     List<CSPracc.DataModules.Player>? Players;
     
-    private Match match;
-    private static List<SteamID> _adminList = null;
+    private Match? match;
+    private static List<SteamID>? _adminList = null;
     public static List<SteamID> AdminList
     {
         get
@@ -58,7 +60,7 @@ public class CSPraccPlugin : BasePlugin
         }
     }
 
-    private BotManager BotManager;
+    private BotManager? BotManager;
 
     #region properties
     public override string ModuleName
@@ -77,8 +79,8 @@ public class CSPraccPlugin : BasePlugin
     }
 
 
-    private static DirectoryInfo _moduleDir;
-    public static DirectoryInfo ModuleDir => _moduleDir;
+    private static DirectoryInfo? _moduleDir;
+    public static DirectoryInfo ModuleDir => _moduleDir!;
 
     private string _rconPassword = String.Empty;
     private string RconPassword
@@ -95,7 +97,7 @@ public class CSPraccPlugin : BasePlugin
             return _rconPassword;
         }
     }
-   private static DirectoryInfo _csgoDir = null;
+   private static DirectoryInfo? _csgoDir = null;
     public static DirectoryInfo Cs2Dir
     {
         get
@@ -108,7 +110,7 @@ public class CSPraccPlugin : BasePlugin
         }
     }
 
-    ChatMenu _modeMenu = null;
+    ChatMenu? _modeMenu = null;
     ChatMenu ModeMenu
     {
         get
@@ -125,9 +127,9 @@ public class CSPraccPlugin : BasePlugin
         }
     }
 
-    private static FileInfo configManagerFile = null;
+    private static FileInfo? configManagerFile = null;
 
-    public static ConfigManager Config;
+    public static ConfigManager? Config;
     #endregion
 
     public override void Load(bool hotReload)      
@@ -141,7 +143,7 @@ public class CSPraccPlugin : BasePlugin
         XmlSerializer serializer = new XmlSerializer(typeof(ConfigManager));
         if (configManagerFile.Exists)
         {
-            Config = (ConfigManager)serializer.Deserialize(File.OpenRead(configManagerFile.FullName));
+            Config = serializer.Deserialize(File.OpenRead(configManagerFile.FullName)) as ConfigManager;
         }
         else
         {
@@ -158,14 +160,55 @@ public class CSPraccPlugin : BasePlugin
         {
             Reset();
         });
+
+
+RegisterListener<Listeners.OnEntitySpawned>(entity =>
+{
+    if(match.CurrentMode == Enums.PluginMode.Pracc)
+    {
+        var designerName = entity.DesignerName;
+        if (designerName != "smokegrenade_projectile") return;
+
+        var projectile = new CSmokeGrenadeProjectile(entity.Handle);
+
+        Server.NextFrame(() =>
+        {
+            CCSPlayerController player = new CCSPlayerController(projectile.Thrower.Value.Controller.Value.Handle);
+            projectile.SmokeColor.X = getTeamColor(player).R;
+            projectile.SmokeColor.Y = getTeamColor(player).G;
+            projectile.SmokeColor.Z = getTeamColor(player).B;
+        });
+    }
+
+});
+
         BotManager = new BotManager();
         Instance = this;
+    }
+
+    private System.Drawing.Color getTeamColor(CCSPlayerController playerController)
+    {
+        switch (playerController.CompTeammateColor)
+        {
+            case 1:
+                return Color.Green;
+            case 2:
+                return Color.Yellow;
+            case 3:
+                return Color.Orange;
+            case 4:
+                return Color.Pink;
+            case 5:
+                return Color.LightBlue;
+            default:
+                return Color.Red;
+        }
     }
 
     public static void WriteConfig(ConfigManager config)
     {
         XmlSerializer serializer = new XmlSerializer(typeof(ConfigManager));
-        if (configManagerFile.Exists)
+        if (configManagerFile!.Exists)
         {
             configManagerFile.Delete();
         }
@@ -228,7 +271,7 @@ public class CSPraccPlugin : BasePlugin
         }
         catch(Exception ex)
         {
-
+            Logging.LogMessage($"{ex.Message}");
         }
         Logging.LogMessage($"OnPlayerChat found command {commandWithArgs}");
 
@@ -251,16 +294,42 @@ public class CSPraccPlugin : BasePlugin
                 }          
             case PRACC_COMMAND.MAP:
             {
-                    match.ChangeMap(player,args);
+                    match!.ChangeMap(player,args);
                     break;
             }
+            case PRACC_COMMAND.PRACC:
+                {
+                    if (!player.IsAdmin())
+                    {
+                        player.PrintToCenter("Only admins can execute this command!");
+                        return HookResult.Continue;
+                    }
+                    this.match!.SwitchTo(Enums.PluginMode.Pracc);
+                    break;
+                }
+            case PRACC_COMMAND.MATCH:
+                {
+                    if (!player.IsAdmin())
+                    {
+                        player.PrintToCenter("Only admins can execute this command!");
+                        return HookResult.Continue;
+                    }
+                    RoundRestoreManager.CleanupOldFiles();
+                    this.match!.SwitchTo(Enums.PluginMode.Match);
+                    break;
+                }
+            case PRACC_COMMAND.SWAP:
+                {
+                    Server.ExecuteCommand(COMMANDS.SWAP_TEAMS);
+                    break;
+                }
             default:
             {
-                    if(match.CurrentMode == enums.PluginMode.Match)
+                    if(match!.CurrentMode == Enums.PluginMode.Match)
                     {
                         MatchCommands(player,command,args);
                     }
-                    if(match.CurrentMode == enums.PluginMode.Pracc)
+                    if(match!.CurrentMode == Enums.PluginMode.Pracc)
                     {
                         PracticeCommands(player,command,args);
                     }
@@ -278,13 +347,13 @@ public class CSPraccPlugin : BasePlugin
         {
             case PRACC_COMMAND.SPAWN:
                 {
-                    if (match.CurrentMode != enums.PluginMode.Pracc) break;
+                    if (match!.CurrentMode != Enums.PluginMode.Pracc) break;
                     SpawnManager.TeleportToSpawn(player, args);
                     break;
                 }
             case PRACC_COMMAND.NADES:
                 {
-                    if (match.CurrentMode != enums.PluginMode.Pracc) break;
+                    if (match!.CurrentMode != Enums.PluginMode.Pracc) break;
                     ChatMenus.OpenMenu(player, NadeManager.NadeMenu);
                     break;
                 }
@@ -321,10 +390,36 @@ public class CSPraccPlugin : BasePlugin
                     {
                         if(playerEnt == null) continue;
                         if(!playerEnt.IsValid) continue;
-                        //if(playerEnt.UserId == player.UserId) continue;
-                        //if (playerEnt.IsBot) continue;
+                        if(playerEnt.UserId == player.UserId) continue;
+                        if (playerEnt.IsBot) continue;
+                        playerEnt.ChangeTeam(CsTeam.Spectator);
                         Logging.LogMessage($"Switching {playerEnt.PlayerName} to spectator");
                     }
+                    break;
+                }
+            case PRACC_COMMAND.CROUCHBOT:
+                {
+                    BotManager.CrouchBot(player);
+                    break;
+                }
+            case PRACC_COMMAND.CROUCHBOOST:
+                {
+                    BotManager.CrouchingBoostBot(player);
+                    break;
+                }
+            case PRACC_COMMAND.GOT:
+                {
+                    player.ChangeTeam(CsTeam.Terrorist);
+                    break;
+                }
+            case PRACC_COMMAND.GOCT:
+                {
+                    player.ChangeTeam(CsTeam.CounterTerrorist);
+                    break;
+                }
+            case PRACC_COMMAND.GOSPEC:
+                {
+                    player.ChangeTeam(CsTeam.Spectator);
                     break;
                 }
         }
@@ -337,47 +432,47 @@ public class CSPraccPlugin : BasePlugin
         {
             case PRACC_COMMAND.WARMUP:
                 {
-                    match.Rewarmup(player);
+                    match!.Rewarmup(player);
                     break;
                 }
             case PRACC_COMMAND.PAUSE:
                 {
-                    match.Pause();
+                    match!.Pause();
                     break;
                 }
             case PRACC_COMMAND.UNPAUSE:
                 {
-                    match.Unpause(player);
+                    match!.Unpause(player);
                     break;
                 }
             case PRACC_COMMAND.FORCEREADY:
                 {
-                    match.Start(player);
+                    match!.Start(player);
                     break;
                 }
             case PRACC_COMMAND.COACH:
                 {
-                    match.AddCoach(player);
+                    match!.AddCoach(player);
                     break;
                 }
             case PRACC_COMMAND.STOPCOACH:
                 {
-                    match.StopCoach(player);
+                    match!.StopCoach(player);
                     break;
                 }
             case PRACC_COMMAND.BACKUPMENU:
                 {
-                    match.RestoreBackup(player);
+                    match!.RestoreBackup(player);
                     break;
                 }
             case PRACC_COMMAND.FORCEUNPAUSE:
                 {
-                    match.ForceUnpause(player);
+                    match!.ForceUnpause(player);
                     break;
                 }
             case PRACC_COMMAND.RESTART:
                 {
-                    match.Restart(player);
+                    match!.Restart(player);
                     break;
                 }
         }
@@ -407,12 +502,13 @@ public class CSPraccPlugin : BasePlugin
 
     private void rconPassword(CCSPlayerController? player,string password)
     {
+        password = password.Trim();
         if (RconPassword != password)
         {
-            player.PrintToCenter("Invalid Password");
+            player!.PrintToCenter("Invalid Password");
             return;
         }
-        AdminList.Add(new SteamID(player.SteamID));
+        AdminList.Add(new SteamID(player!.SteamID));
     }
 
     public void OnFakeRcon(CCSPlayerController? player,string args)
@@ -455,18 +551,16 @@ public class CSPraccPlugin : BasePlugin
         switch(optionText)
         {
             case "Pracc":
-                this.match.SwitchTo(enums.PluginMode.Pracc);
+                this.match!.SwitchTo(Enums.PluginMode.Pracc);
                 break;
             case "Match":
                 RoundRestoreManager.CleanupOldFiles();
-                this.match.SwitchTo(enums.PluginMode.Match);
+                this.match!.SwitchTo(Enums.PluginMode.Match);
                 break;
             case "Help":
                 PrintHelp(player);
                 break;
-
         }
-
     }
     #endregion
 
@@ -494,26 +588,33 @@ public class CSPraccPlugin : BasePlugin
     /// </summary>
     private void Reset()
     {
-        match.SwitchTo(match.CurrentMode, true);
+        match!.SwitchTo(match!.CurrentMode, true);
     }
 
     #endregion
 
     #region events
-    [GameEventHandler]
+    [GameEventHandler(HookMode.Post)]
     public HookResult OnPlayerSpawn(EventPlayerSpawn @event, GameEventInfo info)
     {
-        if(match.CurrentMode == enums.PluginMode.Pracc) 
+        Logging.LogMessage("OnPlayerSpawn");
+        if(match!.CurrentMode == Enums.PluginMode.Pracc) 
         { 
-            BotManager.OnPlayerSpawn(@event, info);
+            BotManager!.OnPlayerSpawn(@event, info);
+        }
+        if (match!.CurrentMode == Enums.PluginMode.Match)
+        {
+            Logging.LogMessage("Mode Match");
+            match!.OnPlayerSpawn(@event, info);
         }
         return HookResult.Continue;
     }
 
+  
     [GameEventHandler]
-    public HookResult OnPlayerSpawn(EventPlayerBlind @event, GameEventInfo info)
+    public HookResult OnPlayerBlind(EventPlayerBlind @event, GameEventInfo info)
     {
-        if (match.CurrentMode == enums.PluginMode.Pracc)
+        if (match!.CurrentMode == Enums.PluginMode.Pracc)
         {
             Methods.MsgToServer($"Flash duration: {@event.BlindDuration.ToString("0.00")}s");
         }

@@ -19,31 +19,31 @@ namespace CSPracc
     public class Match
     {
         
-        private DataModules.enums.PluginMode currentMode = DataModules.enums.PluginMode.Standard;
-        private DataModules.enums.match_state state = DataModules.enums.match_state.warmup;
-        public DataModules.enums.PluginMode CurrentMode => currentMode;
+        private DataModules.Enums.PluginMode currentMode = DataModules.Enums.PluginMode.Standard;
+        private DataModules.Enums.match_state state = DataModules.Enums.match_state.warmup;
+        public DataModules.Enums.PluginMode CurrentMode => currentMode;
 
         bool ReadyTeamCT = false;
         bool ReadyTeamT = false;
 
-        public CCSPlayerController CoachTeam1 { get; set; }
-        public CCSPlayerController CoachTeam2 { get; set; }
+        public CCSPlayerController? CoachTeam1 { get; set; }
+        public CCSPlayerController? CoachTeam2 { get; set; }
 
         public Match() 
         {
-            SwitchTo(DataModules.enums.PluginMode.Standard, true);
+            SwitchTo(DataModules.Enums.PluginMode.Standard, true);
             Server.ExecuteCommand(DataModules.consts.COMMANDS.START_WARMUP);
         }
         public void Pause()
         {
-            if (state == DataModules.enums.match_state.warmup || currentMode != DataModules.enums.PluginMode.Match) { return; }
+            if (state == DataModules.Enums.match_state.warmup || currentMode != DataModules.Enums.PluginMode.Match) { return; }
             Methods.MsgToServer("Match paused. Waiting for both teams to .unpause");
             Server.ExecuteCommand(DataModules.consts.COMMANDS.PAUSE_MATCH);
         }
 
         public void Unpause(CCSPlayerController player)
         {
-            if (state == DataModules.enums.match_state.warmup || currentMode != DataModules.enums.PluginMode.Match) { return; }
+            if (state == DataModules.Enums.match_state.warmup || currentMode != DataModules.Enums.PluginMode.Match) { return; }
             if(player.TeamNum == (float)CsTeam.CounterTerrorist)
             {
                 ReadyTeamCT = true;
@@ -72,7 +72,7 @@ namespace CSPracc
                 player.PrintToCenter("Only admins can execute this command!");
                 return;
             }
-            if (state == DataModules.enums.match_state.warmup || currentMode != DataModules.enums.PluginMode.Match) { return; }
+            if (state == DataModules.Enums.match_state.warmup || currentMode != DataModules.Enums.PluginMode.Match) { return; }
             Methods.MsgToServer("Restarting game.");
             Server.ExecuteCommand(DataModules.consts.COMMANDS.RESTART_GAME);
         }
@@ -86,7 +86,7 @@ namespace CSPracc
                 player.PrintToCenter("Only admins can execute this command!");
                 return;
             }
-            if ( currentMode != DataModules.enums.PluginMode.Match) { return; }
+            if ( currentMode != DataModules.Enums.PluginMode.Match) { return; }
             Methods.MsgToServer("Starting Warmup.");
             Server.ExecuteCommand(DataModules.consts.COMMANDS.START_WARMUP);
         }
@@ -97,15 +97,15 @@ namespace CSPracc
             if(!player.IsValid) { return; }
             if(!player.IsAdmin()) { player.PrintToCenter("Only admins can execute this command!"); return; }
 
-            if (state == DataModules.enums.match_state.live || currentMode != DataModules.enums.PluginMode.Match) { return; }
-            state = DataModules.enums.match_state.live;
+            if (state == DataModules.Enums.match_state.live || currentMode != DataModules.Enums.PluginMode.Match) { return; }
+            state = DataModules.Enums.match_state.live;
             Methods.MsgToServer("Starting Match!");
             Server.ExecuteCommand(DataModules.consts.COMMANDS.START_MATCH);
         }
 
         public void StopCoach(CCSPlayerController playerController)
         {
-            if (CurrentMode != enums.PluginMode.Match) return;
+            if (CurrentMode != Enums.PluginMode.Match) return;
             if (playerController == null) return;
 
             if (playerController.PlayerPawn.Value.TeamNum == (byte)CsTeam.Terrorist)
@@ -136,7 +136,7 @@ namespace CSPracc
 
         public void AddCoach(CCSPlayerController playerController)
         {
-            if (CurrentMode != enums.PluginMode.Match) return;
+            if (CurrentMode != Enums.PluginMode.Match) return;
             if (playerController == null) return;
             if (!playerController.PlayerPawn.IsValid) return;
             if(playerController.PlayerPawn.Value.TeamNum == (byte)CsTeam.Terrorist)
@@ -182,23 +182,23 @@ namespace CSPracc
 
         }
 
-        public void SwitchTo(DataModules.enums.PluginMode pluginMode, bool force = false)
+        public void SwitchTo(DataModules.Enums.PluginMode pluginMode, bool force = false)
         {
             if(pluginMode == currentMode && !force) { return; }
             switch (pluginMode)
             {
-                case DataModules.enums.PluginMode.Standard:
+                case DataModules.Enums.PluginMode.Standard:
                     DataModules.consts.Methods.MsgToServer("Restoring default config.");
                     Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
                     Server.ExecuteCommand("exec server.cfg");
                     currentMode = pluginMode;
                     break;
-                case DataModules.enums.PluginMode.Pracc:
+                case DataModules.Enums.PluginMode.Pracc:
                     DataModules.consts.Methods.MsgToServer("Starting practice mode.");
                     Server.ExecuteCommand("exec CSPRACC\\pracc.cfg");
                     currentMode = pluginMode;
                     break;
-                case DataModules.enums.PluginMode.Match:
+                case DataModules.Enums.PluginMode.Match:
                     DataModules.consts.Methods.MsgToServer("Starting match");
                     Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
                     Server.ExecuteCommand("exec gamemode_competitive.cfg");
@@ -209,7 +209,7 @@ namespace CSPracc
 
         public void RestoreBackup(CCSPlayerController player)
         {
-            if(CurrentMode != enums.PluginMode.Match) { return; }
+            if(CurrentMode != Enums.PluginMode.Match) { return; }
             if(player == null) { return; }
             if(!player.IsValid) { return; }
             if(!player.IsAdmin()) { player.PrintToCenter("Only admins can execute this command!"); return; }
@@ -220,13 +220,43 @@ namespace CSPracc
 
         public void ForceUnpause(CCSPlayerController player)
         {
-            if (CurrentMode != enums.PluginMode.Match) { return; }
+            if (CurrentMode != Enums.PluginMode.Match) { return; }
             if (player == null) { return; }
             if (!player.IsValid) { return; }
             if (!player.IsAdmin()) { player.PrintToCenter("Only admins can execute this command!"); return; }
             ReadyTeamCT = true;
             ReadyTeamT = true;
             Server.ExecuteCommand(DataModules.consts.COMMANDS.UNPAUSE_MATCH);
+        }
+
+        public HookResult OnPlayerSpawn(EventPlayerSpawn @event, GameEventInfo info)
+        {
+            if(CoachTeam1 != null)
+            {
+                Logging.LogMessage($"CoachT1 {@event.Userid.UserId} - {CoachTeam1!.UserId}");
+                if (@event.Userid.UserId == CoachTeam1!.UserId)
+                {
+                    Logging.LogMessage("T Coach commit suicide now!");
+                    CoachTeam1!.InGameMoneyServices!.Account = 0;
+                    Server.ExecuteCommand("mp_suicide_penalty 0");
+                    CSPraccPlugin.Instance!.AddTimer(0.1f, () => CoachTeam1!.PlayerPawn.Value.CommitSuicide(true, true));
+                    Server.ExecuteCommand("mp_suicide_penalty 1");
+
+                }
+            }
+            if(CoachTeam2 != null)
+            {
+                Logging.LogMessage($"CoachT2 {@event.Userid.UserId} - {CoachTeam2!.UserId}");
+                if (@event.Userid.UserId == CoachTeam2!.UserId)
+                {
+                    Logging.LogMessage("CT Coach commit suicide now!");
+                    CoachTeam2!.InGameMoneyServices!.Account = 0;
+                    Server.ExecuteCommand("mp_suicide_penalty 0");
+                    CSPraccPlugin.Instance!.AddTimer(0.1f, () => CoachTeam2!.PlayerPawn.Value.CommitSuicide(true, true));
+                    Server.ExecuteCommand("mp_suicide_penalty 1");
+                }
+            }
+            return HookResult.Changed;
         }
     }
 }

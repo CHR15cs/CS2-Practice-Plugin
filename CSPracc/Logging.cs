@@ -8,8 +8,8 @@ namespace CSPracc
 {
     public class Logging
     {
-        public static Logging Instance { get; private set; }
-        private static FileInfo _logFile = null;
+        public static Logging? Instance { get; private set; }
+        private static FileInfo? _logFile = null;
         public Logging(FileInfo loggignFile) 
         {
             _logFile = loggignFile;

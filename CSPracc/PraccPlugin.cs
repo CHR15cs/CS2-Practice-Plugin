@@ -323,6 +323,58 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
                     Server.ExecuteCommand(COMMANDS.SWAP_TEAMS);
                     break;
                 }
+            case PRACC_COMMAND.ALIAS:
+                {
+                    if(!player.IsAdmin())
+                    {
+                        player.PrintToCenter("Only admins can execute this command!");
+                        return HookResult.Continue;
+                    }
+                    if(!GetArgumentList(args,out List<string> ArgumentList))
+                    {
+                        player.PrintToCenter("Invalid amout of parameters. Command need to be used .alias <newAlias> <commandTobeExecuted>");
+                    }
+                    if(ArgumentList.Count != 2)
+                    {
+                        player.PrintToCenter("Invalid amout of parameters. Command need to be used .alias <newAlias> <commandTobeExecuted>");
+                    }
+                    foreach(CommandAlias cAlias in Config!.CommandAliases)
+                    {
+                        if(cAlias.Alias == (ArgumentList[0]))
+                        {
+                            player.PrintToCenter($"Alias {cAlias.Alias} is already existing. Use .ralias <alias> to remove alias.");
+                            return HookResult.Continue;
+                        }
+                    }
+                    Config!.AddCommandAlias(new CommandAlias(ArgumentList[0], ArgumentList[1]));
+                    player.PrintToCenter($"Added alias {ArgumentList[0]} for command {ArgumentList[1]}");
+                    CSPraccPlugin.WriteConfig(CSPraccPlugin.Config);
+                    break;
+                }
+            case PRACC_COMMAND.REMOVEALIAS:
+                {
+                    if (!player.IsAdmin())
+                    {
+                        player.PrintToCenter("Only admins can execute this command!");
+                        return HookResult.Continue;
+                    }
+                    args = args.Trim();
+                    if(args.Length == 0)
+                    {
+                        player.PrintToCenter("Invalid command arguments");
+                    }
+                    for(int i = 0; i < Config!.CommandAliases.Count;i++)
+                    {
+                        if (Config!.CommandAliases[i].Alias == args)
+                        {
+                            Config!.CommandAliases.RemoveAt(i);
+                            player.PrintToCenter($"Removed alias {args}");
+                            break;
+                        }
+                    }
+
+                    break;
+                }
             default:
             {
                     if(match!.CurrentMode == Enums.PluginMode.Match)
@@ -338,6 +390,33 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
         }
 
         return HookResult.Changed;
+    }
+
+    private bool GetArgumentList(string Argument, out List<string> arguments)
+    {
+        Logging.LogMessage($"Getting command arguments of string {Argument}");
+        arguments = new List<string>();
+        if(String.IsNullOrEmpty(Argument))
+        {
+            return false;
+        }      
+        do
+        {
+            //Remove Leading or Trailing whitespaces
+            Argument = Argument.Trim();
+            int index = Argument.IndexOf(' ');
+            if(index == -1)
+            {
+                arguments.Add(Argument);
+                Argument = string.Empty;
+                break;
+            }
+            string foundArgument = Argument.Substring(0, index);
+            arguments.Add(foundArgument);
+            Logging.LogMessage($"Adding argument {foundArgument}");
+            Argument = Argument.Substring(index);
+        } while (Argument.Length > 0 && Argument != String.Empty);
+        return true;
     }
 
     private void PracticeCommands(CCSPlayerController player,string command,string args)
@@ -573,10 +652,22 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
     /// <returns>returns string with full command</returns>
     public string ReplaceAlias(string alias)
     {
-        string ShortCommand = string.Empty;
+        string ShortCommand = alias;
         string LongCommand = alias;
-
-        //ToDo Implement
+        bool aliasFound = false;
+        do
+        {
+            aliasFound = false;
+            foreach (CommandAlias calias in Config!.CommandAliases)
+            {
+                if (calias.Alias == ShortCommand)
+                {
+                    ShortCommand = calias.Command;
+                    aliasFound = true;
+                }
+            }
+        } while (aliasFound);
+        LongCommand = ShortCommand;
         return LongCommand;
     }
 

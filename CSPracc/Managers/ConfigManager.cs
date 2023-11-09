@@ -19,6 +19,10 @@ namespace CSPracc
         [XmlArray("PluginAdmins")]
         public List<string> Admins;
 
+
+        [XmlArray("CommandAliases")]
+        public List<CommandAlias> CommandAliases;
+
         [XmlElement]
         public List<SavedNade> SavedNades
         {
@@ -35,6 +39,11 @@ namespace CSPracc
         public ConfigManager()
         {
             SavedNades = NadeManager.Nades!;
+        }
+
+        public void AddCommandAlias(CommandAlias commandAlias)
+        {
+            CommandAliases.Add(commandAlias);
         }
     }
 }

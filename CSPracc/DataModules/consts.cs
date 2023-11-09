@@ -53,6 +53,8 @@ namespace CSPracc.DataModules.consts
         public const string GOCT = ".ct";
         public const string GOSPEC = ".spec";
         public const string SWAP = ".swap";
+        public const string ALIAS = ".alias";
+        public const string REMOVEALIAS = ".ralias";
     }
     public class Strings
     {

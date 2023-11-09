@@ -11,7 +11,7 @@ Plugin might be unstable or not working.
 
 ## Implemted Features
 ### QOL
-- [ ] Defining aliases for commands
+- [x] Defining aliases for commands
 - [x] .ct .t .spec
 - [x] .swap
 - [x] .rcon
@@ -28,7 +28,7 @@ Plugin might be unstable or not working.
 - [x] .boost
 - [x] .nobot (removing closest bot)
 - [x] .clearbots (removing all bots of current player)
-- [x] .crouchbot (known issue: if spawned standing up, kill bot and let it respawn)
+- [x] .crouchbot (known issue: bot might appear crouching, but hitbox is still a standing model!)
 - [x] .crouchboost
 ### Match Mode
 - [x] Pause
@@ -57,6 +57,8 @@ Plugin might be unstable or not working.
         .map <mapname>
         .swap
         .ct .t .spec
+        .alias .<NewAlias> .<Command>
+                example : .alias .cbot .crouchbot
 
 ## Chat Commands available in match mode       
         .pause 

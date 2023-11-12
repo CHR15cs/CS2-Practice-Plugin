@@ -374,6 +374,11 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
                     }
                     break;
                 }
+            case PRACC_COMMAND.DEMO:
+                {
+                    DemoManager.OpenDemoManagerMenu(player);
+                    break;
+                }
             default:
             {
                     if(Match.CurrentMode == Enums.PluginMode.Match)
@@ -536,6 +541,16 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
                     Match.Unpause(player);
                     break;
                 }
+            case PRACC_COMMAND.READY:
+                {
+                    Match.Ready(player);
+                    break;
+                }
+            case PRACC_COMMAND.UNREADY:
+                {
+                    Match.UnReady(player);
+                    break;
+                }
             case PRACC_COMMAND.FORCEREADY:
                 {
                     Match.Start(player);
@@ -564,11 +579,6 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
             case PRACC_COMMAND.RESTART:
                 {
                     Match.Restart(player);
-                    break;
-                }
-            case ".demo":
-                {
-                    DemoManager.OpenDemoManagerMenu(player);
                     break;
                 }
         }

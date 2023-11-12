@@ -36,6 +36,72 @@ namespace CSPracc
             Server.ExecuteCommand(DataModules.consts.COMMANDS.PAUSE_MATCH);
         }
 
+        public static void Ready(CCSPlayerController player)
+        {
+            if ( currentMode != DataModules.Enums.PluginMode.Match) { return; }
+            if(player == null ) { return; }
+            if(!player.IsValid) { return; }
+            switch (player.TeamNum)
+            {
+                case (byte)CsTeam.Terrorist:
+                    {
+                        if(ReadyTeamT)
+                        {
+                            break;
+                        }
+                        ReadyTeamT = true;
+                        Methods.MsgToServer("T side is ready!");
+                        break;
+                    }
+                case (byte)CsTeam.CounterTerrorist:
+                    {
+                        if (ReadyTeamCT)
+                        {
+                            break;
+                        }
+                        ReadyTeamCT = true;
+                        Methods.MsgToServer("CT side is ready!");
+                        break;
+                    }
+            }
+            if(ReadyTeamT && ReadyTeamCT)
+            {
+                internalStart();
+            }
+        }
+
+        public static void UnReady(CCSPlayerController player)
+        {
+
+            if (currentMode != DataModules.Enums.PluginMode.Match) { return; }
+            if (player == null) { return; }
+            if (!player.IsValid) { return; }
+
+            switch (player.TeamNum)
+            {
+                case (byte)CsTeam.Terrorist:
+                    {
+                        if (ReadyTeamT)
+                        {
+                            break;
+                        }
+                        ReadyTeamT = false;
+                        Methods.MsgToServer("T side is not ready!");
+                        break;
+                    }
+                case (byte)CsTeam.CounterTerrorist:
+                    {
+                        if (ReadyTeamCT)
+                        {
+                            break;
+                        }
+                        ReadyTeamCT = false;
+                        Methods.MsgToServer("CT side is not ready!");
+                        break;
+                    }
+            }
+        }
+
         public static void Unpause(CCSPlayerController player)
         {
             if (state == DataModules.Enums.match_state.warmup || currentMode != DataModules.Enums.PluginMode.Match) { return; }
@@ -92,13 +158,20 @@ namespace CSPracc
             if(player == null) { return; }
             if(!player.IsValid) { return; }
             if(!player.IsAdmin()) { player.PrintToCenter("Only admins can execute this command!"); return; }
+            internalStart();
+        }
 
+        private static void internalStart()
+        {
+            ReadyTeamCT = false;
+            ReadyTeamT = false;
             if (state == DataModules.Enums.match_state.live || currentMode != DataModules.Enums.PluginMode.Match) { return; }
             state = DataModules.Enums.match_state.live;
             Server.ExecuteCommand("exec CSPRACC\\5on5.cfg");
             Methods.MsgToServer("Starting Match!");
+            Server.ExecuteCommand("bot_kick");
             Server.ExecuteCommand("mp_warmup_end 1");
-            if(DemoManager.DemoManagerSettings.RecordingMode == Enums.RecordingMode.Automatic)
+            if (DemoManager.DemoManagerSettings.RecordingMode == Enums.RecordingMode.Automatic)
             {
                 DemoManager.StartRecording();
             }

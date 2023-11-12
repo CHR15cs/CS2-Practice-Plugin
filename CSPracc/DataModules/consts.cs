@@ -58,6 +58,7 @@ namespace CSPracc.DataModules.consts
         public const string ALIAS = ".alias";
         public const string REMOVEALIAS = ".ralias";
         public const string CLEAR = ".clear";
+        public const string DEMO = ".demo";
     }
     public class Strings
     {

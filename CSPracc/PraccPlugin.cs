@@ -425,13 +425,21 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
         {
             case PRACC_COMMAND.SPAWN:
                 {
-                    if (Match.CurrentMode != Enums.PluginMode.Pracc) break;
                     SpawnManager.TeleportToSpawn(player, args);
                     break;
                 }
-            case PRACC_COMMAND.NADES:
+            case PRACC_COMMAND.TSPAWN:
                 {
-                    if (Match.CurrentMode != Enums.PluginMode.Pracc) break;
+                    SpawnManager.TeleportToTeamSpawn(player, args, CsTeam.Terrorist);
+                    break;
+                }
+            case PRACC_COMMAND.CTSPAWN:
+                {
+                    SpawnManager.TeleportToTeamSpawn(player, args, CsTeam.CounterTerrorist);
+                    break;
+                }
+            case PRACC_COMMAND.NADES:
+                { 
                     ChatMenus.OpenMenu(player, NadeManager.NadeMenu);
                     break;
                 }

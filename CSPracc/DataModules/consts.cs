@@ -33,6 +33,8 @@ namespace CSPracc.DataModules.consts
         public const string HELP = ".help";
         public const string RESTART = ".restart";
         public const string SPAWN = ".spawn";
+        public const string TSPAWN = ".tspawn";
+        public const string CTSPAWN = ".ctspawn";
         public const string COACH = ".coach";
         public const string STOPCOACH = ".stopcoach";
         public const string FAKERCON = ".rcon";

@@ -77,6 +77,11 @@ namespace CSPracc
 
         public static void TeleportToSpawn(CCSPlayerController? player, string args)
         {         
+            TeleportToTeamSpawn(player, args);
+        }
+
+        public static void TeleportToTeamSpawn(CCSPlayerController? player,string args , CsTeam csTeam = CsTeam.None)
+        {
             if (player == null) return;
             if (!player.PlayerPawn.IsValid) return;
 
@@ -93,15 +98,16 @@ namespace CSPracc
                 player.PrintToCenter("invalid parameter");
                 return;
             }
-
-            if (SpawnManager.Spawns[player.TeamNum].Count <= number)
+            CsTeam targetTeam = csTeam == CsTeam.None ? (CsTeam)player.TeamNum : csTeam;
+            if (SpawnManager.Spawns[(byte)targetTeam].Count <= number)
             {
-                player.PrintToCenter($"insufficient number of spawns found. spawns {SpawnManager.Spawns[player.TeamNum].Count} - {number}");
+                player.PrintToCenter($"insufficient number of spawns found. spawns {SpawnManager.Spawns[(byte)targetTeam].Count} - {number}");
                 return;
             }
-            Logging.LogMessage($"teleport to: {SpawnManager.Spawns[player.TeamNum][number].PlayerPosition}");
-            player.PlayerPawn.Value.Teleport(SpawnManager.Spawns[player.TeamNum][number].PlayerPosition, SpawnManager.Spawns[player.TeamNum][number].PlayerAngle, new Vector(0, 0, 0));
+            Logging.LogMessage($"teleport to: {SpawnManager.Spawns[(byte)targetTeam][number].PlayerPosition}");
+            player.PlayerPawn.Value.Teleport(SpawnManager.Spawns[(byte)targetTeam][number].PlayerPosition, SpawnManager.Spawns[(byte)targetTeam][number].PlayerAngle, new Vector(0, 0, 0));
             player.PrintToCenter($"Teleporting to spawn {number + 1}");
         }
+
     }
 }

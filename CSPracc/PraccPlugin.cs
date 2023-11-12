@@ -21,7 +21,6 @@ using CSPracc.DataModules.consts;
 using System.Xml;
 using System.Xml.Serialization;
 using CSPracc.Managers;
-using static System.Formats.Asn1.AsnWriter;
 using System.Drawing;
 
 public class CSPraccPlugin : BasePlugin
@@ -30,7 +29,6 @@ public class CSPraccPlugin : BasePlugin
 
     List<CSPracc.DataModules.Player>? Players;
     
-    private Match? match;
     private static List<SteamID>? _adminList = null;
     public static List<SteamID> AdminList
     {
@@ -139,11 +137,11 @@ public class CSPraccPlugin : BasePlugin
         Logging logging = new Logging(new FileInfo(Path.Combine(ModuleDir.FullName, "Logging.txt")));
         configManagerFile = new FileInfo(Path.Combine(ModuleDir.FullName, "configmanager.xml"));
         Players = new List<CSPracc.DataModules.Player>();
-        match = new Match();
         XmlSerializer serializer = new XmlSerializer(typeof(ConfigManager));
         if (configManagerFile.Exists)
         {
             Config = serializer.Deserialize(File.OpenRead(configManagerFile.FullName)) as ConfigManager;
+            DemoManager.DemoManagerSettings = Config!.DemoManagerSettings;
         }
         else
         {
@@ -164,9 +162,10 @@ public class CSPraccPlugin : BasePlugin
 
 RegisterListener<Listeners.OnEntitySpawned>(entity =>
 {
-    if(match.CurrentMode == Enums.PluginMode.Pracc)
-    {
+    if(Match.CurrentMode == Enums.PluginMode.Pracc)
+    {     
         var designerName = entity.DesignerName;
+        Logging.LogMessage($"Entity spawned : {designerName}");
         if (designerName != "smokegrenade_projectile") return;
 
         var projectile = new CSmokeGrenadeProjectile(entity.Handle);
@@ -174,12 +173,12 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
         Server.NextFrame(() =>
         {
             CCSPlayerController player = new CCSPlayerController(projectile.Thrower.Value.Controller.Value.Handle);
-            projectile.SmokeColor.X = getTeamColor(player).R;
-            projectile.SmokeColor.Y = getTeamColor(player).G;
-            projectile.SmokeColor.Z = getTeamColor(player).B;
+            projectile.SmokeColor.X = (float)getTeamColor(player).R;
+            projectile.SmokeColor.Y = (float)getTeamColor(player).G;
+            projectile.SmokeColor.Z = (float)getTeamColor(player).B;
+            Logging.LogMessage($"smoke color {projectile.SmokeColor}");
         });
     }
-
 });
 
         BotManager = new BotManager();
@@ -188,18 +187,19 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
 
     private System.Drawing.Color getTeamColor(CCSPlayerController playerController)
     {
+        Logging.LogMessage($"Getting Color of player {playerController.CompTeammateColor}");
         switch (playerController.CompTeammateColor)
         {
             case 1:
-                return Color.Green;
+                return Color.FromArgb(50,255,0);
             case 2:
-                return Color.Yellow;
+                return Color.FromArgb(255,255,0);
             case 3:
-                return Color.Orange;
+                return Color.FromArgb(255,132,0);
             case 4:
-                return Color.Pink;
-            case 5:
-                return Color.LightBlue;
+                return Color.FromArgb(255, 0, 255);
+            case 0:
+                return Color.FromArgb(0,187,255);
             default:
                 return Color.Red;
         }
@@ -294,7 +294,7 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
                 }          
             case PRACC_COMMAND.MAP:
             {
-                    match!.ChangeMap(player,args);
+                    Match.ChangeMap(player,args);
                     break;
             }
             case PRACC_COMMAND.PRACC:
@@ -304,7 +304,7 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
                         player.PrintToCenter("Only admins can execute this command!");
                         return HookResult.Continue;
                     }
-                    this.match!.SwitchTo(Enums.PluginMode.Pracc);
+                    Match.SwitchTo(Enums.PluginMode.Pracc);
                     break;
                 }
             case PRACC_COMMAND.MATCH:
@@ -315,7 +315,7 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
                         return HookResult.Continue;
                     }
                     RoundRestoreManager.CleanupOldFiles();
-                    this.match!.SwitchTo(Enums.PluginMode.Match);
+                    Match.SwitchTo(Enums.PluginMode.Match);
                     break;
                 }
             case PRACC_COMMAND.SWAP:
@@ -372,16 +372,15 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
                             break;
                         }
                     }
-
                     break;
                 }
             default:
             {
-                    if(match!.CurrentMode == Enums.PluginMode.Match)
+                    if(Match.CurrentMode == Enums.PluginMode.Match)
                     {
                         MatchCommands(player,command,args);
                     }
-                    if(match!.CurrentMode == Enums.PluginMode.Pracc)
+                    if(Match.CurrentMode == Enums.PluginMode.Pracc)
                     {
                         PracticeCommands(player,command,args);
                     }
@@ -426,13 +425,13 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
         {
             case PRACC_COMMAND.SPAWN:
                 {
-                    if (match!.CurrentMode != Enums.PluginMode.Pracc) break;
+                    if (Match.CurrentMode != Enums.PluginMode.Pracc) break;
                     SpawnManager.TeleportToSpawn(player, args);
                     break;
                 }
             case PRACC_COMMAND.NADES:
                 {
-                    if (match!.CurrentMode != Enums.PluginMode.Pracc) break;
+                    if (Match.CurrentMode != Enums.PluginMode.Pracc) break;
                     ChatMenus.OpenMenu(player, NadeManager.NadeMenu);
                     break;
                 }
@@ -501,6 +500,11 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
                     player.ChangeTeam(CsTeam.Spectator);
                     break;
                 }
+            case PRACC_COMMAND.CLEAR:
+                {
+                    RemoveGrenadeEntities();
+                    break;
+                }
         }
     }
 
@@ -511,47 +515,52 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
         {
             case PRACC_COMMAND.WARMUP:
                 {
-                    match!.Rewarmup(player);
+                    Match.Rewarmup(player);
                     break;
                 }
             case PRACC_COMMAND.PAUSE:
                 {
-                    match!.Pause();
+                    Match.Pause();
                     break;
                 }
             case PRACC_COMMAND.UNPAUSE:
                 {
-                    match!.Unpause(player);
+                    Match.Unpause(player);
                     break;
                 }
             case PRACC_COMMAND.FORCEREADY:
                 {
-                    match!.Start(player);
+                    Match.Start(player);
                     break;
                 }
             case PRACC_COMMAND.COACH:
                 {
-                    match!.AddCoach(player);
+                    Match.AddCoach(player);
                     break;
                 }
             case PRACC_COMMAND.STOPCOACH:
                 {
-                    match!.StopCoach(player);
+                    Match.StopCoach(player);
                     break;
                 }
             case PRACC_COMMAND.BACKUPMENU:
                 {
-                    match!.RestoreBackup(player);
+                    Match.RestoreBackup(player);
                     break;
                 }
             case PRACC_COMMAND.FORCEUNPAUSE:
                 {
-                    match!.ForceUnpause(player);
+                    Match.ForceUnpause(player);
                     break;
                 }
             case PRACC_COMMAND.RESTART:
                 {
-                    match!.Restart(player);
+                    Match.Restart(player);
+                    break;
+                }
+            case ".demo":
+                {
+                    DemoManager.OpenDemoManagerMenu(player);
                     break;
                 }
         }
@@ -630,11 +639,11 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
         switch(optionText)
         {
             case "Pracc":
-                this.match!.SwitchTo(Enums.PluginMode.Pracc);
+                Match.SwitchTo(Enums.PluginMode.Pracc);
                 break;
             case "Match":
                 RoundRestoreManager.CleanupOldFiles();
-                this.match!.SwitchTo(Enums.PluginMode.Match);
+                Match.SwitchTo(Enums.PluginMode.Match);
                 break;
             case "Help":
                 PrintHelp(player);
@@ -671,15 +680,40 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
         return LongCommand;
     }
 
-
-
-
     /// <summary>
     /// Resetting plugin settings
     /// </summary>
     private void Reset()
     {
-        match!.SwitchTo(match!.CurrentMode, true);
+        Match.SwitchTo(Match.CurrentMode, true);
+    }
+
+    private void RemoveGrenadeEntities()
+    {
+        var smokes = Utilities.FindAllEntitiesByDesignerName<CSmokeGrenadeProjectile>("smokegrenade_projectile");
+        foreach (var entity in smokes)
+        {
+            if (entity != null)
+            {
+                entity.Remove();
+            }
+        }
+        var mollys = Utilities.FindAllEntitiesByDesignerName<CSmokeGrenadeProjectile>("molotov_projectile");
+        foreach (var entity in mollys)
+        {
+            if (entity != null)
+            {
+                entity.Remove();
+            }
+        }
+        var inferno = Utilities.FindAllEntitiesByDesignerName<CSmokeGrenadeProjectile>("inferno");
+        foreach (var entity in inferno)
+        {
+            if (entity != null)
+            {
+                entity.Remove();
+            }
+        }
     }
 
     #endregion
@@ -689,27 +723,62 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
     public HookResult OnPlayerSpawn(EventPlayerSpawn @event, GameEventInfo info)
     {
         Logging.LogMessage("OnPlayerSpawn");
-        if(match!.CurrentMode == Enums.PluginMode.Pracc) 
-        { 
+        if (CSPracc.Match.CurrentMode == Enums.PluginMode.Pracc)
+        {
             BotManager!.OnPlayerSpawn(@event, info);
         }
-        if (match!.CurrentMode == Enums.PluginMode.Match)
+        if (CSPracc.Match.CurrentMode == Enums.PluginMode.Match)
         {
             Logging.LogMessage("Mode Match");
-            match!.OnPlayerSpawn(@event, info);
+            CSPracc.Match.OnPlayerSpawn(@event, info);
         }
         return HookResult.Continue;
     }
 
-  
+
     [GameEventHandler]
     public HookResult OnPlayerBlind(EventPlayerBlind @event, GameEventInfo info)
     {
-        if (match!.CurrentMode == Enums.PluginMode.Pracc)
+        if (CSPracc.Match.CurrentMode == Enums.PluginMode.Pracc)
         {
-            Methods.MsgToServer($"Flash duration: {@event.BlindDuration.ToString("0.00")}s");
+            Methods.MsgToServer($"{@event.Attacker.PlayerName} flashed {@event.Userid.PlayerName} for {@event.BlindDuration.ToString("0.00")}s");
         }
         return HookResult.Continue;
     }
+
+    [GameEventHandler]
+    public HookResult OnPlayerHurt(EventPlayerHurt @event, GameEventInfo info)
+    {
+        if (CSPracc.Match.CurrentMode == Enums.PluginMode.Pracc)
+        {
+            Methods.MsgToServer($"Player {@event.Attacker.PlayerName} damaged {@event.Userid.PlayerName} for {@event.DmgHealth}hp with {@event.Weapon}");
+        }
+        return HookResult.Continue;
+    }
+
+    [GameEventHandler]
+    public HookResult OnFreezeTimeEnd(EventRoundFreezeEnd @event, GameEventInfo info)
+    {
+        if (CSPracc.Match.CurrentMode == Enums.PluginMode.Match)
+        {
+           Match.OnFreezeTimeEnd(@event, info);
+        }
+        return HookResult.Continue;
+    }
+
+    [GameEventHandler]
+    public HookResult OnMatchEnd(EventCsMatchEndRestart @event, GameEventInfo info)
+    {
+        if(Match.CurrentMode == Enums.PluginMode.Match)
+        {
+            if(DemoManager.DemoManagerSettings.isRecording)
+            {
+                DemoManager.StopRecording();
+            }
+        }
+        return HookResult.Continue;
+    }
+
+
     #endregion
 }

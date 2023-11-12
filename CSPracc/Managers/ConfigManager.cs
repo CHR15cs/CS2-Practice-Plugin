@@ -1,4 +1,5 @@
 ﻿using CSPracc.DataModules;
+using CSPracc.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +29,7 @@ namespace CSPracc
         {
             get
             {
-                return NadeManager.Nades;
+                return NadeManager.Nades!;
             }
             set
             {
@@ -36,9 +37,13 @@ namespace CSPracc
             }
         }
 
+        [XmlElement]
+        public DemoManagerSettings DemoManagerSettings { get; set; }
+
         public ConfigManager()
         {
             SavedNades = NadeManager.Nades!;
+            DemoManagerSettings = new DemoManagerSettings();
         }
 
         public void AddCommandAlias(CommandAlias commandAlias)

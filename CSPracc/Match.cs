@@ -16,32 +16,27 @@ using CSPracc.DataModules.consts;
 
 namespace CSPracc
 {
-    public class Match
+    public static class Match
     {
         
-        private DataModules.Enums.PluginMode currentMode = DataModules.Enums.PluginMode.Standard;
-        private DataModules.Enums.match_state state = DataModules.Enums.match_state.warmup;
-        public DataModules.Enums.PluginMode CurrentMode => currentMode;
+        private static DataModules.Enums.PluginMode currentMode = DataModules.Enums.PluginMode.Standard;
+        private static DataModules.Enums.match_state state = DataModules.Enums.match_state.warmup;
+        public static DataModules.Enums.PluginMode CurrentMode => currentMode;
 
-        bool ReadyTeamCT = false;
-        bool ReadyTeamT = false;
+        private static bool ReadyTeamCT = false;
+        private static bool ReadyTeamT = false;
 
-        public CCSPlayerController? CoachTeam1 { get; set; }
-        public CCSPlayerController? CoachTeam2 { get; set; }
+        public static CCSPlayerController? CoachTeam1 { get; set; }
+        public static CCSPlayerController? CoachTeam2 { get; set; }
 
-        public Match() 
-        {
-            SwitchTo(DataModules.Enums.PluginMode.Standard, true);
-            Server.ExecuteCommand(DataModules.consts.COMMANDS.START_WARMUP);
-        }
-        public void Pause()
+        public static void Pause()
         {
             if (state == DataModules.Enums.match_state.warmup || currentMode != DataModules.Enums.PluginMode.Match) { return; }
             Methods.MsgToServer("Match paused. Waiting for both teams to .unpause");
             Server.ExecuteCommand(DataModules.consts.COMMANDS.PAUSE_MATCH);
         }
 
-        public void Unpause(CCSPlayerController player)
+        public static void Unpause(CCSPlayerController player)
         {
             if (state == DataModules.Enums.match_state.warmup || currentMode != DataModules.Enums.PluginMode.Match) { return; }
             if(player.TeamNum == (float)CsTeam.CounterTerrorist)
@@ -63,7 +58,7 @@ namespace CSPracc
         }
 
 
-        public void Restart(CCSPlayerController player)
+        public static void Restart(CCSPlayerController player)
         {
             if (player == null) return;
             if (!player.PlayerPawn.IsValid) return;
@@ -77,7 +72,7 @@ namespace CSPracc
             Server.ExecuteCommand(DataModules.consts.COMMANDS.RESTART_GAME);
         }
 
-        public void Rewarmup(CCSPlayerController? player)
+        public static void Rewarmup(CCSPlayerController? player)
         {
             if (player == null) return;
             if (!player.PlayerPawn.IsValid) return;
@@ -88,10 +83,11 @@ namespace CSPracc
             }
             if ( currentMode != DataModules.Enums.PluginMode.Match) { return; }
             Methods.MsgToServer("Starting Warmup.");
+            Server.ExecuteCommand("exec CSPRACC\\5on5_warmup.cfg");
             Server.ExecuteCommand(DataModules.consts.COMMANDS.START_WARMUP);
         }
 
-        public void Start(CCSPlayerController? player)
+        public static void Start(CCSPlayerController? player)
         {
             if(player == null) { return; }
             if(!player.IsValid) { return; }
@@ -99,11 +95,16 @@ namespace CSPracc
 
             if (state == DataModules.Enums.match_state.live || currentMode != DataModules.Enums.PluginMode.Match) { return; }
             state = DataModules.Enums.match_state.live;
+            Server.ExecuteCommand("exec CSPRACC\\5on5.cfg");
             Methods.MsgToServer("Starting Match!");
-            Server.ExecuteCommand(DataModules.consts.COMMANDS.START_MATCH);
+            Server.ExecuteCommand("mp_warmup_end 1");
+            if(DemoManager.DemoManagerSettings.RecordingMode == Enums.RecordingMode.Automatic)
+            {
+                DemoManager.StartRecording();
+            }
         }
 
-        public void StopCoach(CCSPlayerController playerController)
+        public static void StopCoach(CCSPlayerController playerController)
         {
             if (CurrentMode != Enums.PluginMode.Match) return;
             if (playerController == null) return;
@@ -115,6 +116,7 @@ namespace CSPracc
                     if(CoachTeam1.PlayerPawn.Handle == playerController.PlayerPawn.Handle)
                     {
                         CoachTeam1.PrintToCenter("Your no longer the coach now.");
+                        CoachTeam1.Clan = "";
                         CoachTeam1 = null;
                         
                     }
@@ -127,6 +129,7 @@ namespace CSPracc
                     if (CoachTeam2.PlayerPawn.Handle == playerController.PlayerPawn.Handle)
                     {
                         CoachTeam2.PrintToCenter("Your no longer the coach now.");
+                        CoachTeam2.Clan = "";
                         CoachTeam2 = null;
                     }
                 }
@@ -134,8 +137,8 @@ namespace CSPracc
         }
 
 
-        public void AddCoach(CCSPlayerController playerController)
-        {
+        public static void AddCoach(CCSPlayerController playerController)
+        {          
             if (CurrentMode != Enums.PluginMode.Match) return;
             if (playerController == null) return;
             if (!playerController.PlayerPawn.IsValid) return;
@@ -144,6 +147,7 @@ namespace CSPracc
                 if(CoachTeam1 == null)
                 {
                     CoachTeam1 = playerController;
+                    CoachTeam1.Clan = "COACH";
                     CoachTeam1.PrintToCenter("Your the T coach now.");
                 }
                 else
@@ -156,6 +160,7 @@ namespace CSPracc
                 if (CoachTeam2 == null)
                 {
                     CoachTeam2 = playerController;
+                    CoachTeam2.Clan = "COACH";
                     CoachTeam2.PrintToCenter("Your the CT coach now.");
                 }
                 else
@@ -166,7 +171,7 @@ namespace CSPracc
 
         }
 
-        public void ChangeMap(CCSPlayerController player,string mapName)
+        public static void ChangeMap(CCSPlayerController player,string mapName)
         {
             if (player == null) return;
             if (!player.PlayerPawn.IsValid) { return; }
@@ -182,7 +187,7 @@ namespace CSPracc
 
         }
 
-        public void SwitchTo(DataModules.Enums.PluginMode pluginMode, bool force = false)
+        public static void SwitchTo(DataModules.Enums.PluginMode pluginMode, bool force = false)
         {
             if(pluginMode == currentMode && !force) { return; }
             switch (pluginMode)
@@ -201,13 +206,14 @@ namespace CSPracc
                 case DataModules.Enums.PluginMode.Match:
                     DataModules.consts.Methods.MsgToServer("Starting match");
                     Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
-                    Server.ExecuteCommand("exec gamemode_competitive.cfg");
+                    Server.ExecuteCommand("exec CSPRACC\\5on5_warmup.cfg");
                     currentMode = pluginMode;
+                    state = Enums.match_state.warmup;
                     break;
             }
         }
 
-        public void RestoreBackup(CCSPlayerController player)
+        public static void RestoreBackup(CCSPlayerController player)
         {
             if(CurrentMode != Enums.PluginMode.Match) { return; }
             if(player == null) { return; }
@@ -218,7 +224,7 @@ namespace CSPracc
             RoundRestoreManager.OpenBackupMenu(player);
         }
 
-        public void ForceUnpause(CCSPlayerController player)
+        public static void ForceUnpause(CCSPlayerController player)
         {
             if (CurrentMode != Enums.PluginMode.Match) { return; }
             if (player == null) { return; }
@@ -229,7 +235,7 @@ namespace CSPracc
             Server.ExecuteCommand(DataModules.consts.COMMANDS.UNPAUSE_MATCH);
         }
 
-        public HookResult OnPlayerSpawn(EventPlayerSpawn @event, GameEventInfo info)
+        public static HookResult OnPlayerSpawn(EventPlayerSpawn @event, GameEventInfo info)
         {
             if(CoachTeam1 != null)
             {
@@ -239,7 +245,7 @@ namespace CSPracc
                     Logging.LogMessage("T Coach commit suicide now!");
                     CoachTeam1!.InGameMoneyServices!.Account = 0;
                     Server.ExecuteCommand("mp_suicide_penalty 0");
-                    CSPraccPlugin.Instance!.AddTimer(0.1f, () => CoachTeam1!.PlayerPawn.Value.CommitSuicide(true, true));
+                    CSPraccPlugin.Instance!.AddTimer(0.2f, () => CoachTeam1!.PlayerPawn.Value.CommitSuicide(false, true));
                     Server.ExecuteCommand("mp_suicide_penalty 1");
 
                 }
@@ -252,11 +258,35 @@ namespace CSPracc
                     Logging.LogMessage("CT Coach commit suicide now!");
                     CoachTeam2!.InGameMoneyServices!.Account = 0;
                     Server.ExecuteCommand("mp_suicide_penalty 0");
-                    CSPraccPlugin.Instance!.AddTimer(0.1f, () => CoachTeam2!.PlayerPawn.Value.CommitSuicide(true, true));
+                    CSPraccPlugin.Instance!.AddTimer(0.2f, () => CoachTeam2!.PlayerPawn.Value.CommitSuicide(false, true));
                     Server.ExecuteCommand("mp_suicide_penalty 1");
                 }
             }
             return HookResult.Changed;
+        }
+
+        public static HookResult OnFreezeTimeEnd(EventRoundFreezeEnd @event,GameEventInfo info)
+        {
+            if (CoachTeam2 != null)
+            {
+                CSPraccPlugin.Instance!.AddTimer(2.0f, () => SwitchTeamsCoach(CoachTeam2));
+            }
+            if (CoachTeam1 != null)
+            {
+                CSPraccPlugin.Instance!.AddTimer(2.0f, () => SwitchTeamsCoach(CoachTeam1));
+            }
+            return HookResult.Changed;
+        }
+
+        private static void SwitchTeamsCoach(CCSPlayerController playerController)
+        {
+            if(playerController == null)
+            {
+                return;
+            }
+            CsTeam oldTeam = (CsTeam)playerController.TeamNum;
+            playerController.ChangeTeam(CsTeam.Spectator);
+            playerController.ChangeTeam(oldTeam);
         }
     }
 }

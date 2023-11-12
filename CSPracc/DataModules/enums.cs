@@ -18,6 +18,12 @@ namespace CSPracc.DataModules
             incendiary
         }
 
+        public enum RecordingMode
+        {
+            Automatic,
+            Manual
+        }
+
         public enum match_state
         {
             warmup,

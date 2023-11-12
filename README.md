@@ -2,78 +2,28 @@
 Open Source Plugin for Counterstrike 2 based on [CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp)
 
 ## Credits
-For bot command implementation:
-https://github.com/shobhit-pathak/MatchZy/
+For bot command implementation: https://github.com/shobhit-pathak/MatchZy/
+Alot of ideas: https://github.com/splewis/get5
 
 ## Important
-Currently in an early stage of development.
-Plugin might be unstable or not working.
+Currently in an early stage of development.<br>
+Plugin might be unstable or not working.<br>
 
-## Implemted Features
-### QOL
-- [x] Defining aliases for commands
-- [x] .ct .t .spec
-- [x] .swap
-- [x] .rcon
-- [x] !rcon_password for temporary admin rights
-- [x] config file for rcon password and permanent admin list      
-### Practice Mode
-- [x] Practice Config, Infinite Ammo etc             
-- [x] Grenade Practice
-- [x] Spawns
-- [ ] Rethrow
-- [x] watchme
-#### Bot Commands
-- [x] .bot
-- [x] .boost
-- [x] .nobot (removing closest bot)
-- [x] .clearbots (removing all bots of current player)
-- [x] .crouchbot (known issue: bot might appear crouching, but hitbox is still a standing model!)
-- [x] .crouchboost
-### Match Mode
-- [x] Pause
-- [x] Unpause
-- [x] Backup
-- [x] forceready
-- [x] restart
-- [x] warmup 
-- [ ] coach slot
-- [ ] demo recording incl. upload of demo file to media server for easy sharing
-### Retake Mode
-- [ ] Setting custom spawns
-- [ ] Setting random amount or fixed hp
-- [ ] custom weapon pools
-## Files
-        configmanager.xml
-                Stores list of admins, rcon password, list of saved grenades etc.
-        Logging.txt
-                Output which mitght be usefull for debugging purposes
-## Configs
-        Needs to be stores in cfg/CSPRACC/
-## General Chat Commands
-        .menu - Opens small chat menu, current options pracc, match or help
-        .help - Prints information about plugin usage
-        .rcon <Command> - Executing server sided commands 
-        .map <mapname>
-        .swap
-        .ct .t .spec
-        .alias .<NewAlias> .<Command>
-                example : .alias .cbot .crouchbot
+## Plugin Functions
+For detailed informations read [this](https://github.com/CHR15cs/CS2-Practice-Plugin/wiki)<br>
+### Match
+Can be enabled via **.menu** or **.match**.<br>
+Supports basic administration functionalities.<br>
+To see everything this modes supports, visit the [wiki](https://github.com/CHR15cs/CS2-Practice-Plugin/wiki/Match-Commands)<br>
+### Practice
+Can be enabled via **.menu** or **.pracc**.<br>
+Supports many helpful practice functions such as **.spawn (x)** where x is the spawn number.<br>
+Grenade practice was a main topic for me, so I implemented a small **.nades** menu, where lineups are stored which can be saved with **.save (grenade title without whitespaces!)**.<br>
+Detailed information can be found [here](https://github.com/CHR15cs/CS2-Practice-Plugin/wiki/Practice-Commands).<br>
 
-## Chat Commands available in match mode       
-        .pause 
-        .unpause 
-        .forceready
-        .warmup
-        .backup - opens backup menu to restore a round
-        
-## Chat Commands available in practice mode
-        .spawn <number> 
-        .nades - Opens a menu of saved grenade lineups
-        .save <name> <description> - Stores the current position and viewangle as grenade lineup used in .nades
-        .bot
-        .crouchbot
-        .boost
-        .crouchboost
-        .watchme
+## Configuration
+This plugin is somewhat customizeable.<br>
+Any Important steps are described [here](https://github.com/CHR15cs/CS2-Practice-Plugin/wiki/Configuration)<br>
 
+## Issues
+If you have any problems with the plugin, please do not hesitate to open a new issue, I will work on it in my freetime, so do not expect 24/7 support.

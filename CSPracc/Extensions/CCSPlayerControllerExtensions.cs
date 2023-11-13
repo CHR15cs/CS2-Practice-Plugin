@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CSPracc
 {
-    public static class CCSPlayerConstrollerExtensions
+    public static class CCSPlayerControllerExtensions
     {
         public static bool IsAdmin(this CCSPlayerController playerController)
         {

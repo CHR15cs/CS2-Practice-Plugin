@@ -41,6 +41,7 @@ namespace CSPracc.DataModules.consts
         public const string BACKUPMENU = ".backup";
         public const string NADES = ".nades";
         public const string SAVE = ".save";
+        public const string REMOVE = ".remove";
         public const string MAP = ".map";
         public const string RESTORE = ".restore";
         public const string FORCEUNPAUSE = ".forceunpause";

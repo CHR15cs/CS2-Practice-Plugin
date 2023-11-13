@@ -18,6 +18,10 @@ namespace CSPracc
 
         public static void LogMessage(string message) 
         { 
+            if(!CSPraccPlugin.Config.Logging)
+            {
+                return;
+            }
             if(_logFile != null)
             {
                 using (StreamWriter sw = File.AppendText(_logFile.FullName))

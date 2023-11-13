@@ -16,10 +16,6 @@ namespace CSPracc.DataModules
 
         [XmlElement("DemoName")]
         public string? DemoName { get; set; } = "{Map}_{yyyy}_{MM}_{dd}_{mm}_{HH}_{ss}.dem";
-        [XmlElement("MegaUsername")]
-        public string? MegaUsername { get; set; } = "MegaName";
-        [XmlElement("MegaPassword")]
-        public string? MegaPassword { get; set; } = "MegaPassword";
 
         [XmlElement("RecordingMode")]
         public  Enums.RecordingMode RecordingMode

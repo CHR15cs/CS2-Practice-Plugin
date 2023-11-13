@@ -28,7 +28,7 @@ namespace CSPracc
                 {
                     if (nade.Map == Server.MapName)
                     {
-                        NadesMenu.AddMenuOption(nade.Title, handleGive);
+                        NadesMenu.AddMenuOption($"{nade.Title} ID:{nade.ID}", handleGive);
                     }
                 }
                 return NadesMenu;
@@ -61,7 +61,13 @@ namespace CSPracc
             {
                 if (nade.Map == Server.MapName)
                 {
-                    if (nade.Title == grenadeName)
+                    string idofNade = grenadeName.Substring(grenadeName.IndexOf(":")+1);
+                    if(! int.TryParse(idofNade,out int id))
+                     {
+                        player.PrintToCenter($"Could not find nade {idofNade}");
+                        return;
+                    }
+                    if (nade.ID == id)
                     {
                         player.PlayerPawn.Value.Teleport(nade.PlayerPosition, new QAngle(nade.PlayerAngle.X, nade.PlayerAngle.Y, nade.PlayerAngle.Z), nade.Velocity);
                     }
@@ -80,7 +86,46 @@ namespace CSPracc
             if (args == String.Empty) return;
             var absOrigin = player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin;
             string name = args;
-            Nades?.Add(new SavedNade(absOrigin, player.PlayerPawn.Value.EyeAngles, null, name, "", Server.MapName));
+            Nades?.Add(new SavedNade(absOrigin, player.PlayerPawn.Value.EyeAngles, null, name, "", Server.MapName,Nades.Count +1));
+            player.PrintToCenter($"Successfully added grenade {name}");
+            CSPraccPlugin.WriteConfig(CSPraccPlugin.Config);
+        }
+
+        /// <summary>
+        /// Add grenade to the list
+        /// </summary>
+        /// <param name="player">palyer who issued the command</param>
+        /// <param name="args">Arguments shall look like <Name> <Description></param>
+        public static void RemoveGrenade(CCSPlayerController player, string args)
+        {
+            if (player == null) return;
+            if (args == String.Empty) return;
+            args = args.Trim();
+            int id = -1;
+            try
+            {
+                id = Convert.ToInt32(args);
+            }
+            catch
+            {
+                player.PrintToCenter("invalid argument, needs to be a number");
+                return;
+            }
+            bool foundnade = false; 
+            foreach(var nade in Nades)
+            {
+                if(nade.ID == id)
+                {
+                    Nades.Remove(nade);
+                    player.PrintToCenter("Successfully removed nade");
+                    foundnade = true;
+                    break;
+                }
+            }
+            if(!foundnade)
+            {
+                player.PrintToCenter($"Could not find nade with id {id}");
+            }
             CSPraccPlugin.WriteConfig(CSPraccPlugin.Config);
         }
     }

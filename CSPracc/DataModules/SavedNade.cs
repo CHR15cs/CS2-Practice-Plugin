@@ -86,7 +86,10 @@ namespace CSPracc.DataModules
         [XmlAttribute("Map")]
         public string Map { get; set; }
 
-        public SavedNade(CounterStrikeSharp.API.Modules.Utils.Vector palyerPos, CounterStrikeSharp.API.Modules.Utils.QAngle playerangle, CounterStrikeSharp.API.Modules.Utils.Vector grenadeCord,  string title, string description, string map) 
+        [XmlAttribute("ID")]
+        public int ID { get; set; }
+
+        public SavedNade(CounterStrikeSharp.API.Modules.Utils.Vector palyerPos, CounterStrikeSharp.API.Modules.Utils.QAngle playerangle, CounterStrikeSharp.API.Modules.Utils.Vector grenadeCord,  string title, string description, string map, int id) 
         {
             PlayerPositionX = palyerPos.X;
             PlayerPositionY = palyerPos.Y;
@@ -107,17 +110,12 @@ namespace CSPracc.DataModules
             }
             
             Map = map;
+            ID = id;
         }
 
         public SavedNade()
         {
 
-        }
-
-
-        public override string ToString()
-        {
-            return $"{PlayerPosition.X};{PlayerPosition.Y};{PlayerPosition.Z};{PlayerAngle.X};{PlayerAngle.Y};{PlayerAngle.Z};{Title},{Description},{Map}";
         }
     }
 }

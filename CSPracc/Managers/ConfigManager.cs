@@ -24,7 +24,7 @@ namespace CSPracc
         [XmlArray("CommandAliases")]
         public List<CommandAlias> CommandAliases;
 
-        [XmlElement]
+        [XmlArray]
         public List<SavedNade> SavedNades
         {
             get
@@ -39,6 +39,9 @@ namespace CSPracc
 
         [XmlElement]
         public DemoManagerSettings DemoManagerSettings { get; set; }
+
+        [XmlElement]
+        public bool Logging {  get; set; }
 
         public ConfigManager()
         {

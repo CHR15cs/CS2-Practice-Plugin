@@ -148,7 +148,7 @@ public class CSPraccPlugin : BasePlugin
             Config.Admins = new List<string>();
             Config.SavedNades = new List<SavedNade>();
             Config.Admins.Add("steamid1234");
-            Config.SavedNades.Add(new SavedNade(new Vector(0, 0, 0), new QAngle(0, 0, 0), new Vector(0, 0, 0), "test nade", "test", "de_test"));
+            Config.SavedNades.Add(new SavedNade(new Vector(0, 0, 0), new QAngle(0, 0, 0), new Vector(0, 0, 0), "test nade", "test", "de_test", 1));
             WriteConfig(Config);
         }
         RegisterListener<Listeners.OnMapStart>((mapName) =>
@@ -448,6 +448,11 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
             case PRACC_COMMAND.SAVE:
                 {
                     NadeManager.AddGrenade(player, args);
+                    break;
+                }
+            case PRACC_COMMAND.REMOVE:
+                {
+                    NadeManager.RemoveGrenade(player, args);
                     break;
                 }
             case PRACC_COMMAND.BOT:

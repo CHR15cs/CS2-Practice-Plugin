@@ -26,8 +26,6 @@ using System.Drawing;
 public class CSPraccPlugin : BasePlugin
 {
    public static CSPraccPlugin? Instance { get; private set; }
-
-    List<CSPracc.DataModules.Player>? Players;
     
     private static List<SteamID>? _adminList = null;
     public static List<SteamID> AdminList
@@ -136,7 +134,6 @@ public class CSPraccPlugin : BasePlugin
         _moduleDir = new DirectoryInfo(ModuleDirectory);
         Logging logging = new Logging(new FileInfo(Path.Combine(ModuleDir.FullName, "Logging.txt")));
         configManagerFile = new FileInfo(Path.Combine(ModuleDir.FullName, "configmanager.xml"));
-        Players = new List<CSPracc.DataModules.Player>();
         XmlSerializer serializer = new XmlSerializer(typeof(ConfigManager));
         if (configManagerFile.Exists)
         {

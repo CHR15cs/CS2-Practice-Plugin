@@ -213,14 +213,14 @@ namespace CSPracc.Managers
                     spawnedBots[tempPlayer.UserId.Value]["owner"] = botOwner;
                     spawnedBots[tempPlayer.UserId.Value]["crouchstate"] = crouch;
                     CCSPlayer_MovementServices movementService = new CCSPlayer_MovementServices(tempPlayer.PlayerPawn.Value.MovementServices!.Handle);
+                    CCSBot bot = tempPlayer.PlayerPawn.Value.Bot!;
+                    tempPlayer.PlayerPawn.Value.Teleport(botOwnerPosition.PlayerPosition, botOwnerPosition.PlayerAngle, new Vector(0, 0, 0));
                     if ((bool)spawnedBots[tempPlayer.UserId.Value]["crouchstate"])
                     {
-                        CSPraccPlugin.Instance!.AddTimer(0.1f, () => movementService.DuckAmount = 9999999);
-                        movementService.Ducked = true;
-                        movementService.Ducking = true;
-                        movementService.CrouchState = (byte)ForcedCrouchState_t.FORCEDCROUCH_CROUCHED;
-                    }
-                    tempPlayer.PlayerPawn.Value.Teleport(botOwnerPosition.PlayerPosition, botOwnerPosition.PlayerAngle, new Vector(0, 0, 0));
+                        CSPraccPlugin.Instance!.AddTimer(0.1f, () => movementService.DuckAmount = 1);
+                        CSPraccPlugin.Instance!.AddTimer(0.2f, () => bot.IsCrouching = true);
+
+                    }                 
                     unusedBotFound = true;
                 }
             }
@@ -243,15 +243,15 @@ namespace CSPracc.Managers
                     if (spawnedBots[player.UserId.Value]["position"] is Position botPosition)
                     {                   
                         CCSBot bot = player.PlayerPawn.Value.Bot!;
-                        CCSPlayer_MovementServices movementService = new CCSPlayer_MovementServices(player.PlayerPawn.Value.MovementServices!.Handle);
-                        if((bool)spawnedBots[player.UserId.Value]["crouchstate"])
+                        CCSPlayer_MovementServices movementService = new CCSPlayer_MovementServices(player.PlayerPawn.Value.MovementServices!.Handle);                   
+                        player.PlayerPawn.Value.Teleport(botPosition.PlayerPosition, botPosition.PlayerAngle, new Vector(0, 0, 0));
+                        if ((bool)spawnedBots[player.UserId.Value]["crouchstate"]) player.PlayerPawn.Value.Flags |= (uint)PlayerFlags.FL_DUCKING;
+                        if ((bool)spawnedBots[player.UserId.Value]["crouchstate"])
                         {
-                            CSPraccPlugin.Instance!.AddTimer(0.1f, () => movementService.DuckAmount = 9999999);
-                            movementService.Ducked = true;
-                            movementService.Ducking = true;
-                            movementService.CrouchState = (byte)ForcedCrouchState_t.FORCEDCROUCH_CROUCHED;
-                        }                       
-                        player.PlayerPawn.Value.Teleport(botPosition.PlayerPosition, botPosition.PlayerAngle, new Vector(0, 0, 0));                                                         
+                            CSPraccPlugin.Instance!.AddTimer(0.1f, () => movementService.DuckAmount = 1);
+                            CSPraccPlugin.Instance!.AddTimer(0.2f, () => bot.IsCrouching = true);
+                        }
+                       
                     }
                 }
             }

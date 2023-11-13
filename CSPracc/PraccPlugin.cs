@@ -70,7 +70,7 @@ public class CSPraccPlugin : BasePlugin
     {
         get
         {
-            return "1.0.0.0";
+            return "0.9.0.0";
         }
     }
 

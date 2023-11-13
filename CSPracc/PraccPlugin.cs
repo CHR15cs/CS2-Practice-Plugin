@@ -317,6 +317,11 @@ RegisterListener<Listeners.OnEntitySpawned>(entity =>
                 }
             case PRACC_COMMAND.SWAP:
                 {
+                    if (!player.IsAdmin())
+                    {
+                        player.PrintToCenter("Only admins can execute this command!");
+                        return HookResult.Continue;
+                    }
                     Server.ExecuteCommand(COMMANDS.SWAP_TEAMS);
                     break;
                 }

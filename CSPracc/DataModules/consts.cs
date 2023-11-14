@@ -60,6 +60,7 @@ namespace CSPracc.DataModules.consts
         public const string REMOVEALIAS = ".ralias";
         public const string CLEAR = ".clear";
         public const string DEMO = ".demo";
+        public const string SAVELAST = ".savelast";
     }
     public class Strings
     {

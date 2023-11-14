@@ -8,11 +8,16 @@ using System.Text;
 using System.Threading.Tasks;
 using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.DataModules;
+using CSPracc.CommandHandler;
+using CounterStrikeSharp.API.Modules.Entities;
+using System.Xml.Linq;
 
 namespace CSPracc
 {
     public static class NadeManager
     {
+        public static Dictionary<CCSPlayerController, SavedNade> LastThrownGrenade = new Dictionary<CCSPlayerController, SavedNade>();
+
         private static ChatMenu _nadeMenu = null;
         /// <summary>
         /// Grenade chat menu
@@ -24,16 +29,32 @@ namespace CSPracc
                 var NadesMenu = new ChatMenu("Nade Menu");
                 var handleGive = (CCSPlayerController player, ChatMenuOption option) => TeleportPlayer(player, option.Text);
 
+                NadesMenu.AddMenuOption($" {ChatColors.Green}Global saved nades:", handleGive, true);
                 foreach (var nade in Nades)
                 {
                     if (nade.Map == Server.MapName)
                     {
-                        NadesMenu.AddMenuOption($"{nade.Title} ID:{nade.ID}", handleGive);
+                        NadesMenu.AddMenuOption($" {ChatColors.Green}{nade.Title} ID:{nade.ID}", handleGive);
                     }
                 }
                 return NadesMenu;
             }
         }
+
+        public static ChatMenu GetNadeMenu(CCSPlayerController player)
+        {
+            ChatMenu menu = NadeMenu;
+            
+            if (LastThrownGrenade.TryGetValue(player,out SavedNade savedNade))
+            {
+                var handleGive = (CCSPlayerController player, ChatMenuOption option) => TeleportPlayer(player, option.Text);
+                menu.AddMenuOption($" {ChatColors.Red}Personal nades:", handleGive, true);
+                
+                menu.AddMenuOption($" {ChatColors.Red}unsaved nade ID:-1", handleGive);
+            }
+            return menu;
+        }
+
         private static List<CSPracc.DataModules.SavedNade>? _nades = null;
         /// <summary>
         /// Stored nades
@@ -66,6 +87,10 @@ namespace CSPracc
                      {
                         player.PrintToCenter($"Could not find nade {idofNade}");
                         return;
+                    }
+                    if(id == -1)
+                    {
+                        player.PlayerPawn.Value.Teleport(LastThrownGrenade[player].PlayerPosition, new QAngle(LastThrownGrenade[player].PlayerAngle.X, LastThrownGrenade[player].PlayerAngle.Y, LastThrownGrenade[player].PlayerAngle.Z), LastThrownGrenade[player].Velocity);
                     }
                     if (nade.ID == id)
                     {
@@ -126,6 +151,65 @@ namespace CSPracc
             {
                 player.PrintToCenter($"Could not find nade with id {id}");
             }
+            CSPraccPlugin.WriteConfig(CSPraccPlugin.Config);
+        }
+
+        public static void OnEntitySpawned(CEntityInstance entity)
+        {
+            var designerName = entity.DesignerName;
+            if (Match.CurrentMode != Enums.PluginMode.Pracc) return;
+
+            if (designerName.Contains("_projectile"))
+            {
+                Logging.LogMessage("Its a projectile!!!!!!!");
+                CBaseCSGrenadeProjectile projectile = new CBaseCSGrenadeProjectile(entity.Handle);
+                Logging.LogMessage($"Its a {projectile.DesignerName}");
+
+                Server.NextFrame(() =>
+                {
+                    CCSPlayerController player = new CCSPlayerController(projectile.Thrower.Value.Controller.Value.Handle);
+                    Logging.LogMessage($"thrower : {player.PlayerName}");
+                    SavedNade last = new SavedNade(player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin, player.PlayerPawn.Value.EyeAngles, null, "temp", "", Server.MapName, -1);
+                    Logging.LogMessage("generated temp nade");
+                    if (LastThrownGrenade.ContainsKey(player))
+                    {
+                        LastThrownGrenade[player] = last;
+                    }
+                    else
+                    {
+                        LastThrownGrenade.Add(player, last);
+                    }
+
+                });
+
+            }
+
+            if (designerName == "smokegrenade_projectile")
+            {
+                var projectile = new CSmokeGrenadeProjectile(entity.Handle);
+
+                Server.NextFrame(() =>
+                {
+                    CCSPlayerController player = new CCSPlayerController(projectile.Thrower.Value.Controller.Value.Handle);
+                    projectile.SmokeColor.X = (float)Utils.GetTeamColor(player).R;
+                    projectile.SmokeColor.Y = (float)Utils.GetTeamColor(player).G;
+                    projectile.SmokeColor.Z = (float)Utils.GetTeamColor(player).B;
+                    Logging.LogMessage($"smoke color {projectile.SmokeColor}");
+                });
+            }
+        }
+
+        public static void SaveLastGrenade(CCSPlayerController playerController,string newName)
+        {
+            if(!LastThrownGrenade.TryGetValue(playerController, out SavedNade nade))
+            {
+                return;
+            }
+            nade.Title = newName;
+            nade.ID = Nades.Count + 1;
+            Nades.Add(nade);
+            playerController.PrintToCenter($"Successfully added grenade {newName}");
+            LastThrownGrenade.Remove(playerController);
             CSPraccPlugin.WriteConfig(CSPraccPlugin.Config);
         }
     }

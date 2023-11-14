@@ -13,6 +13,8 @@ using CSPracc.DataModules;
 using System.IO;
 using CSPracc.Managers;
 using CSPracc.DataModules.consts;
+using CSPracc.EventHandler;
+using CSPracc.CommandHandler;
 
 namespace CSPracc
 {
@@ -28,6 +30,8 @@ namespace CSPracc
 
         public static CCSPlayerController? CoachTeam1 { get; set; }
         public static CCSPlayerController? CoachTeam2 { get; set; }
+
+        private static BaseEventHandler EventHandler {  get; set; } = null;
 
         public static void Pause()
         {
@@ -269,17 +273,22 @@ namespace CSPracc
                     DataModules.consts.Methods.MsgToServer("Restoring default config.");
                     Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
                     Server.ExecuteCommand("exec server.cfg");
+                    EventHandler = new BaseEventHandler(CSPraccPlugin.Instance!,new BaseCommandHandler());
                     currentMode = pluginMode;
                     break;
                 case DataModules.Enums.PluginMode.Pracc:
                     DataModules.consts.Methods.MsgToServer("Starting practice mode.");
                     Server.ExecuteCommand("exec CSPRACC\\pracc.cfg");
+                    EventHandler.Dispose();
+                    EventHandler = new PracticeEventHandler(CSPraccPlugin.Instance!, new PracticeCommandHandler());
                     currentMode = pluginMode;
                     break;
                 case DataModules.Enums.PluginMode.Match:
                     DataModules.consts.Methods.MsgToServer("Starting match");
                     Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
                     Server.ExecuteCommand("exec CSPRACC\\5on5_warmup.cfg");
+                    EventHandler.Dispose();
+                    EventHandler = new MatchEventHandler(CSPraccPlugin.Instance!, new MatchCommandHandler());
                     currentMode = pluginMode;
                     state = Enums.match_state.warmup;
                     break;
@@ -308,58 +317,5 @@ namespace CSPracc
             Server.ExecuteCommand(DataModules.consts.COMMANDS.UNPAUSE_MATCH);
         }
 
-        public static HookResult OnPlayerSpawn(EventPlayerSpawn @event, GameEventInfo info)
-        {
-            if(CoachTeam1 != null)
-            {
-                Logging.LogMessage($"CoachT1 {@event.Userid.UserId} - {CoachTeam1!.UserId}");
-                if (@event.Userid.UserId == CoachTeam1!.UserId)
-                {
-                    Logging.LogMessage("T Coach commit suicide now!");
-                    CoachTeam1!.InGameMoneyServices!.Account = 0;
-                    Server.ExecuteCommand("mp_suicide_penalty 0");
-                    CSPraccPlugin.Instance!.AddTimer(0.2f, () => CoachTeam1!.PlayerPawn.Value.CommitSuicide(false, true));
-                    Server.ExecuteCommand("mp_suicide_penalty 1");
-
-                }
-            }
-            if(CoachTeam2 != null)
-            {
-                Logging.LogMessage($"CoachT2 {@event.Userid.UserId} - {CoachTeam2!.UserId}");
-                if (@event.Userid.UserId == CoachTeam2!.UserId)
-                {
-                    Logging.LogMessage("CT Coach commit suicide now!");
-                    CoachTeam2!.InGameMoneyServices!.Account = 0;
-                    Server.ExecuteCommand("mp_suicide_penalty 0");
-                    CSPraccPlugin.Instance!.AddTimer(0.2f, () => CoachTeam2!.PlayerPawn.Value.CommitSuicide(false, true));
-                    Server.ExecuteCommand("mp_suicide_penalty 1");
-                }
-            }
-            return HookResult.Changed;
-        }
-
-        public static HookResult OnFreezeTimeEnd(EventRoundFreezeEnd @event,GameEventInfo info)
-        {
-            if (CoachTeam2 != null)
-            {
-                CSPraccPlugin.Instance!.AddTimer(2.0f, () => SwitchTeamsCoach(CoachTeam2));
-            }
-            if (CoachTeam1 != null)
-            {
-                CSPraccPlugin.Instance!.AddTimer(2.0f, () => SwitchTeamsCoach(CoachTeam1));
-            }
-            return HookResult.Changed;
-        }
-
-        private static void SwitchTeamsCoach(CCSPlayerController playerController)
-        {
-            if(playerController == null)
-            {
-                return;
-            }
-            CsTeam oldTeam = (CsTeam)playerController.TeamNum;
-            playerController.ChangeTeam(CsTeam.Spectator);
-            playerController.ChangeTeam(oldTeam);
-        }
     }
 }

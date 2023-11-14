@@ -103,23 +103,37 @@ namespace CSPracc.CommandHandler
 
         protected bool CheckAndGetCommand(int userid, string commandWithArgs,out string command, out string args, out CCSPlayerController player)
         {
+            Logging.LogMessage($"Inside CheckAndGetCommand");
+            Logging.LogMessage($"{nameof(userid)}: {userid}");
+            Logging.LogMessage($"{nameof(commandWithArgs)}: {userid}");
             command = string.Empty;
             args = string.Empty;
             player = null;
+            if(commandWithArgs.StartsWith('!'))
+            {
+                commandWithArgs = "." + commandWithArgs.Substring(1);
+            }
             if (!commandWithArgs.StartsWith("."))
             {
+                Logging.LogMessage("String is no command. Leaving now.");
                 return false;
             }
-            player = new CCSPlayerController(NativeAPI.GetEntityFromIndex(userid));
+            player = new CCSPlayerController(NativeAPI.GetEntityFromIndex(userid+1));
+            
+            Logging.LogMessage($"Created {nameof(player)} ({player.PlayerName}) from userId {userid}");
             if (!IsPlayerValid(player))
             {
                 Logging.LogMessage("EventPlayerChat invalid entity");
                 return false;
             }
+            Logging.LogMessage($"Player {player.PlayerName} is valid");
             commandWithArgs = Utils.ReplaceAlias(commandWithArgs);
+            Logging.LogMessage("Alias replaced");
             Logging.LogMessage("found command " + commandWithArgs);
             command = getCommand(commandWithArgs);
+            Logging.LogMessage($"Extracted command. Command now looks like this: \"{command}\"");
             args = getArgs(commandWithArgs);
+            Logging.LogMessage($"Extracted args. Args now look like this: \"{args}\"");
             return true;
         }
 
@@ -127,6 +141,7 @@ namespace CSPracc.CommandHandler
         {
             if(!CheckAndGetCommand(@event.Userid,@event.Text,out string command,out string args,out CCSPlayerController player))
             {
+                Logging.LogMessage("Returning after CheckAndGetCommand");
                 return false;
             }
             switch (command)
@@ -240,6 +255,7 @@ namespace CSPracc.CommandHandler
                     }
                 default:
                     {
+                        Logging.LogMessage("Could not find base command");
                         break;
                     }
             }

@@ -11,6 +11,7 @@ using CSPracc.DataModules;
 using CSPracc.CommandHandler;
 using CounterStrikeSharp.API.Modules.Entities;
 using System.Xml.Linq;
+using CSPracc.Modes;
 
 namespace CSPracc
 {
@@ -157,7 +158,16 @@ namespace CSPracc
         public static void OnEntitySpawned(CEntityInstance entity)
         {
             var designerName = entity.DesignerName;
-            if (Match.CurrentMode != Enums.PluginMode.Pracc) return;
+            PracticeMode test = null;
+            try
+            {
+                test = (PracticeMode)CSPraccPlugin.PluginMode;
+            }
+            catch (Exception e)
+            {
+                return;
+            }
+            if (test == null) return;
 
             if (designerName.Contains("_projectile"))
             {

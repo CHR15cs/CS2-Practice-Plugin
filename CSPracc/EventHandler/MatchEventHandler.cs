@@ -17,50 +17,20 @@ namespace CSPracc.EventHandler
 
         public MatchEventHandler(CSPraccPlugin plugin, MatchCommandHandler mch) : base(plugin, mch)
         {
-            plugin.RegisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn, hookMode: HookMode.Post);
+            plugin.RegisterEventHandler<EventPlayerSpawn>(MatchMode.OnPlayerSpawnHandler, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventRoundFreezeEnd>(OnFreezeTimeEnd, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventMatchEndConditions>(OnMatchEnd, hookMode: HookMode.Post);
         }
 
-        public HookResult OnPlayerSpawn(EventPlayerSpawn @event, GameEventInfo info)
-        {
-            if (Match.CoachTeam1 != null)
-            {
-                Logging.LogMessage($"CoachT1 {@event.Userid.UserId} - {Match.CoachTeam1!.UserId}");
-                if (@event.Userid.UserId == Match.CoachTeam1!.UserId)
-                {
-                    Logging.LogMessage("T Coach commit suicide now!");
-                    Match.CoachTeam1!.InGameMoneyServices!.Account = 0;
-                    Server.ExecuteCommand("mp_suicide_penalty 0");
-                    CSPraccPlugin.Instance!.AddTimer(0.2f, () => Match.CoachTeam1!.PlayerPawn.Value.CommitSuicide(false, true));
-                    Server.ExecuteCommand("mp_suicide_penalty 1");
-
-                }
-            }
-            if (Match.CoachTeam2 != null)
-            {
-                Logging.LogMessage($"CoachT2 {@event.Userid.UserId} - {Match.CoachTeam2!.UserId}");
-                if (@event.Userid.UserId == Match.CoachTeam2!.UserId)
-                {
-                    Logging.LogMessage("CT Coach commit suicide now!");
-                    Match.CoachTeam2!.InGameMoneyServices!.Account = 0;
-                    Server.ExecuteCommand("mp_suicide_penalty 0");
-                    CSPraccPlugin.Instance!.AddTimer(0.2f, () => Match.CoachTeam2!.PlayerPawn.Value.CommitSuicide(false, true));
-                    Server.ExecuteCommand("mp_suicide_penalty 1");
-                }
-            }
-            return HookResult.Continue;
-        }
-
         public HookResult OnFreezeTimeEnd(EventRoundFreezeEnd @event,GameEventInfo info)
         {
-            if (Match.CoachTeam1 != null)
+            if (MatchMode.CoachTeam1 != null)
             {
-                CSPraccPlugin.Instance!.AddTimer(2.0f, () => SwitchTeamsCoach(Match.CoachTeam1));
+                CSPraccPlugin.Instance!.AddTimer(2.0f, () => SwitchTeamsCoach(MatchMode.CoachTeam1));
             }
-            if (Match.CoachTeam2 != null)
+            if (MatchMode.CoachTeam2 != null)
             {
-                CSPraccPlugin.Instance!.AddTimer(2.0f, () => SwitchTeamsCoach(Match.CoachTeam2));
+                CSPraccPlugin.Instance!.AddTimer(2.0f, () => SwitchTeamsCoach(MatchMode.CoachTeam2));
             }
             return HookResult.Changed;
         }
@@ -87,7 +57,7 @@ namespace CSPracc.EventHandler
 
         public override void Dispose()
         {
-            BasePlugin.GameEventHandler<EventPlayerSpawn> spawnEventHandler = OnPlayerSpawn;
+            BasePlugin.GameEventHandler<EventPlayerSpawn> spawnEventHandler = MatchMode.OnPlayerSpawnHandler;
             Plugin.DeregisterEventHandler("player_spawn", spawnEventHandler, true);
             BasePlugin.GameEventHandler<EventRoundFreezeEnd> eventfreezeRoundEnd = OnFreezeTimeEnd;
             Plugin.DeregisterEventHandler("round_freeze_end", eventfreezeRoundEnd, true);

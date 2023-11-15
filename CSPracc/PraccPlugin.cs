@@ -22,6 +22,8 @@ using System.Xml;
 using System.Xml.Serialization;
 using CSPracc.Managers;
 using System.Drawing;
+using CSPracc.Modes;
+using static CSPracc.DataModules.Enums;
 
 public class CSPraccPlugin : BasePlugin
 {
@@ -108,6 +110,8 @@ public class CSPraccPlugin : BasePlugin
     private static FileInfo? configManagerFile = null;
 
     public static ConfigManager? Config;
+
+    public static BaseMode PluginMode { get; set; }
     #endregion
 
     public override void Load(bool hotReload)
@@ -138,6 +142,7 @@ public class CSPraccPlugin : BasePlugin
             Reset();
         });
         Instance = this;
+        PluginMode = new BaseMode();
     }
 
     public static void WriteConfig(ConfigManager config)
@@ -177,7 +182,38 @@ public class CSPraccPlugin : BasePlugin
     /// </summary>
     private void Reset()
     {
-        Match.SwitchTo(Match.CurrentMode, true);
+        SwitchMode(Enums.PluginMode.Standard);
+    }
+
+    public static void SwitchMode(PluginMode pluginMode)
+    {
+        switch(pluginMode)
+        {
+            case Enums.PluginMode.Standard:
+                {
+                    PluginMode?.Dispose();
+                    PluginMode = new BaseMode();
+                    break;
+                }
+            case Enums.PluginMode.Pracc:
+                {
+                    PluginMode?.Dispose();
+                    PluginMode = new PracticeMode();
+                    break;
+                }
+            case Enums.PluginMode.Match:
+                {
+                    PluginMode?.Dispose();
+                    PluginMode = new MatchMode();
+                    break;
+                }
+            default:
+                {
+                    PluginMode?.Dispose();
+                    PluginMode = new BaseMode();
+                    break;
+                }
+        }
     }
 }
 

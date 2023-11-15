@@ -12,6 +12,7 @@ using CSPracc.Managers;
 using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Menu;
 using CounterStrikeSharp.API.Modules.Utils;
+using CSPracc.Modes;
 
 namespace CSPracc.CommandHandler
 {
@@ -41,11 +42,11 @@ namespace CSPracc.CommandHandler
             switch (optionText)
             {
                 case "Pracc":
-                    Match.SwitchTo(Enums.PluginMode.Pracc);
+                    CSPraccPlugin.SwitchMode(Enums.PluginMode.Pracc);
                     break;
                 case "Match":
                     RoundRestoreManager.CleanupOldFiles();
-                    Match.SwitchTo(Enums.PluginMode.Match);
+                    CSPraccPlugin.SwitchMode(Enums.PluginMode.Match);
                     break;
                 case "Help":
                     PrintHelp(player);
@@ -163,7 +164,7 @@ namespace CSPracc.CommandHandler
                     }
                 case PRACC_COMMAND.MAP:
                     {
-                        Match.ChangeMap(player, args);
+                        BaseMode.ChangeMap(player, args);
                         break;
                     }
                 case PRACC_COMMAND.PRACC:
@@ -173,7 +174,7 @@ namespace CSPracc.CommandHandler
                             player.PrintToCenter("Only admins can execute this command!");
                             return false;
                         }
-                        Match.SwitchTo(Enums.PluginMode.Pracc);
+                        CSPraccPlugin.SwitchMode(Enums.PluginMode.Pracc);
                         break;
                     }
                 case PRACC_COMMAND.MATCH:
@@ -184,7 +185,7 @@ namespace CSPracc.CommandHandler
                             return false;
                         }
                         RoundRestoreManager.CleanupOldFiles();
-                        Match.SwitchTo(Enums.PluginMode.Match);
+                        CSPraccPlugin.SwitchMode(Enums.PluginMode.Match);
                         break;
                     }
                 case PRACC_COMMAND.SWAP:

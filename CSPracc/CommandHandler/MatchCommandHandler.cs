@@ -26,57 +26,57 @@ namespace CSPracc.CommandHandler
             {
                 case PRACC_COMMAND.WARMUP:
                     {
-                        Match.Rewarmup(player);
+                        MatchMode.Rewarmup(player);
                         break;
                     }
                 case PRACC_COMMAND.PAUSE:
                     {
-                        Match.Pause();
+                        MatchMode.Pause();
                         break;
                     }
                 case PRACC_COMMAND.UNPAUSE:
                     {
-                        Match.Unpause(player);
+                        MatchMode.Unpause(player);
                         break;
                     }
                 case PRACC_COMMAND.READY:
                     {
-                        Match.Ready(player);
+                        MatchMode.Ready(player);
                         break;
                     }
                 case PRACC_COMMAND.UNREADY:
                     {
-                        Match.UnReady(player);
+                        MatchMode.UnReady(player);
                         break;
                     }
                 case PRACC_COMMAND.FORCEREADY:
                     {
-                        Match.Start(player);
+                        MatchMode.Start(player);
                         break;
                     }
                 case PRACC_COMMAND.COACH:
                     {
-                        Match.AddCoach(player);
+                        MatchMode.AddCoach(player);
                         break;
                     }
                 case PRACC_COMMAND.STOPCOACH:
                     {
-                        Match.StopCoach(player);
+                        MatchMode.StopCoach(player);
                         break;
                     }
                 case PRACC_COMMAND.BACKUPMENU:
                     {
-                        Match.RestoreBackup(player);
+                        MatchMode.RestoreBackup(player);
                         break;
                     }
                 case PRACC_COMMAND.FORCEUNPAUSE:
                     {
-                        Match.ForceUnpause(player);
+                        MatchMode.ForceUnpause(player);
                         break;
                     }
                 case PRACC_COMMAND.RESTART:
                     {
-                        Match.Restart(player);
+                        MatchMode.Restart(player);
                         break;
                     }
                  default:

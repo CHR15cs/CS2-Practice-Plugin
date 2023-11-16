@@ -74,6 +74,8 @@ public class CSPraccPlugin : BasePlugin
         }
     }
 
+    public override string ModuleAuthor => "CHR15";   
+
 
     private static DirectoryInfo? _moduleDir;
     public static DirectoryInfo ModuleDir => _moduleDir!;
@@ -142,7 +144,7 @@ public class CSPraccPlugin : BasePlugin
             Reset();
         });
         Instance = this;
-        PluginMode = new BaseMode();
+        SwitchMode(Enums.PluginMode.Standard);
     }
 
     public static void WriteConfig(ConfigManager config)

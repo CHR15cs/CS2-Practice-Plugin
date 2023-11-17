@@ -10,6 +10,7 @@ namespace CSPracc.DataStorages
 {
     internal interface IDataStorage<TKey, TValue>
     {
+        public bool Add(TKey key, TValue value);
         public void SetOrAdd(TKey key, TValue value);
         public bool RemoveKey(TKey key);
         public void Clear();

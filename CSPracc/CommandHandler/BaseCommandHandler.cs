@@ -128,11 +128,13 @@ namespace CSPracc.CommandHandler
                 return false;
             }
             Logging.LogMessage($"Player {player.PlayerName} is valid");
-            commandWithArgs = Utils.ReplaceAlias(commandWithArgs);
-            Logging.LogMessage("Alias replaced");
-            Logging.LogMessage("found command " + commandWithArgs);
             command = getCommand(commandWithArgs);
             Logging.LogMessage($"Extracted command. Command now looks like this: \"{command}\"");
+            if(CommandAliasManager.Instance.ReplaceAlias(player, command, out string replacedCommand))
+            {
+                Logging.LogMessage($"Replaced command to {replacedCommand}");
+                command = replacedCommand;
+            }
             args = getArgs(commandWithArgs);
             Logging.LogMessage($"Extracted args. Args now look like this: \"{args}\"");
             return true;
@@ -213,17 +215,7 @@ namespace CSPracc.CommandHandler
                         {
                             player.PrintToCenter("Invalid amout of parameters. Command need to be used .alias <newAlias> <commandTobeExecuted>");
                         }
-                        foreach (CommandAlias cAlias in CSPraccPlugin.Config!.CommandAliases)
-                        {
-                            if (cAlias.Alias == (ArgumentList[0]))
-                            {
-                                player.PrintToCenter($"Alias {cAlias.Alias} is already existing. Use .ralias <alias> to remove alias.");
-                                return false;
-                            }
-                        }
-                        CSPraccPlugin.Config!.AddCommandAlias(new CommandAlias(ArgumentList[0], ArgumentList[1]));
-                        player.PrintToCenter($"Added alias {ArgumentList[0]} for command {ArgumentList[1]}");
-                        CSPraccPlugin.WriteConfig(CSPraccPlugin.Config);
+                        CommandAliasManager.Instance.CreateAlias(player, ArgumentList[0], ArgumentList[1]);
                         break;
                     }
                 case PRACC_COMMAND.REMOVEALIAS:
@@ -238,15 +230,7 @@ namespace CSPracc.CommandHandler
                         {
                             player.PrintToCenter("Invalid command arguments");
                         }
-                        for (int i = 0; i < CSPraccPlugin.Config!.CommandAliases.Count; i++)
-                        {
-                            if (CSPraccPlugin.Config!.CommandAliases[i].Alias == args)
-                            {
-                                CSPraccPlugin.Config!.CommandAliases.RemoveAt(i);
-                                player.PrintToCenter($"Removed alias {args}");
-                                break;
-                            }
-                        }
+                        CommandAliasManager.Instance.RemoveAlias(player, args);
                         break;
                     }
                 case PRACC_COMMAND.DEMO:

@@ -79,7 +79,7 @@ namespace CSPracc
             if (!projectileStorages.ContainsKey(mapName))
             {
                 //TODO: Get Directory from config.
-                projectileStorages.Add(mapName, new ProjectileStorage(new DirectoryInfo(Path.Combine(CSPraccPlugin.ModuleDir.FullName, "Projectiles")), mapName));
+                projectileStorages.Add(mapName, new ProjectileStorage(new DirectoryInfo(Path.Combine(CSPraccPlugin.ModuleDir.FullName, "Projectiles"))));
             }
             return projectileStorages[mapName];
         }

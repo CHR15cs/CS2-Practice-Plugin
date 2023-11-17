@@ -20,11 +20,6 @@ namespace CSPracc
         [XmlArray("PluginAdmins")]
         public List<string> Admins;
 
-
-        [XmlArray("CommandAliases")]
-        public List<CommandAlias> CommandAliases;
-
-     
         [XmlElement]
         public DemoManagerSettings DemoManagerSettings { get; set; }
 
@@ -34,11 +29,6 @@ namespace CSPracc
         public ConfigManager()
         {         
             DemoManagerSettings = new DemoManagerSettings();
-        }
-
-        public void AddCommandAlias(CommandAlias commandAlias)
-        {
-            CommandAliases.Add(commandAlias);
         }
     }
 }

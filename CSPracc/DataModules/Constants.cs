@@ -61,6 +61,8 @@ namespace CSPracc.DataModules.Constants
         public const string CLEAR = ".clear";
         public const string DEMO = ".demo";
         public const string SAVELAST = ".savelast";
+        public const string CHECKPOINT = ".checkpoint";
+        public const string BACK = ".back";
     }
     public class Strings
     {

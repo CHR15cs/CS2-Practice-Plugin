@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CounterStrikeSharp.API.Modules.Timers;
-using CSPracc.DataModules.consts;
+using CSPracc.DataModules.Constants;
 using CounterStrikeSharp.API.Modules.Entities;
 using System.Net.Http.Headers;
 using CounterStrikeSharp.API.Modules.Memory;

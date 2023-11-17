@@ -17,7 +17,7 @@ using CounterStrikeSharp.API.Modules.Menu;
 using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc;
 using CSPracc.DataModules;
-using CSPracc.DataModules.consts;
+using CSPracc.DataModules.Constants;
 using System.Xml;
 using System.Xml.Serialization;
 using CSPracc.Managers;

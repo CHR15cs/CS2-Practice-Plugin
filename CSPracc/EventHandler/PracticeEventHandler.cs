@@ -5,7 +5,7 @@ using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Modules.Events;
 using CSPracc.CommandHandler;
 using CSPracc.DataModules;
-using CSPracc.DataModules.consts;
+using CSPracc.DataModules.Constants;
 using CSPracc.Managers;
 using System;
 using System.Collections.Generic;
@@ -29,7 +29,7 @@ namespace CSPracc.EventHandler
         PracticeCommandHandler PracticeCommandHandler { get; set; }
         public PracticeEventHandler(CSPraccPlugin plugin, PracticeCommandHandler pch) : base(plugin,pch)
         { 
-            plugin.RegisterListener<Listeners.OnEntitySpawned>(entity => NadeManager.OnEntitySpawned(entity));
+            plugin.RegisterListener<Listeners.OnEntitySpawned>(entity => ProjectileManager.OnEntitySpawned(entity));
             
             plugin.RegisterEventHandler<EventPlayerBlind>(OnPlayerBlind, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt, hookMode: HookMode.Post);

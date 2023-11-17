@@ -2,7 +2,7 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Menu;
 using CSPracc.DataModules;
-using CSPracc.DataModules.consts;
+using CSPracc.DataModules.Constants;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

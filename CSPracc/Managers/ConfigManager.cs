@@ -29,11 +29,11 @@ namespace CSPracc
         {
             get
             {
-                return NadeManager.Nades!;
+                return ProjectileManager.Nades!;
             }
             set
             {
-                NadeManager.Nades = value;
+                ProjectileManager.Nades = value;
             }
         }
 
@@ -45,7 +45,7 @@ namespace CSPracc
 
         public ConfigManager()
         {
-            SavedNades = NadeManager.Nades!;
+            SavedNades = ProjectileManager.Nades!;
             DemoManagerSettings = new DemoManagerSettings();
         }
 

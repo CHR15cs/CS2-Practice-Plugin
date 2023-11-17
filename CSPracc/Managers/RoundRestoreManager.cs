@@ -57,7 +57,7 @@ namespace CSPracc.Managers
                     Server.ExecuteCommand($"mp_backup_restore_load_file {backup.Name}");
                 }
             }
-            CSPracc.DataModules.consts.Methods.MsgToServer("Restored round, to continue match both teams need to use .unpause");
+            CSPracc.DataModules.Constants.Methods.MsgToServer("Restored round, to continue match both teams need to use .unpause");
         }
 
 

@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 using CSPracc.DataModules;
 using System.IO;
 using CSPracc.Managers;
-using CSPracc.DataModules.consts;
+using CSPracc.DataModules.Constants;
 using CSPracc.EventHandler;
 using CSPracc.CommandHandler;
 using CSPracc.Modes;
@@ -39,7 +39,7 @@ namespace CSPracc
         {
             if (state == DataModules.Enums.match_state.warmup || currentMode != DataModules.Enums.PluginMode.Match) { return; }
             Methods.MsgToServer("Match paused. Waiting for both teams to .unpause");
-            Server.ExecuteCommand(DataModules.consts.COMMANDS.PAUSE_MATCH);
+            Server.ExecuteCommand(DataModules.Constants.COMMANDS.PAUSE_MATCH);
         }
 
         public static void Ready(CCSPlayerController player)
@@ -114,17 +114,17 @@ namespace CSPracc
             if(player.TeamNum == (float)CsTeam.CounterTerrorist)
             {
                 ReadyTeamCT = true;
-                DataModules.consts.Methods.MsgToServer("CT Side is now ready!");
+                DataModules.Constants.Methods.MsgToServer("CT Side is now ready!");
             }
             if (player.TeamNum == (float)CsTeam.Terrorist)
             {
                 ReadyTeamT = true;
-                DataModules.consts.Methods.MsgToServer("T Side is now ready!");
+                DataModules.Constants.Methods.MsgToServer("T Side is now ready!");
             }
             if(ReadyTeamCT && ReadyTeamT) 
             {
                 Methods.MsgToServer("Both Teams are now ready. Unpausing match!");
-                Server.ExecuteCommand(DataModules.consts.COMMANDS.UNPAUSE_MATCH);
+                Server.ExecuteCommand(DataModules.Constants.COMMANDS.UNPAUSE_MATCH);
             }
             
         }
@@ -141,7 +141,7 @@ namespace CSPracc
             }
             if (state == DataModules.Enums.match_state.warmup || currentMode != DataModules.Enums.PluginMode.Match) { return; }
             Methods.MsgToServer("Restarting game.");
-            Server.ExecuteCommand(DataModules.consts.COMMANDS.RESTART_GAME);
+            Server.ExecuteCommand(DataModules.Constants.COMMANDS.RESTART_GAME);
         }
 
         public static void Rewarmup(CCSPlayerController? player)
@@ -156,7 +156,7 @@ namespace CSPracc
             if ( currentMode != DataModules.Enums.PluginMode.Match) { return; }
             Methods.MsgToServer("Starting Warmup.");
             Server.ExecuteCommand("exec CSPRACC\\5on5_warmup.cfg");
-            Server.ExecuteCommand(DataModules.consts.COMMANDS.START_WARMUP);
+            Server.ExecuteCommand(DataModules.Constants.COMMANDS.START_WARMUP);
         }
 
         public static void Start(CCSPlayerController? player)
@@ -284,7 +284,7 @@ namespace CSPracc
             if (!player.IsAdmin()) { player.PrintToCenter("Only admins can execute this command!"); return; }
             ReadyTeamCT = true;
             ReadyTeamT = true;
-            Server.ExecuteCommand(DataModules.consts.COMMANDS.UNPAUSE_MATCH);
+            Server.ExecuteCommand(DataModules.Constants.COMMANDS.UNPAUSE_MATCH);
         }
 
         public override void ConfigureEnvironment()

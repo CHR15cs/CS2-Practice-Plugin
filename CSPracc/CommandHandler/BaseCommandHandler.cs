@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CounterStrikeSharp.API;
-using CSPracc.DataModules.consts;
+using CSPracc.DataModules.Constants;
 using CSPracc.DataModules;
 using CSPracc.Managers;
 using CounterStrikeSharp.API.Modules.Entities;
@@ -351,7 +351,7 @@ namespace CSPracc.CommandHandler
         public virtual void PrintHelp(CCSPlayerController? player)
         {
             List<string> message = new List<string>();
-            message.Add($" {CSPracc.DataModules.consts.Strings.ChatTag} Command list:");
+            message.Add($" {CSPracc.DataModules.Constants.Strings.ChatTag} Command list:");
             message.Add($" {ChatColors.Green} {PRACC_COMMAND.PAUSE} {ChatColors.White} - Switching mode. Available modes: standard - unloading changes, pracc - loading practice config, match - loading match config");
             message.Add($" {ChatColors.Green} {PRACC_COMMAND.UNPAUSE} {ChatColors.White} - Starting the match. Works only in the warmup during match mode.");
             message.Add($" {ChatColors.Green} {PRACC_COMMAND.STOP}  {ChatColors.White} - Stopping the match.");

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSPracc.DataModules.consts
+namespace CSPracc.DataModules.Constants
 {
     public class COMMANDS
     {
@@ -73,5 +73,9 @@ namespace CSPracc.DataModules.consts
         {
             Server.PrintToChatAll($"{Strings.ChatTag} {msg}");
         }
+    }
+    public class DesignerNames
+    {
+        public const string ProjectileSmoke = "smokegrenade_projectile";
     }
 }

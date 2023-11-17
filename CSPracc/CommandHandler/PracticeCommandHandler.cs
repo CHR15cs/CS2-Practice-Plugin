@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using CounterStrikeSharp.API.Modules.Menu;
 using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API;
-using CSPracc.DataModules.consts;
+using CSPracc.DataModules.Constants;
 using CSPracc.Managers;
 using CSPracc.DataModules;
 
@@ -47,17 +47,17 @@ namespace CSPracc.CommandHandler
                     }
                 case PRACC_COMMAND.NADES:
                     {
-                        ChatMenus.OpenMenu(player, NadeManager.GetNadeMenu(player));
+                        ChatMenus.OpenMenu(player, ProjectileManager.GetNadeMenu(player));
                         break;
                     }
                 case PRACC_COMMAND.SAVE:
                     {
-                        NadeManager.AddGrenade(player, args);
+                        ProjectileManager.AddGrenade(player, args);
                         break;
                     }
                 case PRACC_COMMAND.REMOVE:
                     {
-                        NadeManager.RemoveGrenade(player, args);
+                        ProjectileManager.RemoveGrenade(player, args);
                         break;
                     }
                 case PRACC_COMMAND.BOT:
@@ -126,7 +126,7 @@ namespace CSPracc.CommandHandler
                     }
                 case PRACC_COMMAND.SAVELAST:
                     {
-                        NadeManager.SaveLastGrenade(player, args);
+                        ProjectileManager.SaveLastGrenade(player, args);
                         break;
                     }
                  default:

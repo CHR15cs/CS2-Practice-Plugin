@@ -123,7 +123,11 @@ namespace CSPracc
                 player.PrintToCenter($"Failed to parse protectile id from {idofNade}");
                 return;
             }
-            else if(CurrentProjectileStorage.Get(snapshotId, out ProjectileSnapshot snapshot))
+            RestoreSnapshot(player, idofNade);
+        }
+        internal void RestoreSnapshot(CCSPlayerController player, int snapshotId)
+        {
+            if (CurrentProjectileStorage.Get(snapshotId, out ProjectileSnapshot snapshot))
             {
                 snapshot.Restore(player);
                 return;
@@ -134,7 +138,6 @@ namespace CSPracc
                 return;
             }
         }
-
         /// <summary>
         /// Add grenade to the list
         /// </summary>

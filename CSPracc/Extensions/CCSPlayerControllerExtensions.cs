@@ -1,6 +1,7 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Entities;
+using CounterStrikeSharp.API.Modules.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,13 @@ namespace CSPracc
                 }
             }
             return isAdmin;
+        }
+
+        public static CsTeam GetCsTeam(this CCSPlayerController playerController)
+        {
+            if (playerController == null) { return CsTeam.None; }
+            if (!playerController.IsValid) { return CsTeam.None; }
+            return (CsTeam)playerController.TeamNum;
         }
     }
 }

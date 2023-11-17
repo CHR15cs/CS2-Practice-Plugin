@@ -74,7 +74,7 @@ public class CSPraccPlugin : BasePlugin
         }
     }
 
-    public override string ModuleAuthor => "CHR15";   
+    public override string ModuleAuthor => "CHR15 & Grükan";   
 
 
     private static DirectoryInfo? _moduleDir;

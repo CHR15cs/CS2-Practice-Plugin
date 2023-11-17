@@ -7,21 +7,73 @@ using System.Threading.Tasks;
 
 namespace CSPracc.DataModules
 {
+    public struct Damage
+    {
+        public int DmgGiven;
+        public int HitsGiven;
+        public int DmgTaken;
+        public int HitsTaken;
+    }
     public class DamageInfo
     {
-        public CCSPlayerController? Player1;
-        protected int HitsPlayer1 { get; set; } = 0;
-        protected int DamageTakenP1 { get; set; } = 0;
+        CCSPlayerController DamageIssuer;
 
-        public DamageInfo(CCSPlayerController player1, CCSPlayerController player2) 
+        public Dictionary<CCSPlayerController, Damage> DamageGiven;
+
+        public DamageInfo(CCSPlayerController DamageIssuer) 
         {
-            Player1 = player1;
+            DamageGiven = new Dictionary<CCSPlayerController, Damage> ();
         }
-        public void Update(CCSPlayerController damageTaker, int damage)
+
+        public void AddDamage(CCSPlayerController victim,int damage)
         {
-            if(damageTaker == null) { return; }
-            HitsPlayer1++;
-            DamageTakenP1 += damage;
+            if(DamageGiven.ContainsKey(victim))
+            {
+                if(!DamageGiven.TryGetValue(victim,out Damage damageTaken))
+                {
+                    Damage dmg = new Damage();
+                    dmg.DmgGiven = damage;
+                    dmg.HitsGiven = 1;
+                    DamageGiven.Add(victim, dmg);
+                    return;
+                }
+                
+                damageTaken.DmgGiven += damage;
+                damageTaken.HitsGiven += 1;
+                DamageGiven[victim] = damageTaken;
+            }
+            else
+            {
+                Damage dmg = new Damage();
+                dmg.DmgGiven = damage;
+                dmg.HitsGiven = 1;
+                DamageGiven.Add(victim, dmg);
+            }
+        }
+
+        public void TakeDamage(CCSPlayerController Issuer,int damage)
+        {
+            if (DamageGiven.ContainsKey(Issuer))
+            {
+                if (!DamageGiven.TryGetValue(Issuer, out Damage damageTaken))
+                {
+                    Damage dmg = new Damage();
+                    dmg.DmgTaken = damage;
+                    dmg.HitsTaken = 1;
+                    DamageGiven.Add(Issuer, dmg);
+                    return;
+                }
+                damageTaken.DmgTaken += damage;
+                damageTaken.HitsTaken += 1;
+                DamageGiven[Issuer] = damageTaken;
+            }
+            else
+            {
+                Damage dmg = new Damage();
+                dmg.DmgTaken = damage;
+                dmg.HitsTaken = 1;
+                DamageGiven.Add(Issuer, dmg);
+            }
         }
     }
 }

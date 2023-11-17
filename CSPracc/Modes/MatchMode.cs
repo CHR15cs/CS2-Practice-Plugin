@@ -275,8 +275,6 @@ namespace CSPracc
 
         public static HookResult OnPlayerSpawnHandler(EventPlayerSpawn @event,GameEventInfo info)
         {
-
-
             if (CoachTeam1 != null)
             {
                 Logging.LogMessage($"CoachT1 {@event.Userid.UserId} - {CoachTeam1!.UserId}");

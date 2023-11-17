@@ -31,6 +31,15 @@ namespace CSPracc.DataStorages.JsonStorages
                 }
             }
         }
+        public bool Add(TKey key, TValue value)
+        {
+            if(Storage.ContainsKey(key))
+            {
+                return false;
+            }
+            SetOrAdd(key, value);
+            return true;
+        }
         public void SetOrAdd(TKey key, TValue value)
         {
             Storage.SetOrAdd(key, value);

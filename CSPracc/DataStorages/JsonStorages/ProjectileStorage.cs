@@ -17,7 +17,7 @@ namespace CSPracc.DataStorages.JsonStorages
 {
     public class ProjectileStorage : JsonStorage<int, ProjectileSnapshot>
     {
-        public ProjectileStorage(DirectoryInfo projectileSaveDirectory, string mapName) : base(new FileInfo(Path.Combine(projectileSaveDirectory.FullName, $"{Server.MapName}_projectiles.json"))) { }
+        public ProjectileStorage(DirectoryInfo projectileSaveDirectory) : base(new FileInfo(Path.Combine(projectileSaveDirectory.FullName, $"{Server.MapName}_projectiles.json"))) { }
         public int GetUnusedKey()
         {
             int id = Storage.Count + 1;

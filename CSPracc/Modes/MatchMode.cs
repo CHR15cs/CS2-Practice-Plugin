@@ -17,15 +17,13 @@ using CSPracc.EventHandler;
 using CSPracc.CommandHandler;
 using CSPracc.Modes;
 using static CSPracc.DataModules.Enums;
+using CounterStrikeSharp.API.Modules.Cvars;
 
 namespace CSPracc
 {
     public  class MatchMode : BaseMode
-    {
-        
-        private static DataModules.Enums.PluginMode currentMode = DataModules.Enums.PluginMode.Standard;
+    {       
         private static DataModules.Enums.match_state state = DataModules.Enums.match_state.warmup;
-        public static DataModules.Enums.PluginMode CurrentMode => currentMode;
 
         private static bool ReadyTeamCT = false;
         private static bool ReadyTeamT = false;
@@ -37,15 +35,16 @@ namespace CSPracc
 
         public static void Pause()
         {
-            if (state == DataModules.Enums.match_state.warmup || currentMode != DataModules.Enums.PluginMode.Match) { return; }
+            if (state == DataModules.Enums.match_state.warmup) { return; }
             Methods.MsgToServer("Match paused. Waiting for both teams to .unpause");
             Server.ExecuteCommand(DataModules.Constants.COMMANDS.PAUSE_MATCH);
         }
 
         public static void Ready(CCSPlayerController player)
         {
-            if ( currentMode != DataModules.Enums.PluginMode.Match) { return; }
-            if(player == null ) { return; }
+
+            if (state != match_state.warmup){ return; }
+            if (player == null ) { return; }
             if(!player.IsValid) { return; }
             switch (player.TeamNum)
             {
@@ -78,8 +77,6 @@ namespace CSPracc
 
         public static void UnReady(CCSPlayerController player)
         {
-
-            if (currentMode != DataModules.Enums.PluginMode.Match) { return; }
             if (player == null) { return; }
             if (!player.IsValid) { return; }
 
@@ -110,7 +107,7 @@ namespace CSPracc
 
         public static void Unpause(CCSPlayerController player)
         {
-            if (state == DataModules.Enums.match_state.warmup || currentMode != DataModules.Enums.PluginMode.Match) { return; }
+            if (state == DataModules.Enums.match_state.warmup) { return; }
             if(player.TeamNum == (float)CsTeam.CounterTerrorist)
             {
                 ReadyTeamCT = true;
@@ -129,7 +126,6 @@ namespace CSPracc
             
         }
 
-
         public static void Restart(CCSPlayerController player)
         {
             if (player == null) return;
@@ -139,7 +135,7 @@ namespace CSPracc
                 player.PrintToCenter("Only admins can execute this command!");
                 return;
             }
-            if (state == DataModules.Enums.match_state.warmup || currentMode != DataModules.Enums.PluginMode.Match) { return; }
+            if (state == DataModules.Enums.match_state.warmup ) { return; }
             Methods.MsgToServer("Restarting game.");
             Server.ExecuteCommand(DataModules.Constants.COMMANDS.RESTART_GAME);
         }
@@ -153,7 +149,6 @@ namespace CSPracc
                 player.PrintToCenter("Only admins can execute this command!");
                 return;
             }
-            if ( currentMode != DataModules.Enums.PluginMode.Match) { return; }
             Methods.MsgToServer("Starting Warmup.");
             Server.ExecuteCommand("exec CSPRACC\\5on5_warmup.cfg");
             Server.ExecuteCommand(DataModules.Constants.COMMANDS.START_WARMUP);
@@ -185,7 +180,6 @@ namespace CSPracc
 
         public static void StopCoach(CCSPlayerController playerController)
         {
-            if (CurrentMode != Enums.PluginMode.Match) return;
             if (playerController == null) return;
 
             if (playerController.PlayerPawn.Value.TeamNum == (byte)CsTeam.Terrorist)
@@ -215,10 +209,8 @@ namespace CSPracc
             }
         }
 
-
         public static void AddCoach(CCSPlayerController playerController)
         {
-            if (CurrentMode != Enums.PluginMode.Match) return;
             if (playerController == null) return;
             if (!playerController.PlayerPawn.IsValid) return;
             if (playerController.PlayerPawn.Value.TeamNum == (byte)CsTeam.Terrorist)
@@ -250,23 +242,6 @@ namespace CSPracc
 
         }
 
-
-        public static void SwitchTo(DataModules.Enums.PluginMode pluginMode, bool force = false)
-        {
-            if(pluginMode == currentMode && !force) { return; }
-            switch (pluginMode)
-            {
-                case DataModules.Enums.PluginMode.Standard:
-                    break;
-                case DataModules.Enums.PluginMode.Pracc:
-                   
-                    break;
-                case DataModules.Enums.PluginMode.Match:
-                
-                    break;
-            }
-        }
-
         public static void RestoreBackup(CCSPlayerController player)
         {
             if(player == null) { return; }
@@ -284,23 +259,9 @@ namespace CSPracc
             if (!player.IsAdmin()) { player.PrintToCenter("Only admins can execute this command!"); return; }
             ReadyTeamCT = true;
             ReadyTeamT = true;
-            Server.ExecuteCommand(DataModules.Constants.COMMANDS.UNPAUSE_MATCH);
         }
-
-        public override void ConfigureEnvironment()
-        {
-            DataModules.Constants.Methods.MsgToServer("Starting match");
-            Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
-            Server.ExecuteCommand("exec CSPRACC\\5on5_warmup.cfg");
-            EventHandler?.Dispose();
-            EventHandler = new MatchEventHandler(CSPraccPlugin.Instance!, new MatchCommandHandler());
-            state = Enums.match_state.warmup;
-        }
-
         public static HookResult OnPlayerSpawnHandler(EventPlayerSpawn @event,GameEventInfo info)
         {
-
-
             if (CoachTeam1 != null)
             {
                 Logging.LogMessage($"CoachT1 {@event.Userid.UserId} - {CoachTeam1!.UserId}");
@@ -329,5 +290,14 @@ namespace CSPracc
             return HookResult.Handled;
         }
 
+        public override void ConfigureEnvironment()
+        {
+            DataModules.Constants.Methods.MsgToServer("Starting match");
+            Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
+            Server.ExecuteCommand("exec CSPRACC\\5on5_warmup.cfg");
+            EventHandler?.Dispose();
+            EventHandler = new MatchEventHandler(CSPraccPlugin.Instance!, new MatchCommandHandler());
+            state = Enums.match_state.warmup;
+        }    
     }
 }

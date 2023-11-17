@@ -10,6 +10,7 @@ using System.Data;
 using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API.Modules.Entities;
 using System.Text.RegularExpressions;
+using CounterStrikeSharp.API.Modules.Memory;
 
 namespace CSPracc
 {
@@ -57,18 +58,35 @@ namespace CSPracc
             _spawns = new Dictionary<byte, List<Position>>();
             _spawns.Add((byte)CsTeam.CounterTerrorist, new List<Position>());
             _spawns.Add((byte)CsTeam.Terrorist, new List<Position>());
-            var spawnsct = Utilities.FindAllEntitiesByDesignerName<CBaseEntity>("info_player_counterterrorist");
+            var spawnsct = Utilities.FindAllEntitiesByDesignerName<SpawnPoint>("info_player_counterterrorist");
+            int minprio = 1;
+            foreach( var spawn in spawnsct )
+            {
+                if( spawn.IsValid && spawn.Enabled && spawn.Priority < minprio )
+                {
+                    minprio = spawn.Priority;
+                }
+            }
             foreach (var spawn in spawnsct)
-            {               
-                if (spawn.IsValid)
+            {
+
+                if (spawn.IsValid && spawn.Enabled && spawn.Priority == minprio)
                 {
                     spawns[(byte)CsTeam.CounterTerrorist].Add(new Position(spawn.CBodyComponent!.SceneNode!.AbsOrigin, spawn.CBodyComponent.SceneNode.AbsRotation));
                 }
             }
-            var spawnst = Utilities.FindAllEntitiesByDesignerName<CBaseEntity>("info_player_terrorist");
+            var spawnst = Utilities.FindAllEntitiesByDesignerName<SpawnPoint>("info_player_terrorist");
+            minprio = 1;
             foreach (var spawn in spawnst)
             {
-                if (spawn.IsValid)
+                if (spawn.IsValid && spawn.Enabled && spawn.Priority < minprio)
+                {
+                    minprio = spawn.Priority;
+                }
+            }
+            foreach (var spawn in spawnst)
+            {
+                if (spawn.IsValid && spawn.Enabled && spawn.Priority == minprio)
                 {
                     spawns[(byte)CsTeam.Terrorist].Add(new Position(spawn.CBodyComponent!.SceneNode!.AbsOrigin, spawn.CBodyComponent.SceneNode.AbsRotation));
                 }

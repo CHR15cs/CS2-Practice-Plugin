@@ -48,6 +48,13 @@ namespace CSPracc.CommandHandler
                     }
                 case PRACC_COMMAND.NADES:
                     {
+                        if (args.Length > 0)
+                        {
+                            if (int.TryParse(args, out int id))
+                            {
+                                ProjectileManager.Instance.RestoreSnapshot(player, id);
+                            }
+                        }
                         ChatMenus.OpenMenu(player, ProjectileManager.Instance.GetNadeMenu(player));
                         break;
                     }
@@ -83,6 +90,7 @@ namespace CSPracc.CommandHandler
                     }
                 case PRACC_COMMAND.WATCHME:
                     {
+                        //TODO: Utilities.GetPlayers?
                         var playerEntities = Utilities.FindAllEntitiesByDesignerName<CCSPlayerController>("cs_player_controller");
                         foreach (var playerEnt in playerEntities)
                         {

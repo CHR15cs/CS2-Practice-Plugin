@@ -20,11 +20,11 @@ namespace CSPracc.DataModules.Constants
 
     public class PRACC_COMMAND
     {
-        public const  string MODE = ".menu";
+        public const string MODE = ".menu";
         public const string PRACC = ".pracc";
         public const string MATCH = ".match";
         public const string PAUSE = ".pause";
-        public const  string UNPAUSE = ".unpause";
+        public const string UNPAUSE = ".unpause";
         public const string READY = ".ready";
         public const string UNREADY = ".unready";
         public const string FORCEREADY = ".forceready";
@@ -63,6 +63,7 @@ namespace CSPracc.DataModules.Constants
         public const string SAVELAST = ".savelast";
         public const string CHECKPOINT = ".checkpoint";
         public const string BACK = ".back";
+        public const string UserRole = ".userrole";
     }
     public class Strings
     {

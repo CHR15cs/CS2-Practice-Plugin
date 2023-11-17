@@ -19,7 +19,7 @@ namespace CSPracc.Modes
         protected  BaseEventHandler EventHandler { get; set; }
         public  virtual void ConfigureEnvironment()
         {
-            DataModules.consts.Methods.MsgToServer("Restoring default config.");
+            DataModules.Constants.Methods.MsgToServer("Restoring default config.");
             Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
             Server.ExecuteCommand("exec server.cfg");
             EventHandler = new BaseEventHandler(CSPraccPlugin.Instance!, new BaseCommandHandler());

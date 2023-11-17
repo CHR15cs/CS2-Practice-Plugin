@@ -41,7 +41,7 @@ namespace CSPracc.Managers
         /// </summary>
         /// <param name="mapName">Map name</param>
         /// <returns>Projectile Storage for given map</returns>
-        protected CommandAliasStorage GetOrAddProjectileStorage(CCSPlayerController player)
+        protected CommandAliasStorage GetOrAddPersonalAliasStorage(CCSPlayerController player)
         {
             if (!PlayerSpecificCommandAliasStorages.ContainsKey(player))
             {
@@ -52,7 +52,7 @@ namespace CSPracc.Managers
         }
         public bool ReplaceAlias(CCSPlayerController commandIssuer, string command, out string replacedCommand)
         {
-            CommandAliasStorage personalCommandAliasStorage = GetOrAddProjectileStorage(commandIssuer);
+            CommandAliasStorage personalCommandAliasStorage = GetOrAddPersonalAliasStorage(commandIssuer);
             if (personalCommandAliasStorage.Get(command, out replacedCommand))
             {
                 Logging.LogMessage($"Replaced command {command} from personal storage.");
@@ -133,7 +133,7 @@ namespace CSPracc.Managers
             }
             else
             {
-                CommandAliasStorage personalCommandAliasStorage = GetOrAddProjectileStorage(commandIssuer);
+                CommandAliasStorage personalCommandAliasStorage = GetOrAddPersonalAliasStorage(commandIssuer);
                 if (!personalCommandAliasStorage.RemoveKey(alias))
                 {
                     commandIssuer.PrintToCenter("Failed to remove alias");

@@ -259,6 +259,7 @@ namespace CSPracc
             {
                 return;
             }
+            projectile.Title = name;
             CurrentProjectileStorage.Add(projectile);
             playerController.PrintToCenter($"Successfully added grenade {name}");
             LastThrownGrenade.Remove(playerController);

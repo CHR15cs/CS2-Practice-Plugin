@@ -37,7 +37,7 @@ namespace CSPracc.DataStorages.JsonStorages
             {
                 return false;
             }
-            Storage.SetOrAdd(key, value);
+            SetOrAdd(key, value);
             return true;
         }
         public void SetOrAdd(TKey key, TValue value)

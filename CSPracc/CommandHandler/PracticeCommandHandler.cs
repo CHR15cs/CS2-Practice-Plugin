@@ -47,17 +47,17 @@ namespace CSPracc.CommandHandler
                     }
                 case PRACC_COMMAND.NADES:
                     {
-                        ChatMenus.OpenMenu(player, ProjectileManager.GetNadeMenu(player));
+                        ChatMenus.OpenMenu(player, ProjectileManager.Instance.GetNadeMenu(player));
                         break;
                     }
                 case PRACC_COMMAND.SAVE:
                     {
-                        ProjectileManager.AddGrenade(player, args);
+                        ProjectileManager.Instance.SaveSnapshot(player, args);
                         break;
                     }
                 case PRACC_COMMAND.REMOVE:
                     {
-                        ProjectileManager.RemoveGrenade(player, args);
+                        ProjectileManager.Instance.RemoveSnapshot(player, args);
                         break;
                     }
                 case PRACC_COMMAND.BOT:
@@ -126,7 +126,7 @@ namespace CSPracc.CommandHandler
                     }
                 case PRACC_COMMAND.SAVELAST:
                     {
-                        ProjectileManager.SaveLastGrenade(player, args);
+                        ProjectileManager.Instance.SaveLastGrenade(player, args);
                         break;
                     }
                  default:

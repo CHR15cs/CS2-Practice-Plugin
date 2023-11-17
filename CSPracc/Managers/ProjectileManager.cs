@@ -13,11 +13,25 @@ using CounterStrikeSharp.API.Modules.Entities;
 using System.Xml.Linq;
 using CSPracc.Extensions;
 using CSPracc.DataModules.Constants;
+using CSPracc.Modes;
 
 namespace CSPracc
 {
     public class ProjectileManager
     {
+        private static ProjectileManager _instance;
+        public static ProjectileManager Instance 
+        { 
+            get
+            {
+                if(_instance == null )
+                {
+                    _instance = new ProjectileManager();
+                }
+                return _instance;
+            }
+                
+         }
         public Dictionary<CCSPlayerController, ProjectileSnapshot> LastThrownGrenade = new Dictionary<CCSPlayerController, ProjectileSnapshot>();
 
         private ChatMenu _nadeMenu = null;
@@ -53,7 +67,7 @@ namespace CSPracc
                 return GetOrAddProjectileStorage(Server.MapName);
             }
         }
-        public ProjectileManager(){}
+        private ProjectileManager(){}
         /// <summary>
         /// Gets or Adds Projectile Storage for given map
         /// </summary>
@@ -64,7 +78,7 @@ namespace CSPracc
             if (!projectileStorages.ContainsKey(mapName))
             {
                 //TODO: Get Directory from config.
-                projectileStorages.Add(mapName, new ProjectileStorage(new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), "Projectiles")), mapName));
+                projectileStorages.Add(mapName, new ProjectileStorage(new DirectoryInfo(Path.Combine(CSPraccPlugin.ModuleDir.FullName, "Projectiles")), mapName));
             }
             return projectileStorages[mapName];
         }
@@ -143,7 +157,7 @@ namespace CSPracc
         /// </summary>
         /// <param name="player">palyer who issued the command</param>
         /// <param name="args">Arguments shall look like <Name> <Description></param>
-        public void RemoveProjectile(CCSPlayerController player, string args)
+        public void RemoveSnapshot(CCSPlayerController player, string args)
         {
             if (player == null) return;
             if (args == String.Empty) return;
@@ -176,7 +190,17 @@ namespace CSPracc
 
         public void OnEntitySpawned(CEntityInstance entity)
         {
-            if (Match.CurrentMode != Enums.PluginMode.Pracc) return;
+            //var designerName = entity.DesignerName;
+            //PracticeMode test = null;
+            //try
+            //{
+            //    test = (PracticeMode)CSPraccPlugin.PluginMode;
+            //}
+            //catch (Exception e)
+            //{
+            //    return;
+            //}
+            //if (test == null) return;
 
             if (!entity.IsProjectile())
             {
@@ -208,7 +232,7 @@ namespace CSPracc
                     //TODO parse actual description if provided
                     string description = "";
 
-                    ProjectileSnapshot tmpSnapshot = new ProjectileSnapshot(-1, playerPosition, projectilePosition, playerAngle, name, description, Server.MapName);
+                    ProjectileSnapshot tmpSnapshot = new ProjectileSnapshot(-1, playerPosition.ToVector3(), projectilePosition.ToVector3(), playerAngle.ToVector3(), name, description, Server.MapName);
                     LastThrownGrenade.SetOrAdd(player, tmpSnapshot);
                 });
 

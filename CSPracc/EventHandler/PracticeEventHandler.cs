@@ -21,16 +21,14 @@ namespace CSPracc.EventHandler
     {
         BotManager BotManager { get; set; }
 
-        
         ~PracticeEventHandler()
         {
 
         }
         PracticeCommandHandler PracticeCommandHandler { get; set; }
         public PracticeEventHandler(CSPraccPlugin plugin, PracticeCommandHandler pch) : base(plugin,pch)
-        { 
-            plugin.RegisterListener<Listeners.OnEntitySpawned>(entity => ProjectileManager.OnEntitySpawned(entity));
-            
+        {
+            plugin.RegisterListener<Listeners.OnEntitySpawned>(entity => ProjectileManager.Instance.OnEntitySpawned(entity));          
             plugin.RegisterEventHandler<EventPlayerBlind>(OnPlayerBlind, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn, hookMode: HookMode.Post);

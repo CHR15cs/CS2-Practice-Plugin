@@ -134,9 +134,7 @@ public class CSPraccPlugin : BasePlugin
             Config.RconPassword = "geheim";
             Config.LoggingFile = "Logging.txt";
             Config.Admins = new List<string>();
-            Config.SavedNades = new List<SavedNade>();
-            Config.Admins.Add("steamid1234");
-            Config.SavedNades.Add(new SavedNade(new Vector(0, 0, 0), new QAngle(0, 0, 0), new Vector(0, 0, 0), "test nade", "test", "de_test", 1));
+            Config.Admins.Add("steamid1234");         
             WriteConfig(Config);
         }
         RegisterListener<Listeners.OnMapStart>((mapName) =>

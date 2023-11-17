@@ -6,25 +6,27 @@ using System.Threading.Tasks;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.Extensions;
+using System.Numerics;
+using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 
 namespace CSPracc.DataModules
 {
     public class ProjectileSnapshot
-    {
-        public Vector PlayerPosition { get; init; } = new Vector(0, 0, 0);
-        public Vector PlayerVelocity { get; init; } = new Vector(0,0,0);
-        public Vector ProjectilePosition { get; init; } = new Vector(0, 0, 0);
-        public QAngle PlayerAngle { get; init; } = new QAngle(0, 0, 0);
+    {        
+        public System.Numerics.Vector3 PlayerPosition { get; init; } = new Vector3(0, 0, 0);
+        public System.Numerics.Vector3 PlayerVelocity { get; init; } = new Vector3(0,0,0);
+        public System.Numerics.Vector3 ProjectilePosition { get; init; } = new Vector3(0, 0, 0);
+        public System.Numerics.Vector3 PlayerAngle { get; init; } = new Vector3(0, 0, 0);
         public string Title { get; set; } = "";
         public string Description { get; set; } = "";
         public string Map { get; init; } = "";
         public int Id { get; init; }
         public ProjectileSnapshot() { }
-        public ProjectileSnapshot(int id, Vector playerPosition, Vector projectilePosition, QAngle playerAngle, string title, string description, string map)
+        public ProjectileSnapshot(int id, Vector3 playerPosition, Vector3 projectilePosition, Vector3 playerAngle, string title, string description, string map)
         {
-            PlayerPosition = playerPosition.Copy();
-            ProjectilePosition = projectilePosition.Copy();
-            PlayerAngle = playerAngle.Copy();
+            PlayerPosition = playerPosition;
+            ProjectilePosition = projectilePosition;
+            PlayerAngle = playerAngle;
             Title = title;
             Description = description;
             Map = map;
@@ -32,7 +34,7 @@ namespace CSPracc.DataModules
         }
         public void Restore(CCSPlayerController player)
         {
-            player.PlayerPawn.Value.Teleport(PlayerPosition, PlayerAngle, PlayerVelocity);
+            player.PlayerPawn.Value.Teleport(PlayerPosition.ToCSVector(), PlayerAngle.ToCSQAngle(), PlayerVelocity.ToCSVector());
         }
     }
 }

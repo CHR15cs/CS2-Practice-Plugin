@@ -289,7 +289,7 @@ namespace CSPracc
 
         public override void ConfigureEnvironment()
         {
-            DataModules.consts.Methods.MsgToServer("Starting match");
+            DataModules.Constants.Methods.MsgToServer("Starting match");
             Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
             Server.ExecuteCommand("exec CSPRACC\\5on5_warmup.cfg");
             EventHandler?.Dispose();

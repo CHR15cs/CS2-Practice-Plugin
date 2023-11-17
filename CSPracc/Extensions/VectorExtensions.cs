@@ -17,5 +17,26 @@ namespace CSPracc.Extensions
         {
             return new QAngle(@this.X, @this.Y, @this.Z);
         }
+
+        internal static System.Numerics.Vector3 ToVector3(this Vector @this)
+        {
+            return new System.Numerics.Vector3(@this.X,@this.Y,@this.Z);
+        }
+
+        internal static System.Numerics.Vector3 ToVector3(this QAngle @this)
+        {
+            return new System.Numerics.Vector3(@this.X, @this.Y, @this.Z);
+        }
+
+        internal static Vector ToCSVector(this System.Numerics.Vector3 @this)
+        {
+            return new Vector(@this.X, @this.Y, @this.Z);
+        }
+
+        internal static QAngle ToCSQAngle(this System.Numerics.Vector3 @this)
+        {
+            return new QAngle(@this.X, @this.Y, @this.Z);
+        }
+
     }
 }

@@ -4,7 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Text.Json;
+using Newtonsoft.Json;
+using CSPracc.Extensions;
+using System.Numerics;
+using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 
 namespace CSPracc.DataModules
 {
@@ -22,7 +25,7 @@ namespace CSPracc.DataModules
                 string jsonString = File.ReadAllText(SaveFile.FullName);
                 try
                 {
-                    savedProjectiles = JsonSerializer.Deserialize<Dictionary<int, ProjectileSnapshot>>(jsonString);
+                    savedProjectiles = JsonConvert.DeserializeObject<Dictionary<int, ProjectileSnapshot>>(jsonString);
                 }
                 catch
                 {
@@ -42,10 +45,17 @@ namespace CSPracc.DataModules
         }
         public void Add(Vector playerPosition, Vector projectilePosition, QAngle playerAngle, string title, string description, string map)
         {
+            ProjectileSnapshot snapshot = new ProjectileSnapshot(GetId(), playerPosition.ToVector3(), projectilePosition.ToVector3(), playerAngle.ToVector3(), title, description, map);
+            savedProjectiles.Add(snapshot.Id, snapshot);
+            Save();
+        }
+        public void Add(Vector3 playerPosition, Vector3 projectilePosition, Vector3 playerAngle, string title, string description, string map)
+        {
             ProjectileSnapshot snapshot = new ProjectileSnapshot(GetId(), playerPosition, projectilePosition, playerAngle, title, description, map);
             savedProjectiles.Add(snapshot.Id, snapshot);
             Save();
         }
+
         public void Add(ProjectileSnapshot snapshot)
         {
             Add(snapshot.PlayerPosition, snapshot.ProjectilePosition, snapshot.PlayerAngle, snapshot.Title, snapshot.Description, snapshot.Map);
@@ -84,11 +94,15 @@ namespace CSPracc.DataModules
         public void Save()
         {
             FileInfo backupFile = new FileInfo($"{SaveFile.FullName}.backup");
+            if(!SaveFile.Directory.Exists)
+            {
+                SaveFile.Directory.Create();  
+            }
             if(SaveFile.Exists)
             {
                 SaveFile.CopyTo($"{SaveFile.FullName}.backup", true);
-            }
-            File.WriteAllText(SaveFile.FullName, JsonSerializer.Serialize(savedProjectiles));
+            }            
+            File.WriteAllText(SaveFile.FullName, JsonConvert.SerializeObject(savedProjectiles, formatting: Formatting.Indented));
         }
     }
 }

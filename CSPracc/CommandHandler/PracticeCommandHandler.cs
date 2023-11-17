@@ -16,7 +16,8 @@ namespace CSPracc.CommandHandler
 {
     public class PracticeCommandHandler : BaseCommandHandler
     {
-       
+
+        Dictionary<CCSPlayerController, Position> checkpoints = new Dictionary<CCSPlayerController, Position>();
         BotManager BotManager {  get; set; }
         public PracticeCommandHandler(): base()
         {
@@ -129,7 +130,34 @@ namespace CSPracc.CommandHandler
                         ProjectileManager.Instance.SaveLastGrenade(player, args);
                         break;
                     }
-                 default:
+                case PRACC_COMMAND.CHECKPOINT:
+                    {
+                        if(!checkpoints.ContainsKey(player))
+                        {
+                            checkpoints.Add(player, player.GetCurrentPosition());
+                            player.PrintToCenter("Saved current checkpoint");
+                        }
+                        else
+                        {
+                            checkpoints[player] = player.GetCurrentPosition();
+                            player.PrintToCenter("Saved current checkpoint");
+                        }
+                        break;
+                    }
+                case PRACC_COMMAND.BACK:
+                    {
+                        if (!checkpoints.ContainsKey(player))
+                        {
+                            player.PrintToCenter($"You dont have a saved checkpoint");
+                        }
+                        else
+                        {
+                            player.PlayerPawn.Value.Teleport(checkpoints[player].PlayerPosition, checkpoints[player].PlayerAngle,new Vector(0,0,0));
+                            player.PrintToCenter("Teleported to your checkpoint");
+                        }
+                        break;
+                    }
+                default:
                     {
                         base.PlayerChat(@event, info);
                         return false;

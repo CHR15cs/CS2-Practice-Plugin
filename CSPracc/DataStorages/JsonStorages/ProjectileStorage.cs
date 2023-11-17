@@ -8,16 +8,16 @@ using Newtonsoft.Json;
 using CSPracc.Extensions;
 using System.Numerics;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
-using CSPracc.DataStorages.JsonStorages;
 using CounterStrikeSharp.API;
 using CSPracc.DataStorages;
 using Newtonsoft.Json.Linq;
+using CSPracc.DataModules;
 
-namespace CSPracc.DataModules
+namespace CSPracc.DataStorages.JsonStorages
 {
     public class ProjectileStorage : JsonStorage<int, ProjectileSnapshot>
     {
-        public ProjectileStorage(DirectoryInfo projectileSaveDirectory, string mapName) : base(new FileInfo(Path.Combine(projectileSaveDirectory.FullName, $"{Server.MapName}_projectiles.json"))){}
+        public ProjectileStorage(DirectoryInfo projectileSaveDirectory, string mapName) : base(new FileInfo(Path.Combine(projectileSaveDirectory.FullName, $"{Server.MapName}_projectiles.json"))) { }
         public int GetUnusedKey()
         {
             int id = Storage.Count + 1;

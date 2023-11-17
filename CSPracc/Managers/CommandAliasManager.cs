@@ -94,7 +94,7 @@ namespace CSPracc.Managers
             }
             else
             {
-                CommandAliasStorage personalCommandAliasStorage = GetOrAddProjectileStorage(commandIssuer);
+                CommandAliasStorage personalCommandAliasStorage = GetOrAddPersonalAliasStorage(commandIssuer);
                 if (!personalCommandAliasStorage.Add(alias, command))
                 {
                     commandIssuer.PrintToCenter("Alias already exists.");

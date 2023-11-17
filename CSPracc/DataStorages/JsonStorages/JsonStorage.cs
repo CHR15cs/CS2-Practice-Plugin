@@ -1,0 +1,74 @@
+﻿using CSPracc.DataModules;
+using CSPracc.Extensions;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CSPracc.DataStorages.JsonStorages
+{
+    public abstract class JsonStorage<TKey, TValue> : IDataStorage<TKey, TValue> where TKey : notnull
+    {
+        protected Dictionary<TKey, TValue> Storage { get; } = new Dictionary<TKey, TValue>();
+        FileInfo JsonFile { get; init; }
+        public JsonStorage(FileInfo jsonFile)
+        {
+            JsonFile = jsonFile;
+            if (JsonFile.Exists)
+            {
+                string jsonString = File.ReadAllText(JsonFile.FullName);
+                try
+                {
+                    Storage = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(jsonString)!;
+                }
+                catch
+                {
+                    Logging.LogMessage($"Could not read {JsonFile.Name}. Creating new dictonary.");
+                    Storage = new Dictionary<TKey, TValue>();
+                }
+            }
+        }
+        public void SetOrAdd(TKey key, TValue value)
+        {
+            Storage.SetOrAdd(key, value);
+            Save();
+        }
+        public bool RemoveKey(TKey key)
+        {
+            if (!ContainsKey(key))
+            {
+                return true;
+            }
+            return Storage.Remove(key);
+        }
+        public void Clear()
+        {
+            Storage.Clear();
+        }
+        public bool ContainsKey(TKey key)
+        {
+            return Storage.ContainsKey(key);
+        }
+        public void Save()
+        {
+            FileInfo backupFile = new FileInfo($"{JsonFile.FullName}.backup");
+            if (!JsonFile.Directory!.Exists)
+            {
+                JsonFile.Directory.Create();
+            }
+            if (JsonFile.Exists)
+            {
+                JsonFile.CopyTo($"{JsonFile.FullName}.backup", true);
+            }
+            File.WriteAllText(JsonFile.FullName, JsonConvert.SerializeObject(Storage, formatting: Formatting.Indented));
+        }
+        public List<KeyValuePair<TKey, TValue>> GetAll()
+        {
+            return Storage.ToList();
+        }
+        public abstract bool Get(TKey key, out TValue value);
+    }
+}

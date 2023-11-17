@@ -92,7 +92,7 @@ namespace CSPracc
                 var handleGive = (CCSPlayerController player, ChatMenuOption option) => RestoreSnapshot(player, option.Text);
                 menu.AddMenuOption($" {ChatColors.Red}Personal nades:", handleGive, true);
                 
-                menu.AddMenuOption($" {ChatColors.Red}Last thrown projectile:", handleGive);
+                menu.AddMenuOption($" {ChatColors.Red}Last thrown projectile", handleGive);
             }
             return menu;
         }
@@ -104,14 +104,21 @@ namespace CSPracc
         /// <param name="grenadeName">grenade destination</param>
         private void RestoreSnapshot(CCSPlayerController player, string grenadeName)
         {
-            string idofNade = grenadeName.Substring(grenadeName.IndexOf(":") + 1);
-            if (!int.TryParse(idofNade, out int snapshotId))
+            int index = grenadeName.IndexOf(":");
+            if(index == -1)
             {
-                if(!LastThrownGrenade.TryGetValue(player, out ProjectileSnapshot snapshot))
+                //: not found in string
+                if (LastThrownGrenade.TryGetValue(player, out ProjectileSnapshot snapshot))
                 {
                     snapshot.Restore(player);
                     return;
                 }
+                player.PrintToCenter($"Could not find id in grenade name {grenadeName}");
+                return;
+            }
+            string idofNade = grenadeName.Substring(index + 1);
+            if (!int.TryParse(idofNade, out int snapshotId))
+            {
                 player.PrintToCenter($"Failed to parse protectile id from {idofNade}");
                 return;
             }
@@ -185,17 +192,17 @@ namespace CSPracc
 
         public void OnEntitySpawned(CEntityInstance entity)
         {
-            //var designerName = entity.DesignerName;
-            //PracticeMode test = null;
-            //try
-            //{
-            //    test = (PracticeMode)CSPraccPlugin.PluginMode;
-            //}
-            //catch (Exception e)
-            //{
-            //    return;
-            //}
-            //if (test == null) return;
+            var designerName = entity.DesignerName;
+            PracticeMode test = null;
+            try
+            {
+                test = (PracticeMode)CSPraccPlugin.PluginMode;
+            }
+            catch (Exception e)
+            {
+                return;
+            }
+            if (test == null) return;
 
             if (!entity.IsProjectile())
             {

@@ -19,18 +19,14 @@ namespace CSPracc.DataModules
         public System.Numerics.Vector3 PlayerAngle { get; init; } = new Vector3(0, 0, 0);
         public string Title { get; set; } = "";
         public string Description { get; set; } = "";
-        public string Map { get; init; } = "";
-        public int Id { get; init; }
         public ProjectileSnapshot() { }
-        public ProjectileSnapshot(int id, Vector3 playerPosition, Vector3 projectilePosition, Vector3 playerAngle, string title, string description, string map)
+        public ProjectileSnapshot(Vector3 playerPosition, Vector3 projectilePosition, Vector3 playerAngle, string title, string description)
         {
             PlayerPosition = playerPosition;
             ProjectilePosition = projectilePosition;
             PlayerAngle = playerAngle;
             Title = title;
             Description = description;
-            Map = map;
-            Id = id;
         }
         public void Restore(CCSPlayerController player)
         {

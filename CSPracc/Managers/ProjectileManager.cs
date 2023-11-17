@@ -46,9 +46,9 @@ namespace CSPracc
                 var handleGive = (CCSPlayerController player, ChatMenuOption option) => RestoreSnapshot(player, option.Text);
 
                 NadesMenu.AddMenuOption($" {ChatColors.Green}Global saved nades:", handleGive, true);
-                foreach (ProjectileSnapshot projectileSnapshot in CurrentProjectileStorage.GetAll())
+                foreach (KeyValuePair<int, ProjectileSnapshot> entry in CurrentProjectileStorage.GetAll())
                 {
-                    NadesMenu.AddMenuOption($" {ChatColors.Green}{projectileSnapshot.Title} ID:{projectileSnapshot.Id}", handleGive);
+                    NadesMenu.AddMenuOption($" {ChatColors.Green}{entry.Value.Title} ID:{entry.Key}", handleGive);
                 }
                 return NadesMenu;
             }
@@ -92,7 +92,7 @@ namespace CSPracc
                 var handleGive = (CCSPlayerController player, ChatMenuOption option) => RestoreSnapshot(player, option.Text);
                 menu.AddMenuOption($" {ChatColors.Red}Personal nades:", handleGive, true);
                 
-                menu.AddMenuOption($" {ChatColors.Red}unsaved nade ID:-1", handleGive);
+                menu.AddMenuOption($" {ChatColors.Red}Last thrown projectile:", handleGive);
             }
             return menu;
         }
@@ -107,17 +107,12 @@ namespace CSPracc
             string idofNade = grenadeName.Substring(grenadeName.IndexOf(":") + 1);
             if (!int.TryParse(idofNade, out int snapshotId))
             {
-                player.PrintToCenter($"Failed to parse protectile id from {idofNade}");
-                return;
-            }
-            if(snapshotId == -1)
-            {
-                if (!LastThrownGrenade.TryGetValue(player, out ProjectileSnapshot snapshot))
+                if(!LastThrownGrenade.TryGetValue(player, out ProjectileSnapshot snapshot))
                 {
-                    player.PrintToCenter($"No temporary projectile saved for player {player.PlayerName}");
+                    snapshot.Restore(player);
                     return;
                 }
-                snapshot.Restore(player);
+                player.PrintToCenter($"Failed to parse protectile id from {idofNade}");
                 return;
             }
             else if(CurrentProjectileStorage.Get(snapshotId, out ProjectileSnapshot snapshot))
@@ -172,12 +167,12 @@ namespace CSPracc
                 player.PrintToCenter("invalid argument, needs to be a number");
                 return;
             }
-            if(!CurrentProjectileStorage.IdExists(id))
+            if(!CurrentProjectileStorage.ContainsKey(id))
             {
                 player.PrintToCenter($"Projectile with id {id} does not exist on current map");
                 return;
             }
-            if (CurrentProjectileStorage.Remove(id))
+            if (CurrentProjectileStorage.RemoveKey(id))
             {
                 player.PrintToCenter($"Successfully removed projectile with id {id}");
             }
@@ -232,7 +227,7 @@ namespace CSPracc
                     //TODO parse actual description if provided
                     string description = "";
 
-                    ProjectileSnapshot tmpSnapshot = new ProjectileSnapshot(-1, playerPosition.ToVector3(), projectilePosition.ToVector3(), playerAngle.ToVector3(), name, description, Server.MapName);
+                    ProjectileSnapshot tmpSnapshot = new ProjectileSnapshot(playerPosition.ToVector3(), projectilePosition.ToVector3(), playerAngle.ToVector3(), name, description);
                     LastThrownGrenade.SetOrAdd(player, tmpSnapshot);
                 });
 

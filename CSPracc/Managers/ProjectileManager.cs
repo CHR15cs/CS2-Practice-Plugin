@@ -123,7 +123,7 @@ namespace CSPracc
                 player.PrintToCenter($"Failed to parse protectile id from {idofNade}");
                 return;
             }
-            RestoreSnapshot(player, idofNade);
+            RestoreSnapshot(player, snapshotId);
         }
         internal void RestoreSnapshot(CCSPlayerController player, int snapshotId)
         {

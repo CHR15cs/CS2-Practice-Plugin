@@ -78,7 +78,7 @@ namespace CSPracc.CommandHandler
 
         protected string getArgs(string input)
         {
-            string command, args = null;
+            string command, args = "";
             try
             {
                 //detect arguments

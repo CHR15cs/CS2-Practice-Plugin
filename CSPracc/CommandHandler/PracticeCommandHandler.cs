@@ -53,7 +53,9 @@ namespace CSPracc.CommandHandler
                             if (int.TryParse(args, out int id))
                             {
                                 ProjectileManager.Instance.RestoreSnapshot(player, id);
+                                break;
                             }
+                            player.PrintToCenter("Could not parse argument for nade menu");
                         }
                         ChatMenus.OpenMenu(player, ProjectileManager.Instance.GetNadeMenu(player));
                         break;

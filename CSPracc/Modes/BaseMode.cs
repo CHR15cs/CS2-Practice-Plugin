@@ -13,8 +13,7 @@ namespace CSPracc.Modes
     public class BaseMode : IDisposable
     {
         public BaseMode() 
-        { 
-            ConfigureEnvironment();
+        {            
         }
         protected  BaseEventHandler EventHandler { get; set; }
         public  virtual void ConfigureEnvironment()

@@ -192,7 +192,7 @@ public class CSPraccPlugin : BasePlugin
             case Enums.PluginMode.Standard:
                 {
                     PluginMode?.Dispose();
-                    PluginMode = new BaseMode();
+                    PluginMode =  new BaseMode();                    
                     break;
                 }
             case Enums.PluginMode.Pracc:
@@ -207,13 +207,20 @@ public class CSPraccPlugin : BasePlugin
                     PluginMode = new MatchMode();
                     break;
                 }
+            case Enums.PluginMode.DryRun:
+                {
+                    PluginMode?.Dispose();
+                    PluginMode = new DryRunMode();
+                    break;
+                }
             default:
                 {
                     PluginMode?.Dispose();
                     PluginMode = new BaseMode();
                     break;
-                }
+                }               
         }
+        PluginMode!.ConfigureEnvironment();
     }
 }
 

@@ -11,9 +11,10 @@ namespace CSPracc.CommandHandler
 {
     public class MatchCommandHandler : BaseCommandHandler
     {
-        public MatchCommandHandler():base() 
-        { 
-            
+        MatchMode MatchMode { get; init; }
+        public MatchCommandHandler(MatchMode mode):base() 
+        {
+            MatchMode = mode;
         }
 
         public override bool PlayerChat(EventPlayerChat @event, GameEventInfo info)

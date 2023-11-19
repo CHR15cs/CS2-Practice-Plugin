@@ -13,6 +13,8 @@ using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Menu;
 using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.Modes;
+using System.Xml.Schema;
+using CSPracc.GUI_Elements;
 
 namespace CSPracc.CommandHandler
 {
@@ -236,6 +238,34 @@ namespace CSPracc.CommandHandler
                 case PRACC_COMMAND.DEMO:
                     {
                         DemoManager.OpenDemoManagerMenu(player);
+                        break;
+                    }
+                case ".test":
+                    {
+                        
+                        GUI_Elements.CenterMenu cm = new GUI_Elements.CenterMenu("Test Menu");
+                        cm.AddCenterMenuOption(new GUI_Elements.CenterMenuOption("say hihihi",
+                            new Task(() => { Server.PrintToChatAll("hihihi"); }
+                        ))) ;
+                        cm.AddCenterMenuOption(new GUI_Elements.CenterMenuOption("say hahaha",
+                new Task(() => { Server.PrintToChatAll("hahahha"); }
+            )));
+                        cm.AddCenterMenuOption(new GUI_Elements.CenterMenuOption("say huhuhu",
+new Task(() => { Server.PrintToChatAll("huhuhu"); }
+)));
+                        CenterMenuHandler.Instance.Add(player, cm);
+                        cm.ShowMenu(player);
+                        
+                        break;
+                    }
+                case ".1":
+                    {
+                        CenterMenuHandler.Instance.Command(player, "1");
+                        break;
+                    }
+                case ".2":
+                    {
+                        CenterMenuHandler.Instance.Command(player, "2");
                         break;
                     }
                 default:

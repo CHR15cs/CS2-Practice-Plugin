@@ -215,6 +215,8 @@ namespace CSPracc
                 case (DesignerNames.ProjectileSmoke):
                     {
                         projectile = new CSmokeGrenadeProjectile(entity.Handle);
+                       
+                        Server.PrintToChatAll($"smoke spawned");
                         break;
                     }
                 default:
@@ -226,6 +228,7 @@ namespace CSPracc
 
                 Server.NextFrame(() =>
                 {
+                    projectile.FadeScale =2.0f;
                     CCSPlayerController player = new CCSPlayerController(projectile.Thrower.Value.Controller.Value.Handle);
                     Vector playerPosition = player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin;
                     //TODO provide actual projectile Position

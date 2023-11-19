@@ -11,6 +11,7 @@ using CounterStrikeSharp.API;
 using CSPracc.DataModules.Constants;
 using CSPracc.Managers;
 using CSPracc.DataModules;
+using CounterStrikeSharp.API.Modules.Cvars;
 
 namespace CSPracc.CommandHandler
 {
@@ -155,6 +156,11 @@ namespace CSPracc.CommandHandler
                             player.PlayerPawn.Value.Teleport(checkpoints[player].PlayerPosition, checkpoints[player].PlayerAngle,new Vector(0,0,0));
                             player.PrintToCenter("Teleported to your checkpoint");
                         }
+                        break;
+                    }
+                case ".smoke":
+                    {
+                        Server.ExecuteCommand("ent_create smokegrenade_projectile InitializeSpawnFromWorld");
                         break;
                     }
                 default:

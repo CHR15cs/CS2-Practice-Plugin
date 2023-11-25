@@ -264,7 +264,7 @@ namespace CSPracc
             ReadyTeamCT = true;
             ReadyTeamT = true;
         }
-        public  HookResult OnPlayerSpawnHandler(EventPlayerSpawn @event,GameEventInfo info)
+        public virtual HookResult OnPlayerSpawnHandler(EventPlayerSpawn @event,GameEventInfo info)
         {
             if (CoachTeam1 != null)
             {

@@ -11,6 +11,7 @@ using CounterStrikeSharp.API;
 using CSPracc.DataModules.Constants;
 using CSPracc.Managers;
 using CSPracc.DataModules;
+using CounterStrikeSharp.API.Modules.Memory;
 
 namespace CSPracc.CommandHandler
 {
@@ -132,6 +133,11 @@ namespace CSPracc.CommandHandler
                     }
                 case PRACC_COMMAND.CLEAR:
                     {
+                        Utils.RemoveGrenadeEntitiesFromPlayer(player);
+                        break;
+                    }
+                case PRACC_COMMAND.ClearAll:
+                    {
                         Utils.RemoveGrenadeEntities();
                         break;
                     }
@@ -165,6 +171,27 @@ namespace CSPracc.CommandHandler
                             player.PlayerPawn.Value.Teleport(checkpoints[player].PlayerPosition, checkpoints[player].PlayerAngle,new Vector(0,0,0));
                             player.PrintToCenter("Teleported to your checkpoint");
                         }
+                        break;
+                    }
+                case ".throw":
+                    {
+                        CSmokeGrenadeProjectile? ent = Utilities.CreateEntityByName<CSmokeGrenadeProjectile>("smokegrenade_projectile");
+                        if (ent != null)
+                        {
+                            ent!.Teleport(player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin, new QAngle(0, 0, 0), new Vector(0, 0, 0));
+                            ent.DispatchSpawn();
+
+                        }
+                        else
+                        {
+                            Server.PrintToChatAll("entity is null");
+                        }
+
+                        //player.PlayerPawn.Value.CommitSuicide(true, false);
+                        //var addEntiryInput = VirtualFunction.CreateVoid<IntPtr, string,IntPtr,IntPtr,string,IntPtr>(GameData.GetSignature("CEntityInstance_AcceptInput"));
+                        //var addEntityEvent = VirtualFunction.CreateVoid<IntPtr, string, IntPtr, IntPtr, string, float>(GameData.GetSignature("CEntitySystem_AddEntityIOEvent"));
+                        //addEntiryInput(ent.Handle, "globalname", player.Handle, player.Handle, "custom", 0);
+                        //addEntityEvent(ent.Handle, "FireUser1", player.Handle, player.Handle, "", 0f);
                         break;
                     }
                 default:

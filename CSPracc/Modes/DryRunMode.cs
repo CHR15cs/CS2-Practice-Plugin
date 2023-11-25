@@ -24,6 +24,15 @@ namespace CSPracc
     public  class DryRunMode : MatchMode
     {
 
+        public override HookResult OnPlayerSpawnHandler(EventPlayerSpawn @event, GameEventInfo info)
+        {
+            foreach(CCSPlayerController player in Utilities.GetPlayers())
+            {
+                player.InGameMoneyServices!.Account = 16000;
+            }
+            return base.OnPlayerSpawnHandler(@event, info); ;
+        }
+
         protected override void internalStart()
         {
             ReadyTeamCT = false;

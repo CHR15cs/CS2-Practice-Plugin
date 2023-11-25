@@ -16,7 +16,7 @@ namespace CSPracc.EventHandler
     {
         public DryRunEventHandler(CSPraccPlugin plugin, DryRunCommandHandler mch,DryRunMode mode) : base(plugin, mch,mode)
         {
-
+            plugin.RegisterEventHandler<EventPlayerSpawn>(mode.OnPlayerSpawnHandler, hookMode: HookMode.Post);
         }
 
         public override void Dispose()

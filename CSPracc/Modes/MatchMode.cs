@@ -201,7 +201,6 @@ namespace CSPracc
 
             if(ListCoaches.Remove(playerController.SteamID))
             {
-                Server.PrintToChatAll($"Found coach, removing now");
                 playerController.PrintToCenter("You`re no longer a coach.");
             }
             
@@ -281,12 +280,10 @@ namespace CSPracc
 
             if (ListCoaches == null || ListCoaches.Count == 0) return HookResult.Continue;
 
-            Server.PrintToChatAll("Going through the coaches");
             foreach (ulong id in ListCoaches)
             {
                 if (id ==  @event.Userid!.SteamID)
                 {
-                    Server.PrintToChatAll($"found coach {@event.Userid.PlayerName}!");
                     @event.Userid.InGameMoneyServices!.Account = 0;
                     Server.ExecuteCommand("mp_suicide_penalty 0");
                     CCSPlayerController player = Utilities.GetPlayerFromSteamId(id);

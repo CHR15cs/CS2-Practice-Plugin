@@ -87,5 +87,10 @@ namespace CSPracc.CommandHandler
             }
             return true;
         }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+        }
     }
 }

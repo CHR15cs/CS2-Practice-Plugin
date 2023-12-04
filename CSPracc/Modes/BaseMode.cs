@@ -13,8 +13,7 @@ namespace CSPracc.Modes
     public class BaseMode : IDisposable
     {
         public BaseMode() 
-        { 
-            ConfigureEnvironment();
+        {            
         }
         protected  BaseEventHandler EventHandler { get; set; }
         public  virtual void ConfigureEnvironment()
@@ -40,7 +39,8 @@ namespace CSPracc.Modes
 
         }
         public virtual void Dispose()
-        {        
+        {
+            Server.PrintToChatAll("Dispose Base Mode");
             EventHandler?.Dispose();
         }
 

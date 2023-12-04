@@ -20,34 +20,10 @@ namespace CSPracc.EventHandler
             plugin.RegisterEventHandler<EventPlayerSpawn>(MatchMode.OnPlayerSpawnHandler, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventRoundStart>(OnRoundStart, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventRoundEnd>(OnRoundEnd, hookMode: HookMode.Post);
-            plugin.RegisterEventHandler<EventRoundFreezeEnd>(OnFreezeTimeEnd, hookMode: HookMode.Post);
+            plugin.RegisterEventHandler<EventRoundFreezeEnd>(MatchMode.OnFreezeTimeEnd, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventMatchEndConditions>(OnMatchEnd, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt, hookMode: HookMode.Pre);
             Plugin = plugin;
-        }
-
-        public HookResult OnFreezeTimeEnd(EventRoundFreezeEnd @event,GameEventInfo info)
-        {
-            if (MatchMode.CoachTeam1 != null)
-            {
-                CSPraccPlugin.Instance!.AddTimer(2.0f, () => SwitchTeamsCoach(MatchMode.CoachTeam1));
-            }
-            if (MatchMode.CoachTeam2 != null)
-            {
-                CSPraccPlugin.Instance!.AddTimer(2.0f, () => SwitchTeamsCoach(MatchMode.CoachTeam2));
-            }
-            return HookResult.Changed;
-        }
-
-        private  void SwitchTeamsCoach(CCSPlayerController playerController)
-        {
-            if (playerController == null)
-            {
-                return;
-            }
-            CsTeam oldTeam = (CsTeam)playerController.TeamNum;
-            playerController.ChangeTeam(CsTeam.Spectator);
-            playerController.ChangeTeam(oldTeam);
         }
 
         public HookResult OnMatchEnd(EventMatchEndConditions @event, GameEventInfo info)
@@ -61,7 +37,6 @@ namespace CSPracc.EventHandler
 
         public HookResult OnRoundStart(EventRoundStart @event, GameEventInfo info)
         {
-            Server.PrintToChatAll("RoundStart");
             DamageStats = new Dictionary<ulong, DamageInfo>();
            
             return HookResult.Continue;
@@ -123,7 +98,6 @@ namespace CSPracc.EventHandler
                                 $" From [{DamageStats[player.SteamID].DamageGiven[enemy.SteamID].DmgTaken} / {DamageStats[player.SteamID].DamageGiven[enemy.SteamID].HitsTaken}]" +
                                 $"  - {enemy.PlayerName} ({enemyhp}hp) ");
                         }
-
                     }
 
                 }
@@ -163,7 +137,7 @@ namespace CSPracc.EventHandler
             Plugin.DeregisterEventHandler("round_start", eventRoundStart, true);
             BasePlugin.GameEventHandler<EventRoundEnd> eventRoundEnd = OnRoundEnd;
             Plugin.DeregisterEventHandler("round_end", eventRoundEnd, true);
-            BasePlugin.GameEventHandler<EventRoundFreezeEnd> eventfreezeRoundEnd = OnFreezeTimeEnd;
+            BasePlugin.GameEventHandler<EventRoundFreezeEnd> eventfreezeRoundEnd = MatchMode.OnFreezeTimeEnd;
             Plugin.DeregisterEventHandler("round_freeze_end", eventfreezeRoundEnd, true);
             BasePlugin.GameEventHandler<EventMatchEndConditions> eventMatchEndConditions = OnMatchEnd;
             Plugin.DeregisterEventHandler("match_end_conditions", eventMatchEndConditions, true);

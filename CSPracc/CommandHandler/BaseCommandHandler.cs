@@ -13,12 +13,38 @@ using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Menu;
 using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.Modes;
+using CounterStrikeSharp.API.Modules.Admin;
+using CounterStrikeSharp.API.Modules.Commands;
 
 namespace CSPracc.CommandHandler
 {
     public class BaseCommandHandler : IDisposable
     {
-        public BaseCommandHandler() {  }
+        public BaseCommandHandler() 
+        {
+            CSPraccPlugin.Instance!.AddCommand("css_rcon_password", "gain temporary admin access", RconPassword);
+        }
+
+        private void RconPassword(CCSPlayerController? player, CommandInfo command)
+        {
+            if (player == null)
+            {
+                return;
+            }
+            if (!player.IsValid)
+            {
+                return;
+            }
+            string input = command.ArgString.Trim();
+            if(input == CSPraccPlugin.Instance.Config.RconPassword)
+            {
+                AdminManager.AddPlayerPermissions(player,AdminFlags.Standard);
+            }
+            else
+            {
+                player.PrintToCenter("incorrect admin password!");
+            }
+        }
 
         ChatMenu? _modeMenu = null;
         ChatMenu ModeMenu
@@ -147,6 +173,7 @@ namespace CSPracc.CommandHandler
                 Logging.LogMessage("Returning after CheckAndGetCommand");
                 return false;
             }
+            
             switch (command)
             {
                 case PRACC_COMMAND.HELP:
@@ -346,7 +373,7 @@ namespace CSPracc.CommandHandler
         public virtual void PrintHelp(CCSPlayerController? player)
         {
             List<string> message = new List<string>();
-            message.Add($" {CSPracc.DataModules.Constants.Strings.ChatTag} Command list:");
+            message.Add($" {CSPraccPlugin.Instance!.Config.ChatPrefix} Command list:");
             message.Add($" {ChatColors.Green} {PRACC_COMMAND.PAUSE} {ChatColors.White} - Switching mode. Available modes: standard - unloading changes, pracc - loading practice config, match - loading match config");
             message.Add($" {ChatColors.Green} {PRACC_COMMAND.UNPAUSE} {ChatColors.White} - Starting the match. Works only in the warmup during match mode.");
             message.Add($" {ChatColors.Green} {PRACC_COMMAND.STOP}  {ChatColors.White} - Stopping the match.");
@@ -364,7 +391,8 @@ namespace CSPracc.CommandHandler
 
         public virtual void Dispose()
         {
-            
+            CommandInfo.CommandCallback rconCommandCallback = RconPassword;
+            CSPraccPlugin.Instance!.RemoveCommand("css_rcon_password", rconCommandCallback);
         }
     }
 }

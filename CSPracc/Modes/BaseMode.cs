@@ -40,7 +40,6 @@ namespace CSPracc.Modes
         }
         public virtual void Dispose()
         {
-            Server.PrintToChatAll("Dispose Base Mode");
             EventHandler?.Dispose();
         }
 

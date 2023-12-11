@@ -14,6 +14,7 @@ namespace CSPracc.EventHandler
 {
     public class MatchEventHandler : BaseEventHandler
     {
+        protected MatchMode MatchMode;
         Dictionary<ulong, DamageInfo> DamageStats = new Dictionary<ulong, DamageInfo>();
         public MatchEventHandler(CSPraccPlugin plugin, MatchCommandHandler mch,MatchMode mode) : base(plugin, mch)
         {
@@ -55,18 +56,18 @@ namespace CSPracc.EventHandler
                 {
                     if (!DamageStats.ContainsKey(player.SteamID))
                     {
-                        player.PrintToChat($" {CSPracc.DataModules.Constants.Strings.ChatTag} {ChatColors.DarkBlue} To: [0/0] From  [0/0] - {enemy.PlayerName} ({enemy.PlayerPawn.Value.Health}hp) ");
+                        player.PrintToChat($" {CSPraccPlugin.Instance!.Config.ChatPrefix} {ChatColors.DarkBlue} To: [0/0] From  [0/0] - {enemy.PlayerName} ({enemy.PlayerPawn.Value.Health}hp) ");
                     }
                     else
                     {
                         if(!DamageStats[player.SteamID].DamageGiven.ContainsKey(enemy.SteamID))
                         {
-                            player.PrintToChat($" {CSPracc.DataModules.Constants.Strings.ChatTag} {ChatColors.DarkBlue} To: [0/0] From  [0/0] - {enemy.PlayerName} ({enemy.PlayerPawn.Value.Health}hp) ");
+                            player.PrintToChat($" {CSPraccPlugin.Instance!.Config.ChatPrefix} {ChatColors.DarkBlue} To: [0/0] From  [0/0] - {enemy.PlayerName} ({enemy.PlayerPawn.Value.Health}hp) ");
                         }
                         else
                         {
                             int enemyhp = enemy.PlayerPawn.Value.Health > 0 ? enemy.PlayerPawn.Value.Health : 0;
-                            player.PrintToChat($" {CSPracc.DataModules.Constants.Strings.ChatTag} {ChatColors.DarkBlue} To:" +
+                            player.PrintToChat($" {CSPraccPlugin.Instance!.Config.ChatPrefix} {ChatColors.DarkBlue} To:" +
                                 $" [{DamageStats[player.SteamID].DamageGiven[enemy.SteamID].DmgGiven}/{DamageStats[player.SteamID].DamageGiven[enemy.SteamID].HitsGiven}] " +
                                 $" From [{DamageStats[player.SteamID].DamageGiven[enemy.SteamID].DmgTaken}/{DamageStats[player.SteamID].DamageGiven[enemy.SteamID].HitsTaken}]" +
                                 $"  - {enemy.PlayerName} ({enemyhp}hp) ");                        
@@ -83,18 +84,18 @@ namespace CSPracc.EventHandler
                 {
                     if (!DamageStats.ContainsKey(player.SteamID))
                     {
-                        player.PrintToChat($" {CSPracc.DataModules.Constants.Strings.ChatTag} {ChatColors.DarkBlue} To: [0/0] From  [0/0] - {enemy.PlayerName} ({enemy.PlayerPawn.Value.Health}hp) ");
+                        player.PrintToChat($" {CSPraccPlugin.Instance!.Config.ChatPrefix} {ChatColors.DarkBlue} To: [0/0] From  [0/0] - {enemy.PlayerName} ({enemy.PlayerPawn.Value.Health}hp) ");
                     }
                     else
                     {
                         if (!DamageStats[player.SteamID].DamageGiven.ContainsKey(enemy.SteamID))
                         {
-                            player.PrintToChat($" {CSPracc.DataModules.Constants.Strings.ChatTag} {ChatColors.DarkBlue} To: [0/0] From  [0/0] - {enemy.PlayerName} ({enemy.PlayerPawn.Value.Health}hp) ");
+                            player.PrintToChat($" {CSPraccPlugin.Instance!.Config.ChatPrefix} {ChatColors.DarkBlue} To: [0/0] From  [0/0] - {enemy.PlayerName} ({enemy.PlayerPawn.Value.Health}hp) ");
                         }
                         else
                         {
                             int enemyhp = enemy.PlayerPawn.Value.Health > 0 ? enemy.PlayerPawn.Value.Health : 0;
-                            player.PrintToChat($" {CSPracc.DataModules.Constants.Strings.ChatTag} {ChatColors.DarkBlue} To:" +
+                            player.PrintToChat($" {CSPraccPlugin.Instance!.Config.ChatPrefix} {ChatColors.DarkBlue} To:" +
                                 $" [{DamageStats[player.SteamID].DamageGiven[enemy.SteamID].DmgGiven} / {DamageStats[player.SteamID].DamageGiven[enemy.SteamID].HitsGiven}] " +
                                 $" From [{DamageStats[player.SteamID].DamageGiven[enemy.SteamID].DmgTaken} / {DamageStats[player.SteamID].DamageGiven[enemy.SteamID].HitsTaken}]" +
                                 $"  - {enemy.PlayerName} ({enemyhp}hp) ");

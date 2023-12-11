@@ -25,38 +25,11 @@ using System.Drawing;
 using CSPracc.Modes;
 using static CSPracc.DataModules.Enums;
 
-public class CSPraccPlugin : BasePlugin
+
+[MinimumApiVersion(80)]
+public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
 {
     public static CSPraccPlugin? Instance { get; private set; }
-
-    private static List<SteamID>? _adminList = null;
-    public static List<SteamID> AdminList
-    {
-        get
-        {
-            if (_adminList == null)
-            {
-                _adminList = new List<SteamID>();
-                if (Config != null)
-                {
-                    foreach (string admin in Config.Admins)
-                    {
-                        try
-                        {
-                            _adminList.Add(new SteamID(admin));
-                        }
-                        catch
-                        {
-                            Server.PrintToConsole("ignored admin: " + admin);
-                        }
-
-                    }
-                }
-            }
-            return _adminList;
-
-        }
-    }
 
     #region properties
     public override string ModuleName
@@ -70,7 +43,7 @@ public class CSPraccPlugin : BasePlugin
     {
         get
         {
-            return "0.9.0.1";
+            return "0.9.1.0";
         }
     }
 
@@ -80,21 +53,6 @@ public class CSPraccPlugin : BasePlugin
     private static DirectoryInfo? _moduleDir;
     public static DirectoryInfo ModuleDir => _moduleDir!;
 
-    private string _rconPassword = String.Empty;
-    private string RconPassword
-    {
-        get
-        {
-            if (_rconPassword == String.Empty)
-            {
-                if (Config != null)
-                {
-                    _rconPassword = Config.RconPassword;
-                }
-            }
-            return _rconPassword;
-        }
-    }
     private static DirectoryInfo? _csgoDir = null;
     public static DirectoryInfo Cs2Dir
     {
@@ -111,7 +69,7 @@ public class CSPraccPlugin : BasePlugin
 
     private static FileInfo? configManagerFile = null;
 
-    public static ConfigManager? Config;
+    public CSPraccConfig Config { get; set; }
 
     public static BaseMode PluginMode { get; set; }
     #endregion
@@ -119,24 +77,7 @@ public class CSPraccPlugin : BasePlugin
     public override void Load(bool hotReload)
     {
         base.Load(hotReload);
-        _moduleDir = new DirectoryInfo(ModuleDirectory);
-        Logging logging = new Logging(new FileInfo(Path.Combine(ModuleDir.FullName, "Logging.txt")));
-        configManagerFile = new FileInfo(Path.Combine(ModuleDir.FullName, "configmanager.xml"));
-        XmlSerializer serializer = new XmlSerializer(typeof(ConfigManager));
-        if (configManagerFile.Exists)
-        {
-            Config = serializer.Deserialize(File.OpenRead(configManagerFile.FullName)) as ConfigManager;
-            DemoManager.DemoManagerSettings = Config!.DemoManagerSettings;
-        }
-        else
-        {
-            Config = new ConfigManager();
-            Config.RconPassword = "geheim";
-            Config.LoggingFile = "Logging.txt";
-            Config.Admins = new List<string>();
-            Config.Admins.Add("steamid1234");         
-            WriteConfig(Config);
-        }
+        _moduleDir = new DirectoryInfo(ModuleDirectory);   
         RegisterListener<Listeners.OnMapStart>((mapName) =>
         {
             Reset();
@@ -145,37 +86,10 @@ public class CSPraccPlugin : BasePlugin
         SwitchMode(Enums.PluginMode.Standard);
     }
 
-    public static void WriteConfig(ConfigManager config)
+    public static void WriteConfig()
     {
-        XmlSerializer serializer = new XmlSerializer(typeof(ConfigManager));
-        if (configManagerFile!.Exists)
-        {
-            configManagerFile.Delete();
-        }
-        serializer.Serialize(File.OpenWrite(configManagerFile.FullName), config);
+       
     }
-
-    [ConsoleCommand("css_rcon_password", "allow temporary admin control")]
-    public void OnRconPassword(CCSPlayerController? player, CommandInfo command)
-    {
-        if (player == null) return;
-        if (!player.PlayerPawn.IsValid) return;
-        rconPassword(player, command.ArgString);
-    }
-
-    #region commands
-    private void rconPassword(CCSPlayerController? player, string password)
-    {
-        password = password.Trim();
-        if (RconPassword != password)
-        {
-            player!.PrintToCenter("Invalid Password");
-            return;
-        }
-        CSPraccPlugin.AdminList.Add(new SteamID(player!.SteamID));
-    }
-    #endregion
-
 
     /// <summary>
     /// Resetting plugin settings
@@ -219,6 +133,16 @@ public class CSPraccPlugin : BasePlugin
                 }               
         }
         PluginMode?.ConfigureEnvironment();
+    }
+
+    public void OnConfigParsed(CSPraccConfig config)
+    {
+        if(config == null)
+        {
+            return;
+        }
+        Config = config;
+        DemoManager.DemoManagerSettings = config.DemoManagerSettings;
     }
 }
 

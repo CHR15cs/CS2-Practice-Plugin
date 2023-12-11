@@ -33,7 +33,8 @@ namespace CSPracc.DataModules
         {
             Standard,
             Pracc,
-            Match
+            Match,
+            DryRun
         }
     }
 }

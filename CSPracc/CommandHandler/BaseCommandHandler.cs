@@ -190,6 +190,17 @@ namespace CSPracc.CommandHandler
                         CSPraccPlugin.SwitchMode(Enums.PluginMode.Match);
                         break;
                     }
+                case PRACC_COMMAND.DryRun:
+                    {
+                        if (!player.IsAdmin())
+                        {
+                            player.PrintToCenter("Only admins can execute this command!");
+                            return false;
+                        }
+                        RoundRestoreManager.CleanupOldFiles();
+                        CSPraccPlugin.SwitchMode(Enums.PluginMode.DryRun);
+                        break;
+                    }
                 case PRACC_COMMAND.SWAP:
                     {
                         if (!player.IsAdmin())

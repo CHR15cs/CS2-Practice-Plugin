@@ -15,8 +15,9 @@ namespace CSPracc.EventHandler
     public class MatchEventHandler : BaseEventHandler
     {
         Dictionary<ulong, DamageInfo> DamageStats = new Dictionary<ulong, DamageInfo>();
-        public MatchEventHandler(CSPraccPlugin plugin, MatchCommandHandler mch) : base(plugin, mch)
+        public MatchEventHandler(CSPraccPlugin plugin, MatchCommandHandler mch,MatchMode mode) : base(plugin, mch)
         {
+            MatchMode = mode;
             plugin.RegisterEventHandler<EventPlayerSpawn>(MatchMode.OnPlayerSpawnHandler, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventRoundStart>(OnRoundStart, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventRoundEnd>(OnRoundEnd, hookMode: HookMode.Post);

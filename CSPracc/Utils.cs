@@ -15,6 +15,46 @@ namespace CSPracc
         /// <summary>
         /// Deleting Grenades from server
         /// </summary>
+        public static void RemoveGrenadeEntitiesFromPlayer(CCSPlayerController player)
+        {
+            var smokes = Utilities.FindAllEntitiesByDesignerName<CSmokeGrenadeProjectile>("smokegrenade_projectile");
+            foreach (var entity in smokes)
+            {
+                if (entity != null)
+                {
+                    CCSPlayerController thrower = new CCSPlayerController(entity.Thrower.Value.Controller.Handle);
+                    if(thrower.Handle == player.Handle)
+                    {
+                        entity.Remove();
+                    }
+                    
+                }
+            }
+            var mollys = Utilities.FindAllEntitiesByDesignerName<CSmokeGrenadeProjectile>("molotov_projectile");
+            foreach (var entity in mollys)
+            {
+                if (entity != null)
+                {
+                    CCSPlayerController thrower = new CCSPlayerController(entity.Thrower.Value.Controller.Handle);
+                    if (thrower.Handle == player.Handle)
+                    {
+                        entity.Remove();
+                    }
+                }
+            }
+            var inferno = Utilities.FindAllEntitiesByDesignerName<CSmokeGrenadeProjectile>("inferno");
+            foreach (var entity in inferno)
+            {
+                if (entity != null)
+                {
+                    entity.Remove();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Deleting Grenades from server
+        /// </summary>
         public static void RemoveGrenadeEntities()
         {
             var smokes = Utilities.FindAllEntitiesByDesignerName<CSmokeGrenadeProjectile>("smokegrenade_projectile");

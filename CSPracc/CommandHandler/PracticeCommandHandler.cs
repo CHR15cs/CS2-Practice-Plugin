@@ -12,6 +12,7 @@ using CSPracc.DataModules.Constants;
 using CSPracc.Managers;
 using CSPracc.DataModules;
 using CounterStrikeSharp.API.Modules.Commands;
+using CounterStrikeSharp.API.Modules.Memory;
 
 namespace CSPracc.CommandHandler
 {
@@ -156,6 +157,11 @@ namespace CSPracc.CommandHandler
                         break;
                     }
                 case PRACC_COMMAND.CLEAR:
+                    {
+                        Utils.RemoveGrenadeEntitiesFromPlayer(player);
+                        break;
+                    }
+                case PRACC_COMMAND.ClearAll:
                     {
                         Utils.RemoveGrenadeEntities();
                         break;

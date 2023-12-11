@@ -195,7 +195,7 @@ namespace CSPracc
         }
 
         public void OnEntitySpawned(CEntityInstance entity)
-        {
+        { 
             var designerName = entity.DesignerName;
             PracticeMode test = null;
             try

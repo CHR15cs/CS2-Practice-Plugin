@@ -206,11 +206,17 @@ public class CSPraccPlugin : BasePlugin
                     PluginMode = new MatchMode();
                     break;
                 }
+            case Enums.PluginMode.DryRun:
+                {
+                    PluginMode?.Dispose();
+                    PluginMode = new DryRunMode();
+                    break;
+                }
             default:
                 {
                     PluginMode = new BaseMode();
                     break;
-                }
+                }               
         }
         PluginMode?.ConfigureEnvironment();
     }

@@ -59,11 +59,13 @@ namespace CSPracc.DataModules.Constants
         public const string ALIAS = ".alias";
         public const string REMOVEALIAS = ".ralias";
         public const string CLEAR = ".clear";
+        public const string ClearAll = ".clearall";
         public const string DEMO = ".demo";
         public const string SAVELAST = ".savelast";
         public const string CHECKPOINT = ".checkpoint";
         public const string BACK = ".back";
         public const string UserRole = ".userrole";
+        public const string DryRun = ".dryrun";
     }
     public class Strings
     {

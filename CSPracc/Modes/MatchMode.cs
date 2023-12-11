@@ -170,7 +170,6 @@ namespace CSPracc
             state = match_state.warmup;
             Methods.MsgToServer("Starting Warmup.");
             Server.ExecuteCommand("exec CSPRACC\\5on5_warmup.cfg");
-            Server.ExecuteCommand(DataModules.Constants.COMMANDS.START_WARMUP);
         }
 
         public  void Start(CCSPlayerController? player)

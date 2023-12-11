@@ -13,7 +13,6 @@ namespace CSPracc.DataModules.Constants
         public static string PAUSE_MATCH = "mp_pause_match 1";
         public static string UNPAUSE_MATCH = "mp_unpause_match 1";
         public static string RESTART_GAME = "mp_restartgame 1";
-        public static string START_WARMUP = "exec CSPRACC\\warmup.cfg";
         public static string START_MATCH = "exec CSPRACC\\5on5.cfg";
         public static string SWAP_TEAMS = "mp_swapteams 1";
     }

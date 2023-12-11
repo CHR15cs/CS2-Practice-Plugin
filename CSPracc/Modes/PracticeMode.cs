@@ -17,7 +17,7 @@ namespace CSPracc.Modes
         }
         public override void ConfigureEnvironment()
         {
-            DataModules.Constants.Methods.MsgToServer("Starting practice mode.");
+            DataModules.Constants.Methods.MsgToServer("Loading practice mode.");
             Server.ExecuteCommand("exec CSPRACC\\pracc.cfg");
             EventHandler?.Dispose();
             EventHandler = new PracticeEventHandler(CSPraccPlugin.Instance!, new PracticeCommandHandler());

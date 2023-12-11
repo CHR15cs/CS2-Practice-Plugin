@@ -14,39 +14,16 @@ namespace CSPracc.EventHandler
 {
     public class MatchEventHandler : BaseEventHandler
     {
-        Dictionary<CCSPlayerController, DamageInfo> DamageStats = new Dictionary<CCSPlayerController, DamageInfo>();
+        Dictionary<ulong, DamageInfo> DamageStats = new Dictionary<ulong, DamageInfo>();
         public MatchEventHandler(CSPraccPlugin plugin, MatchCommandHandler mch) : base(plugin, mch)
         {
             plugin.RegisterEventHandler<EventPlayerSpawn>(MatchMode.OnPlayerSpawnHandler, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventRoundStart>(OnRoundStart, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventRoundEnd>(OnRoundEnd, hookMode: HookMode.Post);
-            plugin.RegisterEventHandler<EventRoundFreezeEnd>(OnFreezeTimeEnd, hookMode: HookMode.Post);
+            plugin.RegisterEventHandler<EventRoundFreezeEnd>(MatchMode.OnFreezeTimeEnd, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventMatchEndConditions>(OnMatchEnd, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt, hookMode: HookMode.Pre);
-        }
-
-        public HookResult OnFreezeTimeEnd(EventRoundFreezeEnd @event,GameEventInfo info)
-        {
-            if (MatchMode.CoachTeam1 != null)
-            {
-                CSPraccPlugin.Instance!.AddTimer(2.0f, () => SwitchTeamsCoach(MatchMode.CoachTeam1));
-            }
-            if (MatchMode.CoachTeam2 != null)
-            {
-                CSPraccPlugin.Instance!.AddTimer(2.0f, () => SwitchTeamsCoach(MatchMode.CoachTeam2));
-            }
-            return HookResult.Changed;
-        }
-
-        private  void SwitchTeamsCoach(CCSPlayerController playerController)
-        {
-            if (playerController == null)
-            {
-                return;
-            }
-            CsTeam oldTeam = (CsTeam)playerController.TeamNum;
-            playerController.ChangeTeam(CsTeam.Spectator);
-            playerController.ChangeTeam(oldTeam);
+            Plugin = plugin;
         }
 
         public HookResult OnMatchEnd(EventMatchEndConditions @event, GameEventInfo info)
@@ -60,14 +37,13 @@ namespace CSPracc.EventHandler
 
         public HookResult OnRoundStart(EventRoundStart @event, GameEventInfo info)
         {
-            DamageStats = new Dictionary<CCSPlayerController, DamageInfo>();
+            DamageStats = new Dictionary<ulong, DamageInfo>();
            
             return HookResult.Continue;
         }
 
         public HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo info)
         {
-            Server.PrintToChatAll("Round end");
             //Print Dmg Info
             List<CCSPlayerController> players = Utilities.GetPlayers();
             List<CCSPlayerController> teamCT = players.Where(x => x.GetCsTeam() == CsTeam.CounterTerrorist).ToList();
@@ -76,13 +52,13 @@ namespace CSPracc.EventHandler
             {
                 foreach (CCSPlayerController enemy in teamT)
                 {
-                    if (!DamageStats.ContainsKey(player))
+                    if (!DamageStats.ContainsKey(player.SteamID))
                     {
                         player.PrintToChat($" {CSPracc.DataModules.Constants.Strings.ChatTag} {ChatColors.DarkBlue} To: [0/0] From  [0/0] - {enemy.PlayerName} ({enemy.PlayerPawn.Value.Health}hp) ");
                     }
                     else
                     {
-                        if(!DamageStats[player].DamageGiven.ContainsKey(enemy))
+                        if(!DamageStats[player.SteamID].DamageGiven.ContainsKey(enemy.SteamID))
                         {
                             player.PrintToChat($" {CSPracc.DataModules.Constants.Strings.ChatTag} {ChatColors.DarkBlue} To: [0/0] From  [0/0] - {enemy.PlayerName} ({enemy.PlayerPawn.Value.Health}hp) ");
                         }
@@ -90,8 +66,8 @@ namespace CSPracc.EventHandler
                         {
                             int enemyhp = enemy.PlayerPawn.Value.Health > 0 ? enemy.PlayerPawn.Value.Health : 0;
                             player.PrintToChat($" {CSPracc.DataModules.Constants.Strings.ChatTag} {ChatColors.DarkBlue} To:" +
-                                $" [{DamageStats[player].DamageGiven[enemy].DmgGiven}/{DamageStats[player].DamageGiven[enemy].HitsGiven}] " +
-                                $" From [{DamageStats[player].DamageGiven[enemy].DmgTaken}/{DamageStats[player].DamageGiven[enemy].HitsTaken}]" +
+                                $" [{DamageStats[player.SteamID].DamageGiven[enemy.SteamID].DmgGiven}/{DamageStats[player.SteamID].DamageGiven[enemy.SteamID].HitsGiven}] " +
+                                $" From [{DamageStats[player.SteamID].DamageGiven[enemy.SteamID].DmgTaken}/{DamageStats[player.SteamID].DamageGiven[enemy.SteamID].HitsTaken}]" +
                                 $"  - {enemy.PlayerName} ({enemyhp}hp) ");                        
                         }
                         
@@ -104,13 +80,13 @@ namespace CSPracc.EventHandler
             {
                 foreach (CCSPlayerController enemy in teamCT)
                 {
-                    if (!DamageStats.ContainsKey(player))
+                    if (!DamageStats.ContainsKey(player.SteamID))
                     {
                         player.PrintToChat($" {CSPracc.DataModules.Constants.Strings.ChatTag} {ChatColors.DarkBlue} To: [0/0] From  [0/0] - {enemy.PlayerName} ({enemy.PlayerPawn.Value.Health}hp) ");
                     }
                     else
                     {
-                        if (!DamageStats[player].DamageGiven.ContainsKey(enemy))
+                        if (!DamageStats[player.SteamID].DamageGiven.ContainsKey(enemy.SteamID))
                         {
                             player.PrintToChat($" {CSPracc.DataModules.Constants.Strings.ChatTag} {ChatColors.DarkBlue} To: [0/0] From  [0/0] - {enemy.PlayerName} ({enemy.PlayerPawn.Value.Health}hp) ");
                         }
@@ -118,11 +94,10 @@ namespace CSPracc.EventHandler
                         {
                             int enemyhp = enemy.PlayerPawn.Value.Health > 0 ? enemy.PlayerPawn.Value.Health : 0;
                             player.PrintToChat($" {CSPracc.DataModules.Constants.Strings.ChatTag} {ChatColors.DarkBlue} To:" +
-                                $" [{DamageStats[player].DamageGiven[enemy].DmgGiven}/{DamageStats[player].DamageGiven[enemy].HitsGiven}] " +
-                                $" From [{DamageStats[player].DamageGiven[enemy].DmgTaken}/{DamageStats[player].DamageGiven[enemy].HitsTaken}]" +
+                                $" [{DamageStats[player.SteamID].DamageGiven[enemy.SteamID].DmgGiven} / {DamageStats[player.SteamID].DamageGiven[enemy.SteamID].HitsGiven}] " +
+                                $" From [{DamageStats[player.SteamID].DamageGiven[enemy.SteamID].DmgTaken} / {DamageStats[player.SteamID].DamageGiven[enemy.SteamID].HitsTaken}]" +
                                 $"  - {enemy.PlayerName} ({enemyhp}hp) ");
                         }
-
                     }
 
                 }
@@ -132,24 +107,24 @@ namespace CSPracc.EventHandler
 
         public HookResult OnPlayerHurt(EventPlayerHurt @event, GameEventInfo info)
         {
-            if(!DamageStats.TryGetValue(@event.Attacker, out DamageInfo damageInfo)) 
-            { 
-                if(!DamageStats.ContainsKey(@event.Attacker))
-                {
-                    DamageStats.Add(@event.Attacker, new DamageInfo(@event.Attacker));
-                }
-            }
-            DamageStats[@event.Attacker].AddDamage(@event.Userid, @event.DmgHealth);
-            
-            if (!DamageStats.TryGetValue(@event.Userid, out DamageInfo damageInfoTaker))
+            if(!DamageStats.TryGetValue(@event.Attacker.SteamID, out DamageInfo damageInfo)) 
             {
-                if (!DamageStats.ContainsKey(@event.Userid))
+                if(!DamageStats.ContainsKey(@event.Attacker.SteamID))
                 {
-                    DamageStats.Add(@event.Userid, new DamageInfo(@event.Userid));
+                    DamageStats.Add(@event.Attacker.SteamID, new DamageInfo(@event.Attacker));
                 }
             }
-            DamageStats[@event.Userid].TakeDamage(@event.Attacker, @event.DmgHealth);
-            return HookResult.Handled;
+            DamageStats[@event.Attacker.SteamID].AddDamage(@event.Userid.SteamID, @event.DmgHealth);
+            
+            if (!DamageStats.TryGetValue(@event.Userid.SteamID, out DamageInfo damageInfoTaker))
+            {
+                if (!DamageStats.ContainsKey(@event.Userid.SteamID))
+                {
+                    DamageStats.Add(@event.Userid.SteamID, new DamageInfo(@event.Userid));
+                }
+            }
+            DamageStats[@event.Userid.SteamID].TakeDamage(@event.Attacker.SteamID, @event.DmgHealth);
+            return HookResult.Continue;
         }
 
         public override void Dispose()
@@ -161,8 +136,8 @@ namespace CSPracc.EventHandler
             BasePlugin.GameEventHandler<EventRoundStart> eventRoundStart = OnRoundStart;
             Plugin.DeregisterEventHandler("round_start", eventRoundStart, true);
             BasePlugin.GameEventHandler<EventRoundEnd> eventRoundEnd = OnRoundEnd;
-            Plugin.DeregisterEventHandler("round_end", eventRoundStart, true);
-            BasePlugin.GameEventHandler<EventRoundFreezeEnd> eventfreezeRoundEnd = OnFreezeTimeEnd;
+            Plugin.DeregisterEventHandler("round_end", eventRoundEnd, true);
+            BasePlugin.GameEventHandler<EventRoundFreezeEnd> eventfreezeRoundEnd = MatchMode.OnFreezeTimeEnd;
             Plugin.DeregisterEventHandler("round_freeze_end", eventfreezeRoundEnd, true);
             BasePlugin.GameEventHandler<EventMatchEndConditions> eventMatchEndConditions = OnMatchEnd;
             Plugin.DeregisterEventHandler("match_end_conditions", eventMatchEndConditions, true);

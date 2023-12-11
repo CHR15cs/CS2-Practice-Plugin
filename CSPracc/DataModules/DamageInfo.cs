@@ -18,14 +18,14 @@ namespace CSPracc.DataModules
     {
         CCSPlayerController DamageIssuer;
 
-        public Dictionary<CCSPlayerController, Damage> DamageGiven;
+        public Dictionary<ulong, Damage> DamageGiven;
 
         public DamageInfo(CCSPlayerController DamageIssuer) 
         {
-            DamageGiven = new Dictionary<CCSPlayerController, Damage> ();
+            DamageGiven = new Dictionary<ulong, Damage> ();
         }
 
-        public void AddDamage(CCSPlayerController victim,int damage)
+        public void AddDamage(ulong victim,int damage)
         {
             if(DamageGiven.ContainsKey(victim))
             {
@@ -51,7 +51,7 @@ namespace CSPracc.DataModules
             }
         }
 
-        public void TakeDamage(CCSPlayerController Issuer,int damage)
+        public void TakeDamage(ulong Issuer,int damage)
         {
             if (DamageGiven.ContainsKey(Issuer))
             {

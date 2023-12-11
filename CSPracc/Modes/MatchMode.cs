@@ -18,6 +18,7 @@ using CSPracc.CommandHandler;
 using CSPracc.Modes;
 using static CSPracc.DataModules.Enums;
 using CounterStrikeSharp.API.Modules.Cvars;
+using CounterStrikeSharp.API.Modules.Entities;
 
 namespace CSPracc
 {
@@ -28,10 +29,20 @@ namespace CSPracc
         private static bool ReadyTeamCT = false;
         private static bool ReadyTeamT = false;
 
-        public static CCSPlayerController? CoachTeam1 { get; set; }
-        public static CCSPlayerController? CoachTeam2 { get; set; }
+        public static List<ulong>? ListCoaches { get; set; }
 
         private static BaseEventHandler EventHandler {  get; set; } = null;
+
+
+        public MatchMode() : base()
+        {
+
+        }
+
+        public override void Dispose()
+        {
+            EventHandler?.Dispose();
+        }
 
         public static void Pause()
         {
@@ -149,6 +160,7 @@ namespace CSPracc
                 player.PrintToCenter("Only admins can execute this command!");
                 return;
             }
+            state = match_state.warmup;
             Methods.MsgToServer("Starting Warmup.");
             Server.ExecuteCommand("exec CSPRACC\\5on5_warmup.cfg");
             Server.ExecuteCommand(DataModules.Constants.COMMANDS.START_WARMUP);
@@ -168,6 +180,7 @@ namespace CSPracc
             ReadyTeamT = false;
             if (state == DataModules.Enums.match_state.live) { return; }
             state = DataModules.Enums.match_state.live;
+            RoundRestoreManager.CleanupOldFiles();
             Server.ExecuteCommand("exec CSPRACC\\5on5.cfg");
             Methods.MsgToServer("Starting Match!");
             Server.ExecuteCommand("bot_kick");
@@ -182,64 +195,34 @@ namespace CSPracc
         {
             if (playerController == null) return;
 
-            if (playerController.PlayerPawn.Value.TeamNum == (byte)CsTeam.Terrorist)
+            if(ListCoaches == null ||  ListCoaches.Count == 0) return;
+
+            Server.PrintToChatAll($"Looking for coach now {playerController.SteamID} , count of coaches {ListCoaches.Count}");
+
+            if(ListCoaches.Remove(playerController.SteamID))
             {
-                if(CoachTeam1 !=  null)
-                {
-                    if(CoachTeam1.PlayerPawn.Handle == playerController.PlayerPawn.Handle)
-                    {
-                        CoachTeam1.PrintToCenter("Your no longer the coach now.");
-                        CoachTeam1.Clan = "";
-                        CoachTeam1 = null;
-                        
-                    }
-                }
+                playerController.PrintToCenter("You`re no longer a coach.");
             }
-            if (playerController.PlayerPawn.Value.TeamNum == (byte)CsTeam.CounterTerrorist)
-            {
-                if (CoachTeam2 != null)
-                {
-                    if (CoachTeam2.PlayerPawn.Handle == playerController.PlayerPawn.Handle)
-                    {
-                        CoachTeam2.PrintToCenter("Your no longer the coach now.");
-                        CoachTeam2.Clan = "";
-                        CoachTeam2 = null;
-                    }
-                }
-            }
+            
         }
 
         public static void AddCoach(CCSPlayerController playerController)
         {
             if (playerController == null) return;
             if (!playerController.PlayerPawn.IsValid) return;
-            if (playerController.PlayerPawn.Value.TeamNum == (byte)CsTeam.Terrorist)
-            {
-                if (CoachTeam1 == null)
-                {
-                    CoachTeam1 = playerController;
-                    CoachTeam1.Clan = "COACH";
-                    CoachTeam1.PrintToCenter("Your the T coach now.");
-                }
-                else
-                {
-                    playerController.PrintToCenter("There is already someone in coach slot! Use !stopcoach to leave coaching slot");
-                }
-            }
-            if (playerController.PlayerPawn.Value.TeamNum == (byte)CsTeam.CounterTerrorist)
-            {
-                if (CoachTeam2 == null)
-                {
-                    CoachTeam2 = playerController;
-                    CoachTeam2.Clan = "COACH";
-                    CoachTeam2.PrintToCenter("Your the CT coach now.");
-                }
-                else
-                {
-                    playerController.PrintToCenter("There is already someone in coach slot! Use !stopcoach to leave coaching slot");
-                }
-            }
 
+            if (ListCoaches == null)
+            {
+                ListCoaches = new List<ulong>();
+            }
+            if(ListCoaches.Contains(playerController.SteamID))
+            {
+                playerController.PrintToCenter("You already are a coach.");
+                return;
+            }
+            ListCoaches.Add(playerController.SteamID);
+            playerController.Clan = "COACH";
+            playerController.PrintToCenter("You`re a coach now.");
         }
 
         public static void RestoreBackup(CCSPlayerController player)
@@ -260,39 +243,62 @@ namespace CSPracc
             ReadyTeamCT = true;
             ReadyTeamT = true;
         }
+
+        public static HookResult OnFreezeTimeEnd(EventRoundFreezeEnd @event, GameEventInfo info)
+        {
+            if (state == match_state.warmup) { return HookResult.Continue; }
+            if (MatchMode.ListCoaches != null && MatchMode.ListCoaches.Count > 0)
+            {
+                CSPraccPlugin.Instance!.AddTimer(2.0f, () => SwitchTeamsCoach(ListCoaches));
+            }
+            return HookResult.Changed;
+        }
+
+        private static void SwitchTeamsCoach(List<ulong> playerList)
+        {
+            if (playerList == null || playerList.Count == 0) return;
+
+            
+            foreach (ulong id in playerList)
+            {
+                CCSPlayerController player = Utilities.GetPlayerFromSteamId(id);
+                if (player == null || !player.IsValid)
+                {
+                    return;
+                }
+                CsTeam oldTeam = (CsTeam)player.TeamNum;
+                player.ChangeTeam(CsTeam.Spectator);
+                player.ChangeTeam(oldTeam);
+            }
+        }
+
         public static HookResult OnPlayerSpawnHandler(EventPlayerSpawn @event,GameEventInfo info)
         {
-            if (CoachTeam1 != null)
-            {
-                Logging.LogMessage($"CoachT1 {@event.Userid.UserId} - {CoachTeam1!.UserId}");
-                if (@event.Userid.UserId == MatchMode.CoachTeam1!.UserId)
-                {
-                    Logging.LogMessage("T Coach commit suicide now!");
-                    CoachTeam1!.InGameMoneyServices!.Account = 0;
-                    Server.ExecuteCommand("mp_suicide_penalty 0");
-                    CSPraccPlugin.Instance!.AddTimer(0.2f, () => CoachTeam1!.PlayerPawn.Value.CommitSuicide(false, true));
-                    Server.ExecuteCommand("mp_suicide_penalty 1");
+            if(state == match_state.warmup) { return HookResult.Continue; }
 
-                }
-            }
-            if (MatchMode.CoachTeam2 != null)
+            if(@event.Userid == null ) return HookResult.Continue;
+
+            if (ListCoaches == null || ListCoaches.Count == 0) return HookResult.Continue;
+
+            foreach (ulong id in ListCoaches)
             {
-                Logging.LogMessage($"CoachT2 {@event.Userid.UserId} - {CoachTeam2!.UserId}");
-                if (@event.Userid.UserId == MatchMode.CoachTeam2!.UserId)
+                if (id ==  @event.Userid!.SteamID)
                 {
-                    Logging.LogMessage("CT Coach commit suicide now!");
-                    CoachTeam2!.InGameMoneyServices!.Account = 0;
+                    @event.Userid.InGameMoneyServices!.Account = 0;
                     Server.ExecuteCommand("mp_suicide_penalty 0");
-                    CSPraccPlugin.Instance!.AddTimer(0.2f, () => CoachTeam2!.PlayerPawn.Value.CommitSuicide(false, true));
+                    CCSPlayerController player = Utilities.GetPlayerFromSteamId(id);
+                    if(player == null || !player.IsValid) { return HookResult.Continue; }
+                    CSPraccPlugin.Instance!.AddTimer(0.5f, () => player!.PlayerPawn!.Value!.CommitSuicide(false, true));
                     Server.ExecuteCommand("mp_suicide_penalty 1");
                 }
             }
-            return HookResult.Handled;
+
+            return HookResult.Continue;
         }
 
         public override void ConfigureEnvironment()
         {
-            DataModules.Constants.Methods.MsgToServer("Starting match");
+            DataModules.Constants.Methods.MsgToServer("Loading match mode.");
             Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
             Server.ExecuteCommand("exec CSPRACC\\5on5_warmup.cfg");
             EventHandler?.Dispose();

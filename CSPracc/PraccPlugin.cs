@@ -187,33 +187,32 @@ public class CSPraccPlugin : BasePlugin
 
     public static void SwitchMode(PluginMode pluginMode)
     {
-        switch(pluginMode)
+        PluginMode?.Dispose();
+        switch (pluginMode)
         {
             case Enums.PluginMode.Standard:
                 {
-                    PluginMode?.Dispose();
+
                     PluginMode = new BaseMode();
                     break;
                 }
             case Enums.PluginMode.Pracc:
                 {
-                    PluginMode?.Dispose();
                     PluginMode = new PracticeMode();
                     break;
                 }
             case Enums.PluginMode.Match:
                 {
-                    PluginMode?.Dispose();
                     PluginMode = new MatchMode();
                     break;
                 }
             default:
                 {
-                    PluginMode?.Dispose();
                     PluginMode = new BaseMode();
                     break;
                 }
         }
+        PluginMode?.ConfigureEnvironment();
     }
 }
 

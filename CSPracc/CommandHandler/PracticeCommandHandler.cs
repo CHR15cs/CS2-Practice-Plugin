@@ -11,6 +11,7 @@ using CounterStrikeSharp.API;
 using CSPracc.DataModules.Constants;
 using CSPracc.Managers;
 using CSPracc.DataModules;
+using CounterStrikeSharp.API.Modules.Commands;
 
 namespace CSPracc.CommandHandler
 {
@@ -22,7 +23,31 @@ namespace CSPracc.CommandHandler
         public PracticeCommandHandler(): base()
         {
             BotManager = new BotManager();
+            CSPraccPlugin.Instance.AddCommand("css_pracc_smokecolor_enabled", "Enables / disabled smoke color", PraccSmokecolorEnabled);
         }
+
+        public static bool PraccSmokeColorEnabled = true;
+        private void PraccSmokecolorEnabled(CCSPlayerController? player, CommandInfo command)
+        {
+            if (command == null)
+            {
+                return;
+            }
+            if(command.ArgString.Length == 0)
+            {
+                Server.PrintToConsole("PraccSmokecolorEnabled used with invalid args");
+            }
+            if(command.ArgString.ToLower() == "true" || command.ArgString.ToLower() == "1")
+            {
+                PraccSmokeColorEnabled=true;
+            }
+            if (command.ArgString.ToLower() == "false" || command.ArgString.ToLower() == "0")
+            {
+                PraccSmokeColorEnabled = false;
+            }
+            return;
+        }
+
         public override bool PlayerChat(EventPlayerChat @event, GameEventInfo info)
         {
             if (!CheckAndGetCommand(@event.Userid, @event.Text, out string command, out string args, out CCSPlayerController player))
@@ -178,6 +203,7 @@ namespace CSPracc.CommandHandler
 
         public override void Dispose()
         {
+            CSPraccPlugin.Instance.RemoveCommand("css_pracc_smokecolor_enabled", PraccSmokecolorEnabled);
             base.Dispose();
         }
     }

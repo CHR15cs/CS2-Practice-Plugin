@@ -242,6 +242,7 @@ namespace CSPracc
                     LastThrownGrenade.SetOrAdd(player, tmpSnapshot);
                 });
 
+            if (!PracticeCommandHandler.PraccSmokeColorEnabled) return;
             if (projectile is CSmokeGrenadeProjectile)
             {
                 Server.NextFrame(() =>

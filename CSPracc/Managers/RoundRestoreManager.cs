@@ -25,6 +25,42 @@ namespace CSPracc.Managers
             return CSPraccPlugin.Cs2Dir.GetFiles("backup_round*").ToList();
         }
 
+        public static void LoadLastBackup(CCSPlayerController player)
+        {
+            if (player == null) return;
+            if (!player.PlayerPawn.IsValid) return;
+            if (!player.IsAdmin())
+            {
+                player.PrintToCenter("Only admins can execute this command!");
+                return;
+            }
+
+            List<FileInfo> Backupfiles = GetBackupFiles();
+            int highestRound = 0;
+            foreach (FileInfo file in Backupfiles)
+            {
+                try
+                {
+                    int round = Convert.ToInt32(file.Name.Substring(file.Name.Length - 6, 2));
+                    if (round > highestRound)
+                    {
+                        highestRound = round;
+                    }
+                }
+                catch { }               
+            }
+            string sround = highestRound >= 10 ? highestRound.ToString() : "0"+highestRound;
+            foreach (FileInfo backup in Backupfiles)
+            {
+                if(backup.Name.Contains(sround))
+                {
+                    Server.ExecuteCommand($"mp_backup_restore_load_file {backup.Name}");
+                }
+            }
+            CSPracc.DataModules.Constants.Methods.MsgToServer("Restored round, to continue match both teams need to use .unpause");
+
+        }
+
         public static void OpenBackupMenu(CCSPlayerController player)
         {
             if (player == null) return;

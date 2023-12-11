@@ -162,6 +162,7 @@ namespace CSPracc
             }
             state = match_state.warmup;
             Methods.MsgToServer("Starting Warmup.");
+            Methods.MsgToServer("Waiting for both teams to be ready.");
             Server.ExecuteCommand("exec CSPRACC\\5on5_warmup.cfg");
         }
 

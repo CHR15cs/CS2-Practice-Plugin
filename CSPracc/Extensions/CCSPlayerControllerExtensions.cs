@@ -1,8 +1,10 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.DataModules;
+using CSPracc.DataModules.Constants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,16 +17,12 @@ namespace CSPracc
     {
         public static bool IsAdmin(this CCSPlayerController playerController)
         {
-            bool isAdmin = false;
-            foreach (SteamID id in CSPraccPlugin.AdminList)
-            {
-                SteamID idPlayer = new SteamID(playerController.SteamID);
-                if (idPlayer.SteamId3 == id.SteamId3)
-                {
-                    isAdmin = true;
-                }
-            }
-            return isAdmin;
+            AdminData adminData = AdminManager.GetPlayerAdminData(new SteamID(playerController.SteamID));
+            if(adminData == null)
+            {              
+                return false;
+            }     
+            return adminData.Flags.Contains(AdminFlags.Standard);
         }
 
         public static CsTeam GetCsTeam(this CCSPlayerController playerController)

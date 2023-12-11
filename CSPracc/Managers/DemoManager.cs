@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Config;
 using CounterStrikeSharp.API.Modules.Menu;
 using CSPracc.DataModules;
 using CSPracc.DataModules.Constants;
@@ -123,13 +124,13 @@ namespace CSPracc.Managers
             {
                 DemoManagerSettings.RecordingMode = Enums.RecordingMode.Manual;
             }
-            CSPraccPlugin.WriteConfig(CSPraccPlugin.Config!);
+            CSPraccPlugin.Instance.Config.DemoManagerSettings = DemoManagerSettings;
         }
 
         private static void SwitchAutomaticUpload()
         {
             DemoManagerSettings.AutomaticUpload = !DemoManagerSettings.AutomaticUpload;
-            CSPraccPlugin.WriteConfig(CSPraccPlugin.Config!);
+            CSPraccPlugin.Instance.Config.DemoManagerSettings = DemoManagerSettings;
         }
 
         public static void UploadDemo(FileInfo demoFile)

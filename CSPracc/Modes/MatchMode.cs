@@ -23,12 +23,7 @@ using CounterStrikeSharp.API.Modules.Entities;
 namespace CSPracc
 {
     public  class MatchMode : BaseMode
-    {
-        public MatchMode() : base()
-        {
-
-        }
-        protected  DataModules.Enums.match_state state = DataModules.Enums.match_state.warmup;
+    {        protected  DataModules.Enums.match_state state = DataModules.Enums.match_state.warmup;
 
         public static List<ulong>? ListCoaches { get; set; }
         protected  bool ReadyTeamCT = false;
@@ -47,8 +42,6 @@ namespace CSPracc
         {
             EventHandler?.Dispose();
         }
-
-        public static void Pause()
         private  BaseEventHandler EventHandler {  get; set; } = null;
 
         public  void Pause()
@@ -232,8 +225,6 @@ namespace CSPracc
             playerController.PrintToCenter("You`re a coach now.");
         }
 
-        
-
         public  void RestoreBackup(CCSPlayerController player)
         {
             if(player == null) { return; }
@@ -255,11 +246,34 @@ namespace CSPracc
         public virtual HookResult OnPlayerSpawnHandler(EventPlayerSpawn @event,GameEventInfo info)
         {
             if (state == match_state.warmup) { return HookResult.Continue; }
-            if (MatchMode.ListCoaches != null && MatchMode.ListCoaches.Count > 0)
+            if (ListCoaches != null && ListCoaches.Count > 0)
             {
-                CSPraccPlugin.Instance!.AddTimer(2.0f, () => SwitchTeamsCoach(ListCoaches));
+                foreach (ulong id in ListCoaches)
+                {
+                    if (id == @event.Userid!.SteamID)
+                    {
+                        @event.Userid.InGameMoneyServices!.Account = 0;
+                        Server.ExecuteCommand("mp_suicide_penalty 0");
+                        CCSPlayerController player = Utilities.GetPlayerFromSteamId(id);
+                        if (player == null || !player.IsValid) { return HookResult.Continue; }
+                        CSPraccPlugin.Instance!.AddTimer(0.5f, () => player!.PlayerPawn!.Value!.CommitSuicide(false, true));
+                        Server.ExecuteCommand("mp_suicide_penalty 1");
+                    }
+                }
+               
             }
             return HookResult.Changed;
+        }
+
+        public HookResult OnFreezeTimeEnd(EventRoundFreezeEnd @event,GameEventInfo info) 
+        {
+
+            if (state == match_state.warmup) { return HookResult.Continue; }
+            if (ListCoaches != null && ListCoaches.Count > 0)
+            {
+                CSPraccPlugin.Instance!.AddTimer(2.0f, () => SwitchTeamsCoach(ListCoaches));
+            }                
+            return HookResult.Continue;
         }
 
         private static void SwitchTeamsCoach(List<ulong> playerList)
@@ -278,30 +292,6 @@ namespace CSPracc
                 player.ChangeTeam(CsTeam.Spectator);
                 player.ChangeTeam(oldTeam);
             }
-        }
-
-        public static HookResult OnPlayerSpawnHandler(EventPlayerSpawn @event,GameEventInfo info)
-        {
-            if(state == match_state.warmup) { return HookResult.Continue; }
-
-            if(@event.Userid == null ) return HookResult.Continue;
-
-            if (ListCoaches == null || ListCoaches.Count == 0) return HookResult.Continue;
-
-            foreach (ulong id in ListCoaches)
-            {
-                if (id ==  @event.Userid!.SteamID)
-                {
-                    @event.Userid.InGameMoneyServices!.Account = 0;
-                    Server.ExecuteCommand("mp_suicide_penalty 0");
-                    CCSPlayerController player = Utilities.GetPlayerFromSteamId(id);
-                    if(player == null || !player.IsValid) { return HookResult.Continue; }
-                    CSPraccPlugin.Instance!.AddTimer(0.5f, () => player!.PlayerPawn!.Value!.CommitSuicide(false, true));
-                    Server.ExecuteCommand("mp_suicide_penalty 1");
-                }
-            }
-
-            return HookResult.Continue;
         }
 
         public override void ConfigureEnvironment()

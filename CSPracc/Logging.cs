@@ -18,7 +18,7 @@ namespace CSPracc
 
         public static void LogMessage(string message) 
         { 
-            if(!CSPraccPlugin.Config.Logging)
+            if(!CSPraccPlugin.Instance.Config.Logging)
             {
                 return;
             }

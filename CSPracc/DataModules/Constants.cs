@@ -67,16 +67,16 @@ namespace CSPracc.DataModules.Constants
         public const string UserRole = ".userrole";
         public const string DryRun = ".dryrun";
     }
-    public class Strings
-    {
-        public static string ChatTag = $" {ChatColors.Green}[{ChatColors.Red}CSPRACC{ChatColors.Green}]{ChatColors.White} ";
-    }
 
+    public class AdminFlags
+    {
+        public const string Standard = "@CSPracc/admin";
+    }
     public class Methods
     {
         public static void MsgToServer(string msg)
         {
-            Server.PrintToChatAll($"{Strings.ChatTag} {msg}");
+            Server.PrintToChatAll($"{CSPraccPlugin.Instance!.Config.ChatPrefix} {msg}");
         }
     }
     public class DesignerNames

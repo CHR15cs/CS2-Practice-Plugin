@@ -21,7 +21,9 @@ Can be enabled via **.menu** or **.pracc**.<br>
 Supports many helpful practice functions such as **.spawn (x)** where x is the spawn number.<br>
 Grenade practice was a main topic for me, so I implemented a small **.nades** menu, where lineups are stored which can be saved with **.save (grenade title without whitespaces!)**.<br>
 Detailed information can be found [here](https://github.com/CHR15cs/CS2-Practice-Plugin/wiki/Practice-Commands).<br>
-
+### DryRun
+Can be enabled via **.dryrun**.<br>
+Is based on the match mode. But this supports addidtional commands, see [here](https://github.com/CHR15cs/CS2-Practice-Plugin/wiki/DryRun-Commands).
 ## Configuration
 This plugin is somewhat customizeable.<br>
 Any Important steps are described [here](https://github.com/CHR15cs/CS2-Practice-Plugin/wiki/Configuration)<br>

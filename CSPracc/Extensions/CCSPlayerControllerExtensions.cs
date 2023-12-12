@@ -16,13 +16,8 @@ namespace CSPracc
     public static class CCSPlayerControllerExtensions
     {
         public static bool IsAdmin(this CCSPlayerController playerController)
-        {
-            AdminData adminData = AdminManager.GetPlayerAdminData(new SteamID(playerController.SteamID));
-            if(adminData == null)
-            {              
-                return false;
-            }     
-            return adminData.Flags.Contains(AdminFlags.Standard);
+        {     
+            return AdminManager.PlayerHasPermissions(playerController, AdminFlags.Standard);
         }
 
         public static CsTeam GetCsTeam(this CCSPlayerController playerController)

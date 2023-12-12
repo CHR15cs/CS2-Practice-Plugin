@@ -70,6 +70,11 @@ namespace CSPracc.CommandHandler
                         MatchMode.RestoreBackup(player);
                         break;
                     }
+                case PRACC_COMMAND.RESTORE:
+                    {
+                        MatchMode.RestoreLastRound(player);
+                        break;
+                    }
                 case PRACC_COMMAND.FORCEUNPAUSE:
                     {
                         MatchMode.ForceUnpause(player);

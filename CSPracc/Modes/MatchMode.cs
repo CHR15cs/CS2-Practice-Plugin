@@ -235,6 +235,16 @@ namespace CSPracc
             RoundRestoreManager.OpenBackupMenu(player);
         }
 
+        public void RestoreLastRound(CCSPlayerController player)
+        {
+            if (player == null) { return; }
+            if (!player.IsValid) { return; }
+            if (!player.IsAdmin()) { player.PrintToCenter("Only admins can execute this command!"); return; }
+            Pause();
+            Methods.MsgToServer("Admin is using round restore manager.");
+            RoundRestoreManager.LoadLastBackup(player);
+        }
+
         public  void ForceUnpause(CCSPlayerController player)
         {
             if (player == null) { return; }
@@ -242,6 +252,8 @@ namespace CSPracc
             if (!player.IsAdmin()) { player.PrintToCenter("Only admins can execute this command!"); return; }
             ReadyTeamCT = true;
             ReadyTeamT = true;
+            Methods.MsgToServer("Both Teams are now ready. Unpausing match!");
+            Server.ExecuteCommand(DataModules.Constants.COMMANDS.UNPAUSE_MATCH);
         }
         public virtual HookResult OnPlayerSpawnHandler(EventPlayerSpawn @event,GameEventInfo info)
         {

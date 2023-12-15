@@ -122,8 +122,12 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
                 }
             case Enums.PluginMode.DryRun:
                 {
-                    PluginMode?.Dispose();
                     PluginMode = new DryRunMode();
+                    break;
+                }
+            case Enums.PluginMode.Retake:
+                {
+                    PluginMode = new RetakeMode();
                     break;
                 }
             default:

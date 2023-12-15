@@ -74,6 +74,9 @@ namespace CSPracc.CommandHandler
                     RoundRestoreManager.CleanupOldFiles();
                     CSPraccPlugin.SwitchMode(Enums.PluginMode.Match);
                     break;
+                case "Retakes":
+                    CSPraccPlugin.SwitchMode(Enums.PluginMode.Retake);
+                    break;
                 case "Help":
                     PrintHelp(player);
                     break;
@@ -226,6 +229,16 @@ namespace CSPracc.CommandHandler
                         }
                         RoundRestoreManager.CleanupOldFiles();
                         CSPraccPlugin.SwitchMode(Enums.PluginMode.DryRun);
+                        break;
+                    }
+                case ".retake":
+                    {
+                        if (!player.IsAdmin())
+                        {
+                            player.PrintToCenter("Only admins can execute this command!");
+                            return false;
+                        }
+                        CSPraccPlugin.SwitchMode(Enums.PluginMode.Retake);
                         break;
                     }
                 case PRACC_COMMAND.SWAP:

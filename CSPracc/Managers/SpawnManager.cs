@@ -11,11 +11,25 @@ using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API.Modules.Entities;
 using System.Text.RegularExpressions;
 using CounterStrikeSharp.API.Modules.Memory;
+using CSPracc.DataStorages.JsonStorages;
+using CSPracc.Extensions;
 
 namespace CSPracc
 {
     public static class SpawnManager
     {
+        private static SpawnPointStorage? _spawnPointStorage;
+        private static SpawnPointStorage? spawnPointStorage
+        {
+            get
+            {
+                if (_spawnPointStorage == null || _spawnPointStorage.Map != Server.MapName)
+                {
+                    _spawnPointStorage = new SpawnPointStorage(new DirectoryInfo(Path.Combine(CSPraccPlugin.Instance.ModuleDirectory, "SpawnPoints")));
+                }
+                return _spawnPointStorage;
+            }
+        }
         private static string lastMap = String.Empty;
         private static Dictionary<byte, List<Position>>? _spawns = null;
         /// <summary>
@@ -123,8 +137,57 @@ namespace CSPracc
                 return;
             }
             Logging.LogMessage($"teleport to: {SpawnManager.Spawns[(byte)targetTeam][number].PlayerPosition}");
+            Utils.RemoveNoClip(player);
             player.PlayerPawn.Value.Teleport(SpawnManager.Spawns[(byte)targetTeam][number].PlayerPosition, SpawnManager.Spawns[(byte)targetTeam][number].PlayerAngle, new Vector(0, 0, 0));
+            
             player.PrintToCenter($"Teleporting to spawn {number + 1}");
+        }
+
+        public static void DeleteAllSpawnPoints()
+        {
+            var spawnst = Utilities.FindAllEntitiesByDesignerName<SpawnPoint>("info_player_terrorist");
+            foreach(SpawnPoint spawner in spawnst)
+            {
+                spawner.Remove();
+            }
+            var spawnsct = Utilities.FindAllEntitiesByDesignerName<SpawnPoint>("info_player_counterterrorist");
+            foreach (SpawnPoint spawner in spawnsct)
+            {
+                spawner.Remove();
+            }
+        }
+
+        public static void AddCurrentPositionAsSpawnPoint(CCSPlayerController player, string Bombsite)
+        {
+            if (player == null || !player.IsValid) return;
+
+            spawnPointStorage!.AddSpawnPoint(new JsonSpawnPoint(player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.ToVector3(), player.PlayerPawn.Value!.EyeAngles.ToVector3(),Bombsite),player.GetCsTeam());
+        }
+
+        public static void LoadSpawnsForBombsite(string Bombsite)
+        {
+            if(Bombsite == null) return;
+            if(spawnPointStorage!.GetSpawnPoints().Values.Count == 0) return;
+            DeleteAllSpawnPoints();
+            CreateSpawnPointsFromJsonPoints(spawnPointStorage.GetSpawnPointsFromTeam(CsTeam.Terrorist)!, "info_player_terrorist",Bombsite);
+            CreateSpawnPointsFromJsonPoints(spawnPointStorage.GetSpawnPointsFromTeam(CsTeam.CounterTerrorist)!, "info_player_counterterrorist",Bombsite);
+        }
+
+        private static void CreateSpawnPointsFromJsonPoints(List<JsonSpawnPoint> jsonSpawnPoints,string entityName,string Bombsite)
+        {
+            foreach (JsonSpawnPoint point in jsonSpawnPoints)
+            {
+                if(point.Bombsite != Bombsite) continue;
+                SpawnPoint? sp = Utilities.CreateEntityByName<SpawnPoint>(entityName);
+                if (sp == null) continue;
+                Vector absOrig = sp.AbsOrigin!;
+                absOrig = point.Position.ToCSVector();
+                QAngle eyeAngle = sp.AbsRotation!;
+                eyeAngle = point.QAngle.ToCSQAngle();
+                sp.TeamNum = (int)CsTeam.Terrorist;
+                sp.Priority = 0;
+                Server.NextFrame(() => sp.DispatchSpawn());
+            }
         }
 
     }

@@ -17,6 +17,14 @@ namespace CSPracc.DataModules.Constants
         public static string SWAP_TEAMS = "mp_swapteams 1";
     }
 
+    public class RETAKE_COMMAND
+    {
+        public const string edit = ".edit";
+        public const string stopedit = ".stopedit";
+        public const string addspawna = ".addspawna";
+        public const string addspawnb = ".addspawnb";
+    }
+
     public class PRACC_COMMAND
     {
         public const string MODE = ".menu";

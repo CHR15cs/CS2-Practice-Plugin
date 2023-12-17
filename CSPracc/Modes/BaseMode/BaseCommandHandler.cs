@@ -20,9 +20,11 @@ namespace CSPracc.CommandHandler
 {
     public class BaseCommandHandler : IDisposable
     {
-        public BaseCommandHandler() 
+        BaseMode BaseMode;
+        public BaseCommandHandler(BaseMode mode) 
         {
             CSPraccPlugin.Instance!.AddCommand("css_rcon_password", "gain temporary admin access", RconPassword);
+            BaseMode = mode;
         }
 
         private void RconPassword(CCSPlayerController? player, CommandInfo command)
@@ -186,7 +188,7 @@ namespace CSPracc.CommandHandler
                     }
                 case PRACC_COMMAND.MODE:
                     {
-                        ShowModeMenu(player);
+                        BaseMode.ShowModeMenu(player);
                         break;
                     }
                 case PRACC_COMMAND.FAKERCON:
@@ -368,7 +370,7 @@ namespace CSPracc.CommandHandler
                 player.PrintToCenter("Only admins can execute this command!");
                 return;
             }
-            ChatMenus.OpenMenu(player, ModeMenu);
+            
         }
 
         public void OnFakeRcon(CCSPlayerController? player, string args)

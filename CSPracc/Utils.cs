@@ -102,6 +102,11 @@ namespace CSPracc
             Server.PrintToChatAll($"{CSPraccPlugin.Instance!.Config.ChatPrefix} {message}");
         }
 
+        public static void ClientChatMessage(string message, CCSPlayerController player)
+        {
+            player.PrintToChat($"{CSPraccPlugin.Instance!.Config.ChatPrefix} {message}");
+        }
+
         public static Color GetTeamColor(CCSPlayerController playerController)
         {
             Logging.LogMessage($"Getting Color of player {playerController.CompTeammateColor}");

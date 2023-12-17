@@ -73,6 +73,7 @@ namespace CSPracc.DataModules.Constants
         public const string BACK = ".back";
         public const string UserRole = ".userrole";
         public const string DryRun = ".dryrun";
+        public const string timer = ".timer";
     }
 
     public class AdminFlags

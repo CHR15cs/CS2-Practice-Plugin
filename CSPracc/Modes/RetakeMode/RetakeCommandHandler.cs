@@ -13,7 +13,7 @@ namespace CSPracc.CommandHandler
     public class RetakeCommandHandler : BaseCommandHandler
     {
         RetakeMode RetakeMode { get; set; }
-        public RetakeCommandHandler(RetakeMode mode):base() 
+        public RetakeCommandHandler(RetakeMode mode):base(mode) 
         { 
             RetakeMode = mode;
         }

@@ -15,6 +15,7 @@ using CSPracc.Extensions;
 using CSPracc.DataModules.Constants;
 using CSPracc.Modes;
 using CSPracc.DataStorages.JsonStorages;
+using System.Reflection;
 
 namespace CSPracc
 {
@@ -34,6 +35,8 @@ namespace CSPracc
                 
          }
         public Dictionary<CCSPlayerController, ProjectileSnapshot> LastThrownGrenade = new Dictionary<CCSPlayerController, ProjectileSnapshot>();
+        public Dictionary<int, DateTime> LastThrownSmoke = new Dictionary<int, DateTime>();
+
 
         private ChatMenu _nadeMenu = null;
         /// <summary>
@@ -237,7 +240,7 @@ namespace CSPracc
                     string name = "LastThrown";
                     //TODO parse actual description if provided
                     string description = "";
-
+                    
                     ProjectileSnapshot tmpSnapshot = new ProjectileSnapshot(playerPosition.ToVector3(), projectilePosition.ToVector3(), playerAngle.ToVector3(), name, description);
                     LastThrownGrenade.SetOrAdd(player, tmpSnapshot);
                 });
@@ -251,11 +254,28 @@ namespace CSPracc
                     CCSPlayerController player = new CCSPlayerController(projectile.Thrower.Value.Controller.Value.Handle);
                     smokeProjectile.SmokeColor.X = (float)Utils.GetTeamColor(player).R;
                     smokeProjectile.SmokeColor.Y = (float)Utils.GetTeamColor(player).G;
-                    smokeProjectile.SmokeColor.Z = (float)Utils.GetTeamColor(player).B;
+                    if(LastThrownSmoke.ContainsKey(((int)projectile.Index)))
+                    {
+                        LastThrownSmoke[(int)projectile.Index] = DateTime.Now;
+                    }
+                    else
+                    {
+                        LastThrownSmoke.Add((int)projectile.Index, DateTime.Now);
+                    }                    
                     Logging.LogMessage($"smoke color {smokeProjectile.SmokeColor}");
                 });
-            }
+            }           
         }
+
+        public HookResult OnSmokeDetonate(EventSmokegrenadeDetonate @event, GameEventInfo info)
+        {
+            if(LastThrownSmoke.TryGetValue(@event.Entityid, out var result)) 
+            {
+                Utils.ServerMessage($"Smoke thrown by {@event.Userid.PlayerName} took {(DateTime.Now - result).TotalSeconds.ToString("0.00")}s to detonate");
+            }
+            return HookResult.Continue;
+        }
+
 
         public void SaveLastGrenade(CCSPlayerController playerController, string name)
         {

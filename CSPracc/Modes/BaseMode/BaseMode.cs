@@ -7,21 +7,40 @@ using System.Text;
 using System.Threading.Tasks;
 using CSPracc.EventHandler;
 using CSPracc.CommandHandler;
+using CSPracc.Managers;
+using CSPracc.DataModules;
 
 namespace CSPracc.Modes
 {
     public class BaseMode : IDisposable
     {
+        HtmlMenu ModeMenu { get; set; }
         public BaseMode() 
-        {            
+        {
+            GuiManager = new GuiManager();
+            List<KeyValuePair<string,Task>> list = new List<KeyValuePair<string, Task>>();
+            list.Add(new KeyValuePair<string, Task>("Pracc", new Task(() =>CSPraccPlugin.SwitchMode(Enums.PluginMode.Pracc))));
+            list.Add(new KeyValuePair<string, Task>("Match", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Match))));
+            list.Add(new KeyValuePair<string, Task>("Dryrun", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.DryRun))));
+            list.Add(new KeyValuePair<string, Task>("Pracc1", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Pracc))));
+            list.Add(new KeyValuePair<string, Task>("Match2", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Match))));
+            list.Add(new KeyValuePair<string, Task>("Dryrun3", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.DryRun))));
+            list.Add(new KeyValuePair<string, Task>("Dryrun4", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.DryRun))));
+            list.Add(new KeyValuePair<string, Task>("Match3", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Match))));
+            list.Add(new KeyValuePair<string, Task>("Prac2", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Pracc))));
+            list.Add(new KeyValuePair<string, Task>("Dryrun5", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.DryRun))));
+            ModeMenu = new HtmlMenu("Select Mode", list);
         }
+
+        protected GuiManager GuiManager { get; set; }
+
         protected  BaseEventHandler EventHandler { get; set; }
         public  virtual void ConfigureEnvironment()
         {
             DataModules.Constants.Methods.MsgToServer("Restoring default config.");
             Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
             Server.ExecuteCommand("exec server.cfg");
-            EventHandler = new BaseEventHandler(CSPraccPlugin.Instance!, new BaseCommandHandler());
+            EventHandler = new BaseEventHandler(CSPraccPlugin.Instance!, new BaseCommandHandler(this));           
         }
         public static void ChangeMap(CCSPlayerController player, string mapName)
         {
@@ -38,6 +57,16 @@ namespace CSPracc.Modes
             Server.ExecuteCommand($"changelevel {mapName}");
 
         }
+
+        public void ShowModeMenu(CCSPlayerController playerController)
+        {
+            if(playerController == null) return;
+            if (!playerController.IsValid) return;
+            if(!playerController.IsAdmin()) {  return; }
+
+            GuiManager.AddMenu(playerController.SteamID, ModeMenu);
+        }
+
         public virtual void Dispose()
         {
             EventHandler?.Dispose();

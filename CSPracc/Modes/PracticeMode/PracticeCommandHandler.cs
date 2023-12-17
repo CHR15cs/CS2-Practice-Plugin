@@ -13,6 +13,7 @@ using CSPracc.Managers;
 using CSPracc.DataModules;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Memory;
+using CSPracc.Modes;
 
 namespace CSPracc.CommandHandler
 {
@@ -21,8 +22,10 @@ namespace CSPracc.CommandHandler
 
         Dictionary<CCSPlayerController, Position> checkpoints = new Dictionary<CCSPlayerController, Position>();
         BotManager BotManager {  get; set; }
-        public PracticeCommandHandler(): base()
+        PracticeMode PracticeMode { get; set; }
+        public PracticeCommandHandler(PracticeMode mode): base(mode)
         {
+            PracticeMode = mode;
             BotManager = new BotManager();
             CSPraccPlugin.Instance.AddCommand("css_pracc_smokecolor_enabled", "Enables / disabled smoke color", PraccSmokecolorEnabled);
         }
@@ -193,9 +196,14 @@ namespace CSPracc.CommandHandler
                         }
                         else
                         {
-                            player.PlayerPawn.Value.Teleport(checkpoints[player].PlayerPosition, checkpoints[player].PlayerAngle,new Vector(0,0,0));
+                            player.PlayerPawn.Value!.Teleport(checkpoints[player].PlayerPosition, checkpoints[player].PlayerAngle,new Vector(0,0,0));
                             player.PrintToCenter("Teleported to your checkpoint");
                         }
+                        break;
+                    }
+                case PRACC_COMMAND.timer:
+                    {
+                        PracticeMode.StartTimer(player);
                         break;
                     }
                 default:

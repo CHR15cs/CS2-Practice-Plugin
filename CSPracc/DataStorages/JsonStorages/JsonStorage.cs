@@ -51,7 +51,13 @@ namespace CSPracc.DataStorages.JsonStorages
             {
                 return true;
             }
-            return Storage.Remove(key);
+            if(Storage.Remove(key))
+            {
+                Save();
+                return true;
+            }
+            return false;
+
         }
         public void Clear()
         {

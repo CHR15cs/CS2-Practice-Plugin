@@ -22,13 +22,6 @@ namespace CSPracc.Modes
             list.Add(new KeyValuePair<string, Task>("Pracc", new Task(() =>CSPraccPlugin.SwitchMode(Enums.PluginMode.Pracc))));
             list.Add(new KeyValuePair<string, Task>("Match", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Match))));
             list.Add(new KeyValuePair<string, Task>("Dryrun", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.DryRun))));
-            list.Add(new KeyValuePair<string, Task>("Pracc1", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Pracc))));
-            list.Add(new KeyValuePair<string, Task>("Match2", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Match))));
-            list.Add(new KeyValuePair<string, Task>("Dryrun3", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.DryRun))));
-            list.Add(new KeyValuePair<string, Task>("Dryrun4", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.DryRun))));
-            list.Add(new KeyValuePair<string, Task>("Match3", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Match))));
-            list.Add(new KeyValuePair<string, Task>("Prac2", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Pracc))));
-            list.Add(new KeyValuePair<string, Task>("Dryrun5", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.DryRun))));
             ModeMenu = new HtmlMenu("Select Mode", list);
         }
 

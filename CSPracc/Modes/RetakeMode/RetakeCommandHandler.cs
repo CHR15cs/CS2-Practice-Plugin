@@ -48,6 +48,11 @@ namespace CSPracc.CommandHandler
                         RetakeMode.AddSpawn(player, "B");
                         break;
                     }
+                case ".guns":
+                {
+                        RetakeMode.ShowGunMenu(player);
+                        break;
+                    }
                 default:
                     {
                         base.PlayerChat(@event, info);

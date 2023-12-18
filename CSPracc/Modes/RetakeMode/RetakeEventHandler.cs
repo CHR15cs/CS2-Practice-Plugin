@@ -7,6 +7,7 @@ using CSPracc.CommandHandler;
 using CSPracc.DataModules;
 using CSPracc.DataModules.Constants;
 using CSPracc.Managers;
+using CSPracc.Modes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,50 +22,35 @@ namespace CSPracc.EventHandler
     {
         BotManager BotManager { get; set; }
 
+        RetakeMode RetakeMode { get; set; }
         ~RetakeEventHandler()
         {
 
         }
         RetakeCommandHandler RetakeCommandHandler { get; set; }
-        public RetakeEventHandler(CSPraccPlugin plugin, RetakeCommandHandler rch) : base(plugin,rch)
+        public RetakeEventHandler(CSPraccPlugin plugin, RetakeCommandHandler rch, RetakeMode mode) : base(plugin,rch)
         {
+            RetakeMode = mode;
             plugin.RegisterListener<Listeners.OnEntitySpawned>(entity => ProjectileManager.Instance.OnEntitySpawned(entity));          
-            plugin.RegisterEventHandler<EventPlayerBlind>(OnPlayerBlind, hookMode: HookMode.Post);
-            plugin.RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt, hookMode: HookMode.Post);
-            plugin.RegisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn, hookMode: HookMode.Post);
+            plugin.RegisterEventHandler<EventPlayerSpawn>(mode.OnPlayerSpawn, hookMode: HookMode.Post);
+            plugin.RegisterEventHandler<EventRoundStart>(mode.OnRoundStart, hookMode: HookMode.Post);
+            plugin.RegisterEventHandler<EventRoundEnd>(mode.OnRoundEnd, hookMode: HookMode.Post);
             Plugin = plugin;
             BotManager = new BotManager();
             RetakeCommandHandler = rch;
         }
 
-        public HookResult OnPlayerBlind(EventPlayerBlind @event, GameEventInfo info)
-        {
-            Methods.MsgToServer($"Player {@event.Attacker.PlayerName} flashed {@event.Userid.PlayerName} for {@event.BlindDuration.ToString("0.00")}s");
-            return HookResult.Continue;
-        }
-
-        public HookResult OnPlayerHurt(EventPlayerHurt @event, GameEventInfo info)
-        {
-            Methods.MsgToServer($"Player {@event.Attacker.PlayerName} damaged {@event.Userid.PlayerName} for {@event.DmgHealth}hp with {@event.Weapon}");
-            return HookResult.Continue;
-        }
-
-        public HookResult OnPlayerSpawn(EventPlayerSpawn @event, GameEventInfo info)
-        {
-            BotManager!.OnPlayerSpawn(@event, info);
-            return HookResult.Continue;
-        }
-
         public override void Dispose()
-        {            
-            GameEventHandler<EventPlayerBlind> playerblind = OnPlayerBlind;
-            Plugin.DeregisterEventHandler("player_blind", playerblind, true);
+        {
 
-            GameEventHandler<EventPlayerHurt> playerhurt = OnPlayerHurt;
-            Plugin.DeregisterEventHandler("player_hurt", playerhurt, true);
+            GameEventHandler<EventRoundStart> roundstart = RetakeMode.OnRoundStart;
+            Plugin.DeregisterEventHandler("round_start", roundstart, true);
 
-            GameEventHandler<EventPlayerSpawn> playerspawn = OnPlayerSpawn;
-            Plugin.DeregisterEventHandler("player_spawn", playerhurt, true);
+            GameEventHandler<EventPlayerSpawn> playerspawn = RetakeMode.OnPlayerSpawn;
+            Plugin.DeregisterEventHandler("player_spawn", playerspawn, true);
+
+            GameEventHandler<EventRoundEnd> roundend = RetakeMode.OnRoundEnd;
+            Plugin.DeregisterEventHandler("round_end", roundend, true);
 
             base.Dispose();
         }

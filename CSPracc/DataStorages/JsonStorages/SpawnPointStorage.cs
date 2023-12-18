@@ -2,6 +2,7 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.DataModules;
+using CSPracc.Modes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,13 @@ namespace CSPracc.DataStorages.JsonStorages
         private FileInfo SpawnPointFile { get; }
         private Dictionary<CsTeam, List<JsonSpawnPoint>> spawnPoints;
         public string Map { get; init; }
+
+        private Dictionary<CsTeam,List<int>> usedSpawn = new Dictionary<CsTeam, List<int>>();
         public SpawnPointStorage(DirectoryInfo spawnPointDir) :base(new FileInfo(Path.Combine(spawnPointDir.FullName, $"{Server.MapName}_spawnpoints.json")))
         {
             spawnPoints = new Dictionary<CsTeam, List<JsonSpawnPoint>>();
             Map = Server.MapName;
-            SpawnPointFile = new FileInfo(Path.Combine(CSPraccPlugin.Instance.ModulePath,"SpawnPoints",$"Spawns_{Map}.json"));
+            SpawnPointFile = new FileInfo(Path.Combine(Path.Combine(spawnPointDir.FullName, $"{Server.MapName}_spawnpoints.json")));
             if(SpawnPointFile.Exists)
             {
                 spawnPoints = loadSpawnPointsFromFile(SpawnPointFile);
@@ -41,13 +44,71 @@ namespace CSPracc.DataStorages.JsonStorages
             return spawnPoints;
         }
 
-        public List<JsonSpawnPoint>? GetSpawnPointsFromTeam(CsTeam team)
+        public List<JsonSpawnPoint>? GetSpawnPointsFromTeam(CsTeam team,string bombsite)
         {
             if(!spawnPoints.ContainsKey(team))
             {
                 return null;
             }
-            return spawnPoints[team];
+            List<JsonSpawnPoint> teamSpawnPoints = spawnPoints[team];
+            List<JsonSpawnPoint> targetSpawnPoints = new List<JsonSpawnPoint>();
+            foreach(JsonSpawnPoint jsp in teamSpawnPoints)
+            {
+                if(jsp.Bombsite == bombsite)
+                {
+                    targetSpawnPoints.Add(jsp);
+                }
+            }
+            return targetSpawnPoints;
+        }
+
+        public void ResetUsedSpawns()
+        {
+            usedSpawn.Clear();
+        }
+
+        public JsonSpawnPoint? GetUnusedSpawnPointFromTeam(CsTeam team,string bombsite)
+        {
+            if(!spawnPoints.ContainsKey(team))
+            {
+                return null;
+            }
+            List<JsonSpawnPoint> spawnsPerTeam = GetSpawnPointsFromTeam(team,bombsite)!;
+            List<int>? usedSpawnIds = null;
+            if (usedSpawn.ContainsKey(team))
+            {
+                if(usedSpawn.TryGetValue(team, out usedSpawnIds))
+                {
+                    if(usedSpawnIds == null)
+                    {
+                        usedSpawn[team] = new List<int>();
+                    }
+                }
+            }
+            else
+            {
+                usedSpawnIds = new List<int>(); 
+                usedSpawn.Add(team, usedSpawnIds);
+            }
+            if(usedSpawnIds!.Count == spawnsPerTeam.Count)
+            {
+                //all spawns are in use
+                return null;
+            }
+            Random rnd = new Random();
+            int spawnid = -1;
+            bool unusedSpawnFound = false;
+            do
+            {
+                spawnid = rnd.Next(0, spawnsPerTeam.Count);
+                if(!usedSpawnIds.Contains(spawnid))
+                {
+                    unusedSpawnFound = true;
+                }
+            } while (!unusedSpawnFound);
+            usedSpawn[team].Add(spawnid);
+            return spawnsPerTeam[spawnid];
+
         }
 
         public void AddSpawnPoint(JsonSpawnPoint spawnPointToAdd,CsTeam team)
@@ -85,7 +146,7 @@ namespace CSPracc.DataStorages.JsonStorages
 
         public override bool Get(int key, out List<JsonSpawnPoint> value)
         {
-           value = GetSpawnPointsFromTeam((CsTeam)key)!;
+           value = GetSpawnPointsFromTeam((CsTeam)key,"")!;
             if(value == null)
             {
                 return false;

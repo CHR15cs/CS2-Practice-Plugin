@@ -17,6 +17,7 @@ namespace CSPracc.Managers
 
         Dictionary<ulong,DateTime> Timers = new Dictionary<ulong,DateTime>();
         Dictionary<ulong,HtmlMenu> htmlMenus = new Dictionary<ulong, HtmlMenu> ();
+        Dictionary<ulong,HtmlMessage> htmlMessage = new Dictionary<ulong, HtmlMessage> ();  
 
         public GuiManager() 
         {
@@ -30,6 +31,25 @@ namespace CSPracc.Managers
             CSPraccPlugin.Instance.AddCommand("css_7", "sel 1", Selection);
             CSPraccPlugin.Instance.AddCommand("css_8", "sel 1", Selection);
             CSPraccPlugin.Instance.AddCommand("css_9", "sel 1", Selection);
+        }
+
+        public void ShowHtmlMessage(HtmlMessage message,CCSPlayerController player)
+        {
+            if (message == null) return;
+            if (player == null) return;
+            if (!player.IsValid) return;
+
+            Server.NextFrame(() =>
+            {
+                if (htmlMessage.ContainsKey(player.SteamID))
+                {
+                    htmlMessage[player.SteamID] = message;
+                }
+                else
+                {
+                    htmlMessage.Add(player.SteamID, message);
+                }
+            });
         }
 
         public void StartTimer(CCSPlayerController playerController) 
@@ -48,14 +68,18 @@ namespace CSPracc.Managers
 
         public void AddMenu(ulong id, HtmlMenu menu)
         {
-            if(htmlMenus.ContainsKey(id))
+            Server.NextFrame(() =>
             {
-                htmlMenus[id] = menu;
-            }
-            else
-            {
-                htmlMenus.Add(id, menu);
-            }
+                if (htmlMenus.ContainsKey(id))
+                {
+                    htmlMenus[id] = menu;
+                }
+                else
+                {
+                    htmlMenus.Add(id, menu);
+                }
+            });
+
         }
 
         public void Dispose()
@@ -106,6 +130,26 @@ namespace CSPracc.Managers
                 if((menu.Page +1) * maxItemsPerSite  <  menu.Options.Count) menuText += $"<font color=\"green\">!8</font> - Next";
                 menuText += $"<font color=\"green\">!9</font> - Close";
                 player.PrintToCenterHtml(menuText);
+            }
+
+            foreach(var key in htmlMessage.Keys)
+            {
+                CCSPlayerController? player = Utilities.GetPlayerFromSteamId(key);
+                if (player == null) { htmlMessage.Remove(key); continue; }
+                if (!htmlMessage.TryGetValue(key, out HtmlMessage? message))
+                {
+                    htmlMessage.Remove(key);
+                    continue;
+                }
+
+                if(message.DateTimeEnd > DateTime.Now)
+                {
+                    player.PrintToCenterHtml(message.Message);
+                }
+                else
+                {
+                    htmlMessage.Remove(player.SteamID);
+                }               
             }
 
             foreach(var key in Timers.Keys)

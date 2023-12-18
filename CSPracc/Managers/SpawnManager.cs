@@ -143,18 +143,22 @@ namespace CSPracc
             player.PrintToCenter($"Teleporting to spawn {number + 1}");
         }
 
-        public static void DeleteAllSpawnPoints()
+        public static void ClearUsedSpawns()
         {
-            var spawnst = Utilities.FindAllEntitiesByDesignerName<SpawnPoint>("info_player_terrorist");
-            foreach(SpawnPoint spawner in spawnst)
+            spawnPointStorage.ResetUsedSpawns();
+        }
+
+        public static bool TeleportToUnusedSpawn(CCSPlayerController player,string bombsite)
+        {
+            if (player == null || !player.IsValid || player.IsBot) return false;
+
+            JsonSpawnPoint? unusedSpawn = spawnPointStorage!.GetUnusedSpawnPointFromTeam(player.GetCsTeam(),bombsite);
+            if (unusedSpawn == null)
             {
-                spawner.Remove();
+                return false;
             }
-            var spawnsct = Utilities.FindAllEntitiesByDesignerName<SpawnPoint>("info_player_counterterrorist");
-            foreach (SpawnPoint spawner in spawnsct)
-            {
-                spawner.Remove();
-            }
+            player.PlayerPawn.Value!.Teleport(unusedSpawn.Position.ToCSVector(),unusedSpawn.QAngle.ToCSQAngle(),new Vector(0, 0, 0));         
+            return true;
         }
 
         public static void AddCurrentPositionAsSpawnPoint(CCSPlayerController player, string Bombsite)
@@ -167,10 +171,54 @@ namespace CSPracc
         public static void LoadSpawnsForBombsite(string Bombsite)
         {
             if(Bombsite == null) return;
-            if(spawnPointStorage!.GetSpawnPoints().Values.Count == 0) return;
-            DeleteAllSpawnPoints();
-            CreateSpawnPointsFromJsonPoints(spawnPointStorage.GetSpawnPointsFromTeam(CsTeam.Terrorist)!, "info_player_terrorist",Bombsite);
-            CreateSpawnPointsFromJsonPoints(spawnPointStorage.GetSpawnPointsFromTeam(CsTeam.CounterTerrorist)!, "info_player_counterterrorist",Bombsite);
+            Server.PrintToConsole("Check if spawnpoints exist");
+            if(spawnPointStorage!.GetSpawnPoints() == null) { Server.PrintToConsole("GetSpawnPoints returned null"); return; }
+            Server.PrintToConsole("GetSpawnPoints returned NOT null");
+            Dictionary<CsTeam, List<JsonSpawnPoint>> spawns = spawnPointStorage!.GetSpawnPoints();
+            if(spawns != null) 
+            {
+                foreach(CsTeam team in spawns.Keys)
+                {
+                    Server.PrintToConsole($"team {team} exist");
+                }
+                if (!spawns.ContainsKey(CsTeam.Terrorist))
+                {
+                    Server.PrintToConsole("No Terrorist spawns exist");
+                    return;
+                }
+                if (!spawns.ContainsKey(CsTeam.CounterTerrorist))
+                {
+                    Server.PrintToConsole("No Counter-Terrorist spawns exist");
+                    return;
+                }
+                int tcount = 0;
+                int ctcount = 0;
+                foreach (JsonSpawnPoint spawner in spawns[CsTeam.Terrorist])
+                {
+                    tcount++;
+                }
+                foreach (JsonSpawnPoint spawner in spawns[CsTeam.CounterTerrorist])
+                {
+                    ctcount++;
+                }
+                Server.PrintToConsole($"TCount: {tcount} - CTCount {ctcount}");
+                if(tcount == 0 || ctcount == 0)
+                {
+                    Server.PrintToConsole("insufficient amount of spawns exist");
+                    return;
+                }
+            }
+            else
+            {
+                Server.PrintToConsole("spawns were null");
+                return;
+            }
+            Server.PrintToConsole("Calling Delete SpawnPoints");
+            //DeleteAllSpawnPoints();
+            //Server.PrintToConsole("Calling Create Terrorist SpawnPoints");
+            //CreateSpawnPointsFromJsonPoints(spawnPointStorage.GetSpawnPointsFromTeam(CsTeam.Terrorist)!, "info_player_terrorist", Bombsite);
+            //Server.PrintToConsole("Calling Create Counter Terrorist SpawnPoints");
+            //CreateSpawnPointsFromJsonPoints(spawnPointStorage.GetSpawnPointsFromTeam(CsTeam.CounterTerrorist)!, "info_player_counterterrorist", Bombsite);
         }
 
         private static void CreateSpawnPointsFromJsonPoints(List<JsonSpawnPoint> jsonSpawnPoints,string entityName,string Bombsite)
@@ -178,15 +226,17 @@ namespace CSPracc
             foreach (JsonSpawnPoint point in jsonSpawnPoints)
             {
                 if(point.Bombsite != Bombsite) continue;
-                SpawnPoint? sp = Utilities.CreateEntityByName<SpawnPoint>(entityName);
+                Server.PrintToConsole("Found spawnpoint for bombsite");
+                SpawnPoint? sp = Utilities.CreateEntityByName<SpawnPoint>("spawnpoint");
                 if (sp == null) continue;
+                Server.PrintToConsole("SpawnPoint not null");
                 Vector absOrig = sp.AbsOrigin!;
                 absOrig = point.Position.ToCSVector();
                 QAngle eyeAngle = sp.AbsRotation!;
                 eyeAngle = point.QAngle.ToCSQAngle();
                 sp.TeamNum = (int)CsTeam.Terrorist;
                 sp.Priority = 0;
-                Server.NextFrame(() => sp.DispatchSpawn());
+                sp.DispatchSpawn();
             }
         }
 

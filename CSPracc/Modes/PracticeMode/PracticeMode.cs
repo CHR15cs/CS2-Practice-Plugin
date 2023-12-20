@@ -23,6 +23,13 @@ namespace CSPracc.Modes
             base.GuiManager.StartTimer(player);
         }
 
+        public void ShowNadeMenu(CCSPlayerController player)
+        {
+            if (player == null) return;
+            if(!player.IsValid) return;
+            GuiManager.AddMenu(player.SteamID, ProjectileManager.Instance.GetNadeMenu(player));            
+        }
+
         public override void ConfigureEnvironment()
         {
             DataModules.Constants.Methods.MsgToServer("Loading practice mode.");

@@ -29,9 +29,9 @@ namespace CSPracc.Managers
 
         public void ShowGunMenu(CCSPlayerController player)
         {
-            List<KeyValuePair<string, Task>> GunMenuOptions = new List<KeyValuePair<string, Task>>();
-            GunMenuOptions.Add(new KeyValuePair<string, Task>($"Rifle Menu", new Task(() => ShowRifleMenu(player))));
-            GunMenuOptions.Add(new KeyValuePair<string, Task>($"Pistol Menu", new Task(() => ShowPistolMenu(player))));
+            List<KeyValuePair<string, Action>> GunMenuOptions = new List<KeyValuePair<string, Action>>();
+            GunMenuOptions.Add(new KeyValuePair<string, Action>($"Rifle Menu", new Action(() => ShowRifleMenu(player))));
+            GunMenuOptions.Add(new KeyValuePair<string, Action>($"Pistol Menu", new Action(() => ShowPistolMenu(player))));
             GunMenu = new HtmlMenu("Gun Menu", GunMenuOptions);
             GuiManager.AddMenu(player.SteamID, GunMenu);
         }
@@ -164,20 +164,20 @@ namespace CSPracc.Managers
             {
                 return;
             }
-            List<KeyValuePair<string, Task>> rifleOptions = new List<KeyValuePair<string, Task>>();
+            List<KeyValuePair<string, Action>> rifleOptions = new List<KeyValuePair<string, Action>>();
             if (!WeaponKitStorage.Get((int)player.GetCsTeam(), out WeaponKit kit))
             {
                 return;
             }
             foreach (string primary in kit.Primary)
             {
-                rifleOptions.Add(new KeyValuePair<string, Task>(primary.Substring(7), new Task(() => {
+                rifleOptions.Add(new KeyValuePair<string, Action>(primary.Substring(7), new Action(() => {
 
                     SelectPrimaryWeapon(player, primary);
                 })
                     ));
             }
-            rifleOptions.Add(new KeyValuePair<string, Task>("None", new Task(() => SelectPrimaryWeapon(player, ""))));
+            rifleOptions.Add(new KeyValuePair<string, Action>("None", new Action(() => SelectPrimaryWeapon(player, ""))));
             HtmlMenu RifleMenu = new HtmlMenu("Rifle Menu", rifleOptions);
             GuiManager.AddMenu(player.SteamID, RifleMenu);
         }
@@ -188,14 +188,14 @@ namespace CSPracc.Managers
             if (player == null) return;
             if (!player.IsValid) return;
 
-            List<KeyValuePair<string, Task>> pistolOptions = new List<KeyValuePair<string, Task>>();
+            List<KeyValuePair<string, Action>> pistolOptions = new List<KeyValuePair<string, Action>>();
             if (!WeaponKitStorage.Get((int)player.GetCsTeam(), out WeaponKit kit))
             {
                 return;
             }
             foreach (string secondary in kit.Secondary)
             {
-                pistolOptions.Add(new KeyValuePair<string, Task>(secondary.Substring(7), new Task(() => SelectSecondaryWeapon(player, secondary))));
+                pistolOptions.Add(new KeyValuePair<string, Action>(secondary.Substring(7), new Action(() => SelectSecondaryWeapon(player, secondary))));
             }
             HtmlMenu pistolMenu = new HtmlMenu("Pistol Menu", pistolOptions);
             GuiManager.AddMenu(player.SteamID, pistolMenu);

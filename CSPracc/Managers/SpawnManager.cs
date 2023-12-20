@@ -156,7 +156,7 @@ namespace CSPracc
             if (unusedSpawn == null)
             {
                 return false;
-            }
+            }          
             player.PlayerPawn.Value!.Teleport(unusedSpawn.Position.ToCSVector(),unusedSpawn.QAngle.ToCSQAngle(),new Vector(0, 0, 0));         
             return true;
         }

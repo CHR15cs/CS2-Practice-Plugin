@@ -18,10 +18,11 @@ namespace CSPracc.Modes
         public BaseMode() 
         {
             GuiManager = new GuiManager();
-            List<KeyValuePair<string,Task>> list = new List<KeyValuePair<string, Task>>();
-            list.Add(new KeyValuePair<string, Task>("Pracc", new Task(() =>CSPraccPlugin.SwitchMode(Enums.PluginMode.Pracc))));
-            list.Add(new KeyValuePair<string, Task>("Match", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Match))));
-            list.Add(new KeyValuePair<string, Task>("Dryrun", new Task(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.DryRun))));
+            List<KeyValuePair<string,Action>> list = new List<KeyValuePair<string, Action>>();
+            list.Add(new KeyValuePair<string, Action>("Pracc", new Action(() =>CSPraccPlugin.SwitchMode(Enums.PluginMode.Pracc))));
+            list.Add(new KeyValuePair<string, Action>("Match", new Action(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Match))));
+            list.Add(new KeyValuePair<string, Action>("Dryrun", new Action(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.DryRun))));
+            list.Add(new KeyValuePair<string, Action>("Retake", new Action(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Retake))));
             ModeMenu = new HtmlMenu("Select Mode", list);
         }
 

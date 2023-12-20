@@ -200,8 +200,8 @@ namespace CSPracc.Managers
             }
             if (menu.Options.Count >= index) 
             {
-                menu.Options[menu.Page * 4 + index -1].Value.RunSynchronously();
-                if(menu.CloseOnSelect)
+                Server.NextFrame(menu.Options[menu.Page * 4 + index - 1].Value);
+                if (menu.CloseOnSelect)
                 {
                     htmlMenus.Remove(player.SteamID);
                 }

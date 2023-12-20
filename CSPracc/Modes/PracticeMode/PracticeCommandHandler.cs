@@ -13,6 +13,8 @@ using CSPracc.Managers;
 using CSPracc.DataModules;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Memory;
+using CSPracc.Modes;
+using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
 
 namespace CSPracc.CommandHandler
 {
@@ -21,8 +23,10 @@ namespace CSPracc.CommandHandler
 
         Dictionary<CCSPlayerController, Position> checkpoints = new Dictionary<CCSPlayerController, Position>();
         BotManager BotManager {  get; set; }
-        public PracticeCommandHandler(): base()
+        PracticeMode PracticeMode { get; set; }
+        public PracticeCommandHandler(PracticeMode mode): base(mode)
         {
+            PracticeMode = mode;
             BotManager = new BotManager();
             CSPraccPlugin.Instance.AddCommand("css_pracc_smokecolor_enabled", "Enables / disabled smoke color", PraccSmokecolorEnabled);
         }
@@ -83,7 +87,7 @@ namespace CSPracc.CommandHandler
                             }
                             player.PrintToCenter("Could not parse argument for nade menu");
                         }
-                        ChatMenus.OpenMenu(player, ProjectileManager.Instance.GetNadeMenu(player));
+                        PracticeMode.ShowNadeMenu(player);
                         break;
                     }
                 case PRACC_COMMAND.SAVE:
@@ -193,11 +197,36 @@ namespace CSPracc.CommandHandler
                         }
                         else
                         {
-                            player.PlayerPawn.Value.Teleport(checkpoints[player].PlayerPosition, checkpoints[player].PlayerAngle,new Vector(0,0,0));
+                            player.PlayerPawn.Value!.Teleport(checkpoints[player].PlayerPosition, checkpoints[player].PlayerAngle,new Vector(0,0,0));
                             player.PrintToCenter("Teleported to your checkpoint");
                         }
                         break;
                     }
+                case PRACC_COMMAND.timer:
+                    {
+                        PracticeMode.StartTimer(player);
+                        break;
+                    }
+                //case ".throw":
+                //    {
+
+                //        //               MemoryFunctionVoid<IntPtr, string, IntPtr, IntPtr, string, int> AcceptEntityInput =
+                //        // new(@"\x55\x48\x89\xE5\x41\x57\x49\x89\xFF\x41\x56\x48\x8D\x7D\xC0");
+
+
+                //        Server.PrintToConsole("creating smoke");
+                //        CChicken? smoke = Utilities.CreateEntityByName<CChicken>("chicken");
+                //        if(smoke == null)
+                //        {
+                //            Server.PrintToConsole("smoke is  null");
+                //        }
+                //        smoke.Teleport(player.PlayerPawn.Value.CBodyComponent.SceneNode.AbsOrigin, new QAngle(0, 0, 0), new Vector(0, 0, 0));
+                //        //smoke.TeamNum = player.TeamNum;
+                //        smoke.DispatchSpawn();
+                //        //AcceptEntityInput.Invoke(smoke.Handle, "InitializeSpawnFromWorld", player.Handle, player.Handle, "", 0);
+                //        //AcceptEntityInput.Invoke(smoke.Handle,"FireUser1",player.Handle,player.Handle,"",0);
+                //        break;
+                //    }
                 default:
                     {
                         base.PlayerChat(@event, info);

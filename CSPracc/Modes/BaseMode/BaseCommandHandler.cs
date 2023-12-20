@@ -20,9 +20,11 @@ namespace CSPracc.CommandHandler
 {
     public class BaseCommandHandler : IDisposable
     {
-        public BaseCommandHandler() 
+        BaseMode BaseMode;
+        public BaseCommandHandler(BaseMode mode) 
         {
             CSPraccPlugin.Instance!.AddCommand("css_rcon_password", "gain temporary admin access", RconPassword);
+            BaseMode = mode;
         }
 
         private void RconPassword(CCSPlayerController? player, CommandInfo command)
@@ -73,6 +75,9 @@ namespace CSPracc.CommandHandler
                 case "Match":
                     RoundRestoreManager.CleanupOldFiles();
                     CSPraccPlugin.SwitchMode(Enums.PluginMode.Match);
+                    break;
+                case "Retakes":
+                    CSPraccPlugin.SwitchMode(Enums.PluginMode.Retake);
                     break;
                 case "Help":
                     PrintHelp(player);
@@ -183,7 +188,7 @@ namespace CSPracc.CommandHandler
                     }
                 case PRACC_COMMAND.MODE:
                     {
-                        ShowModeMenu(player);
+                        BaseMode.ShowModeMenu(player);
                         break;
                     }
                 case PRACC_COMMAND.FAKERCON:
@@ -226,6 +231,16 @@ namespace CSPracc.CommandHandler
                         }
                         RoundRestoreManager.CleanupOldFiles();
                         CSPraccPlugin.SwitchMode(Enums.PluginMode.DryRun);
+                        break;
+                    }
+                case ".retake":
+                    {
+                        if (!player.IsAdmin())
+                        {
+                            player.PrintToCenter("Only admins can execute this command!");
+                            return false;
+                        }
+                        CSPraccPlugin.SwitchMode(Enums.PluginMode.Retake);
                         break;
                     }
                 case PRACC_COMMAND.SWAP:
@@ -355,7 +370,7 @@ namespace CSPracc.CommandHandler
                 player.PrintToCenter("Only admins can execute this command!");
                 return;
             }
-            ChatMenus.OpenMenu(player, ModeMenu);
+            
         }
 
         public void OnFakeRcon(CCSPlayerController? player, string args)

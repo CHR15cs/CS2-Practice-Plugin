@@ -47,7 +47,10 @@ namespace CSPracc
             {
                 if (entity != null)
                 {
-                    entity.Remove();
+                    if (entity.Thrower.Index == player.Index)
+                    {
+                        entity.Remove();
+                    }
                 }
             }
         }
@@ -81,6 +84,26 @@ namespace CSPracc
                     entity.Remove();
                 }
             }
+        }
+
+        public static void RemoveNoClip(CCSPlayerController player)
+        {
+            if (player == null || !player.IsValid) return;
+
+            if (player.PlayerPawn.Value!.MoveType == MoveType_t.MOVETYPE_NOCLIP)
+            {
+                player.PlayerPawn.Value.MoveType = MoveType_t.MOVETYPE_WALK;
+            }
+        }
+
+        public static void ServerMessage(string message)
+        {
+            Server.PrintToChatAll($"{CSPraccPlugin.Instance!.Config.ChatPrefix} {message}");
+        }
+
+        public static void ClientChatMessage(string message, CCSPlayerController player)
+        {
+            player.PrintToChat($"{CSPraccPlugin.Instance!.Config.ChatPrefix} {message}");
         }
 
         public static Color GetTeamColor(CCSPlayerController playerController)

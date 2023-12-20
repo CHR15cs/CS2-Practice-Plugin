@@ -8,6 +8,8 @@ using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.Extensions;
 using System.Numerics;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
+using CounterStrikeSharp.API.Modules.Entities;
+using CounterStrikeSharp.API;
 
 namespace CSPracc.DataModules
 {
@@ -30,7 +32,8 @@ namespace CSPracc.DataModules
         }
         public void Restore(CCSPlayerController player)
         {
-            player.PlayerPawn.Value.Teleport(PlayerPosition.ToCSVector(), PlayerAngle.ToCSQAngle(), PlayerVelocity.ToCSVector());
+            Utils.RemoveNoClip(player);
+            player.PlayerPawn.Value.Teleport(PlayerPosition.ToCSVector(), PlayerAngle.ToCSQAngle(), PlayerVelocity.ToCSVector());            
         }
     }
 }

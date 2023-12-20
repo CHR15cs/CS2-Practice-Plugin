@@ -1,4 +1,5 @@
 ﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Core;
 using CSPracc.CommandHandler;
 using CSPracc.EventHandler;
 using System;
@@ -15,12 +16,26 @@ namespace CSPracc.Modes
         public PracticeMode() : base() 
         {
         }
+
+        public void StartTimer(CCSPlayerController player)
+        {
+            if (player == null) return;
+            base.GuiManager.StartTimer(player);
+        }
+
+        public void ShowNadeMenu(CCSPlayerController player)
+        {
+            if (player == null) return;
+            if(!player.IsValid) return;
+            GuiManager.AddMenu(player.SteamID, ProjectileManager.Instance.GetNadeMenu(player));            
+        }
+
         public override void ConfigureEnvironment()
         {
             DataModules.Constants.Methods.MsgToServer("Loading practice mode.");
             Server.ExecuteCommand("exec CSPRACC\\pracc.cfg");
             EventHandler?.Dispose();
-            EventHandler = new PracticeEventHandler(CSPraccPlugin.Instance!, new PracticeCommandHandler());
+            EventHandler = new PracticeEventHandler(CSPraccPlugin.Instance!, new PracticeCommandHandler(this));
         }
     }
 }

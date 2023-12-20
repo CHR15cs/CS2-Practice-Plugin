@@ -32,6 +32,7 @@ namespace CSPracc.EventHandler
             plugin.RegisterEventHandler<EventPlayerBlind>(OnPlayerBlind, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn, hookMode: HookMode.Post);
+            plugin.RegisterEventHandler<EventSmokegrenadeDetonate>(ProjectileManager.Instance.OnSmokeDetonate,hookMode: HookMode.Post);
             Plugin = plugin;
             BotManager = new BotManager();
             PracticeCommandHandler = pch;
@@ -55,6 +56,12 @@ namespace CSPracc.EventHandler
             return HookResult.Continue;
         }
 
+        public HookResult OnSmokeDetonate(EventSmokegrenadeDetonate @event, GameEventInfo info)
+        {
+            ProjectileManager.ReferenceEquals(@event, info);
+            return HookResult.Continue;
+        }
+
         public override void Dispose()
         {            
             GameEventHandler<EventPlayerBlind> playerblind = OnPlayerBlind;
@@ -65,6 +72,9 @@ namespace CSPracc.EventHandler
 
             GameEventHandler<EventPlayerSpawn> playerspawn = OnPlayerSpawn;
             Plugin.DeregisterEventHandler("player_spawn", playerhurt, true);
+
+            GameEventHandler<EventSmokegrenadeDetonate> smokegrenadedetonate = ProjectileManager.Instance.OnSmokeDetonate;
+            Plugin.DeregisterEventHandler("smokegrenade_detonate", smokegrenadedetonate, true);
 
             base.Dispose();
         }

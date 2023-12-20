@@ -12,7 +12,7 @@ namespace CSPracc.CommandHandler
     public class MatchCommandHandler : BaseCommandHandler
     {
         MatchMode MatchMode { get; init; }
-        public MatchCommandHandler(MatchMode mode):base() 
+        public MatchCommandHandler(MatchMode mode):base(mode) 
         {
             MatchMode = mode;
         }

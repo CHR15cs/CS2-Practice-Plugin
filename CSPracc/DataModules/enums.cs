@@ -34,7 +34,8 @@ namespace CSPracc.DataModules
             Standard,
             Pracc,
             Match,
-            DryRun
+            DryRun,
+            Retake
         }
     }
 }

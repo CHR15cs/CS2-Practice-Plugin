@@ -12,6 +12,7 @@ using CounterStrikeSharp.API;
 using CSPracc.DataStorages;
 using Newtonsoft.Json.Linq;
 using CSPracc.DataModules;
+using CounterStrikeSharp.API.Core;
 
 namespace CSPracc.DataStorages.JsonStorages
 {
@@ -27,14 +28,14 @@ namespace CSPracc.DataStorages.JsonStorages
             }
             return id;
         }
-        public void Add(Vector playerPosition, Vector projectilePosition, QAngle playerAngle, string title, string description, string map)
+        public void Add(Vector playerPosition, Vector projectilePosition, QAngle playerAngle, Vector velocity,string title, string description, string map)
         {
-            ProjectileSnapshot snapshot = new ProjectileSnapshot(playerPosition.ToVector3(), projectilePosition.ToVector3(), playerAngle.ToVector3(), title, description);
+            ProjectileSnapshot snapshot = new ProjectileSnapshot(playerPosition.ToVector3(), projectilePosition.ToVector3(), playerAngle.ToVector3(), velocity.ToVector3(), title, description,GrenadeType_t.GRENADE_TYPE_SMOKE);
             Add(snapshot);
         }
-        public void Add(Vector3 playerPosition, Vector3 projectilePosition, Vector3 playerAngle, string title, string description)
+        public void Add(Vector3 playerPosition, Vector3 projectilePosition, Vector3 playerAngle, Vector3 velocity,string title, string description)
         {
-            ProjectileSnapshot snapshot = new ProjectileSnapshot(playerPosition, projectilePosition, playerAngle, title, description);
+            ProjectileSnapshot snapshot = new ProjectileSnapshot(playerPosition, projectilePosition, playerAngle, velocity, title, description, GrenadeType_t.GRENADE_TYPE_SMOKE);
             Add(snapshot);
         }
 

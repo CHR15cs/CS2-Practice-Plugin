@@ -25,6 +25,23 @@ namespace CSPracc.DataModules.Constants
         public const string addspawnb = ".addspawnb";
     }
 
+    public class PREFIRE_COMMAND
+    {
+        public const string options = ".options";
+        public const string routes = ".routes";
+        public const string route = ".route";
+        public const string addroute = ".addroute";
+        public const string deleteroute = ".deleteroute";
+        public const string editroute = ".editroute";
+        public const string next = ".next";
+        public const string back = ".back";
+        public const string guns = ".guns";
+        public const string addspawn = ".addspawn";
+        public const string addstartingpoint = ".addstart";
+        public const string savecurrentroute = ".save";
+        public const string restart = ".restart";
+    }
+
     public class PRACC_COMMAND
     {
         public const string MODE = ".menu";
@@ -74,6 +91,10 @@ namespace CSPracc.DataModules.Constants
         public const string UserRole = ".userrole";
         public const string DryRun = ".dryrun";
         public const string timer = ".timer";
+        public const string rethrow = ".throw";
+        public const string flash = ".flash";
+        public const string noflash = ".noflash";
+        public const string stop = ".stop";
     }
 
     public class AdminFlags
@@ -90,5 +111,9 @@ namespace CSPracc.DataModules.Constants
     public class DesignerNames
     {
         public const string ProjectileSmoke = "smokegrenade_projectile";
+        public const string ProjectileFlashbang = "flashbang_projectile";
+        public const string ProjectileHE = "hegrenade_projectile";
+        public const string ProjectileDecoy = "decoy_projectile";
+        public const string ProjectileMolotov = "molotov_projectile";
     }
 }

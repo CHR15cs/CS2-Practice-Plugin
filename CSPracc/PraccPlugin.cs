@@ -24,7 +24,7 @@ using CSPracc.Managers;
 using System.Drawing;
 using CSPracc.Modes;
 using static CSPracc.DataModules.Enums;
-
+using System.Resources;
 
 [MinimumApiVersion(80)]
 public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
@@ -69,9 +69,9 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
 
     private static FileInfo? configManagerFile = null;
 
-    public CSPraccConfig Config { get; set; }
+    public CSPraccConfig? Config { get; set; }
 
-    public static BaseMode PluginMode { get; set; }
+    public static BaseMode? PluginMode { get; set; }
     #endregion
 
     public override void Load(bool hotReload)
@@ -81,14 +81,10 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
         RegisterListener<Listeners.OnMapStart>((mapName) =>
         {
             Reset();
+            Server.PrecacheModel("weapons/models/grenade/incendiary/weapon_incendiarygrenade.vmdl_c");
         });
         Instance = this;
-        SwitchMode(Enums.PluginMode.Standard);
-    }
-
-    public static void WriteConfig()
-    {
-       
+        SwitchMode(Config!.ModeToLoad);       
     }
 
     /// <summary>
@@ -96,7 +92,7 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
     /// </summary>
     private void Reset()
     {
-        SwitchMode(Enums.PluginMode.Standard);
+        SwitchMode(Config!.ModeToLoad);
     }
 
     public static void SwitchMode(PluginMode pluginMode)
@@ -104,9 +100,8 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
         PluginMode?.Dispose();
         switch (pluginMode)
         {
-            case Enums.PluginMode.Standard:
+            case Enums.PluginMode.Base:
                 {
-
                     PluginMode = new BaseMode();
                     break;
                 }
@@ -128,6 +123,11 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
             case Enums.PluginMode.Retake:
                 {
                     PluginMode = new RetakeMode();
+                    break;
+                }
+            case Enums.PluginMode.Prefire:
+                {
+                    PluginMode = new PrefireMode();
                     break;
                 }
             default:

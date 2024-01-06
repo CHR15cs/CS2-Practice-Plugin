@@ -22,8 +22,16 @@ Supports many helpful practice functions such as **.spawn (x)** where x is the s
 Grenade practice was a main topic for me, so I implemented a small **.nades** menu, where lineups are stored which can be saved with **.save (grenade title without whitespaces!)**.<br>
 Detailed information can be found [here](https://github.com/CHR15cs/CS2-Practice-Plugin/wiki/Practice-Commands).<br>
 ### DryRun
-Can be enabled via **.dryrun**.<br>
+Can be enabled via **.menu** or **.dryrun**.<br>
 Is based on the match mode. But this supports addidtional commands, see [here](https://github.com/CHR15cs/CS2-Practice-Plugin/wiki/DryRun-Commands).
+### Retake
+Can be enabled via **.menu** or **.retake**.<br>
+**THIS MODE STILL NEEDS ALOT OF WORK!**<br>
+Use .edit to edit spawns for each site. Add spawns for your current team by using .addspawna for A site or .addspawnb to add the spawn for the b site.<br>
+To delete spawns, you need to edit the spawn file. See the wiki for more.<br>
+### Prefire
+Can be enabled via **.menu** or **.prefire**.<br>
+**THIS MODE STILL NEEDS ALOT OF WORK!**<br>
 ## Configuration
 This plugin is somewhat customizeable.<br>
 Any Important steps are described [here](https://github.com/CHR15cs/CS2-Practice-Plugin/wiki/Configuration)<br>

@@ -18,23 +18,25 @@ using static CounterStrikeSharp.API.Core.BasePlugin;
 
 namespace CSPracc.EventHandler
 {
-    public class RetakeEventHandler : BaseEventHandler
+    public class PrefireEventHandler : BaseEventHandler
     {
         PracticeBotManager BotManager { get; set; }
 
-        RetakeMode RetakeMode { get; set; }
-        ~RetakeEventHandler()
+        PrefireMode PrefireMode { get; set; }
+        ~PrefireEventHandler()
         {
 
         }
-        RetakeCommandHandler RetakeCommandHandler { get; set; }
-        public RetakeEventHandler(CSPraccPlugin plugin, RetakeCommandHandler rch, RetakeMode mode) : base(plugin,rch)
+        PrefireCommandHandler RetakeCommandHandler { get; set; }
+        public PrefireEventHandler(CSPraccPlugin plugin, PrefireCommandHandler rch, PrefireMode mode) : base(plugin,rch)
         {
-            RetakeMode = mode;
+            PrefireMode = mode;
             //plugin.RegisterListener<Listeners.OnEntitySpawned>(entity => ProjectileManager.Instance.OnEntitySpawned(entity));          
             plugin.RegisterEventHandler<EventPlayerSpawn>(mode.OnPlayerSpawn, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventRoundStart>(mode.OnRoundStart, hookMode: HookMode.Post);
-            plugin.RegisterEventHandler<EventRoundEnd>(mode.OnRoundEnd, hookMode: HookMode.Post);
+            plugin.RegisterEventHandler<EventPlayerHurt>(mode.OnPlayerHurt, hookMode: HookMode.Pre);
+            plugin.RegisterEventHandler<EventPlayerDeath>(mode.OnPlayerDeath, hookMode: HookMode.Pre);
+            
             Plugin = plugin;
             BotManager = new PracticeBotManager();
             RetakeCommandHandler = rch;
@@ -43,14 +45,17 @@ namespace CSPracc.EventHandler
         public override void Dispose()
         {
 
-            GameEventHandler<EventRoundStart> roundstart = RetakeMode.OnRoundStart;
+            GameEventHandler<EventRoundStart> roundstart = PrefireMode.OnRoundStart;
             Plugin.DeregisterEventHandler("round_start", roundstart, true);
 
-            GameEventHandler<EventPlayerSpawn> playerspawn = RetakeMode.OnPlayerSpawn;
+            GameEventHandler<EventPlayerSpawn> playerspawn = PrefireMode.OnPlayerSpawn;
             Plugin.DeregisterEventHandler("player_spawn", playerspawn, true);
 
-            GameEventHandler<EventRoundEnd> roundend = RetakeMode.OnRoundEnd;
-            Plugin.DeregisterEventHandler("round_end", roundend, true);
+            GameEventHandler<EventPlayerHurt> playerhurt = PrefireMode.OnPlayerHurt;
+            Plugin.DeregisterEventHandler("player_hurt", playerhurt, false);
+
+            GameEventHandler<EventPlayerDeath> playerdeath = PrefireMode.OnPlayerDeath;
+            Plugin.DeregisterEventHandler("player_death", playerdeath, false);
 
             base.Dispose();
         }

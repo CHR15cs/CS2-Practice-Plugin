@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using static CSPracc.DataModules.Enums;
 
 namespace CSPracc
 {
@@ -16,6 +17,7 @@ namespace CSPracc
         [JsonPropertyName("ChatPrefix")] public string ChatPrefix { get; set; } = $" {ChatColors.Green}[{ChatColors.Red}CSPRACC{ChatColors.Green}]{ChatColors.White} ";
         [JsonPropertyName("RconPassword")] public string RconPassword { get; set; } = "secret";
         [JsonPropertyName("DemoSettings")] public DemoManagerSettings DemoManagerSettings { get; set; } = new DemoManagerSettings();
+        [JsonPropertyName("StandardMode")] public PluginMode ModeToLoad { get; set; } = PluginMode.Base;
 
     }
 }

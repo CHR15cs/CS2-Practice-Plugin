@@ -38,9 +38,10 @@ namespace CSPracc.CommandHandler
                 return;
             }
             string input = command.ArgString.Trim();
-            if(input == CSPraccPlugin.Instance.Config.RconPassword)
+            if(input == CSPraccPlugin.Instance!.Config!.RconPassword)
             {
                 AdminManager.AddPlayerPermissions(player,AdminFlags.Standard);
+                player.HtmlMessage("Granted temporary admin permissions.");
             }
             else
             {
@@ -241,6 +242,16 @@ namespace CSPracc.CommandHandler
                             return false;
                         }
                         CSPraccPlugin.SwitchMode(Enums.PluginMode.Retake);
+                        break;
+                    }
+                case ".prefire":
+                    {
+                        if (!player.IsAdmin())
+                        {
+                            player.PrintToCenter("Only admins can execute this command!");
+                            return false;
+                        }
+                        CSPraccPlugin.SwitchMode(Enums.PluginMode.Prefire);
                         break;
                     }
                 case PRACC_COMMAND.SWAP:

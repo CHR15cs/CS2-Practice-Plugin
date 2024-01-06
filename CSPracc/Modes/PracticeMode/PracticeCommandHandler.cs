@@ -22,12 +22,15 @@ namespace CSPracc.CommandHandler
     {
 
         Dictionary<CCSPlayerController, Position> checkpoints = new Dictionary<CCSPlayerController, Position>();
-        BotManager BotManager {  get; set; }
+        PracticeBotManager BotManager {  get; set; }
         PracticeMode PracticeMode { get; set; }
-        public PracticeCommandHandler(PracticeMode mode): base(mode)
+
+        ProjectileManager ProjectileManager { get; set; }
+        public PracticeCommandHandler(PracticeMode mode,ref ProjectileManager projectileManager, ref PracticeBotManager botManager): base(mode)
         {
             PracticeMode = mode;
-            BotManager = new BotManager();
+            BotManager = botManager;
+            ProjectileManager =  projectileManager;
             CSPraccPlugin.Instance.AddCommand("css_pracc_smokecolor_enabled", "Enables / disabled smoke color", PraccSmokecolorEnabled);
         }
 
@@ -82,7 +85,7 @@ namespace CSPracc.CommandHandler
                         {
                             if (int.TryParse(args, out int id))
                             {
-                                ProjectileManager.Instance.RestoreSnapshot(player, id);
+                                ProjectileManager.RestoreSnapshot(player, id);
                                 break;
                             }
                             player.PrintToCenter("Could not parse argument for nade menu");
@@ -92,12 +95,12 @@ namespace CSPracc.CommandHandler
                     }
                 case PRACC_COMMAND.SAVE:
                     {
-                        ProjectileManager.Instance.SaveSnapshot(player, args);
+                        ProjectileManager.SaveSnapshot(player, args);
                         break;
                     }
                 case PRACC_COMMAND.REMOVE:
                     {
-                        ProjectileManager.Instance.RemoveSnapshot(player, args);
+                        ProjectileManager.RemoveSnapshot(player, args);
                         break;
                     }
                 case PRACC_COMMAND.BOT:
@@ -172,7 +175,7 @@ namespace CSPracc.CommandHandler
                     }
                 case PRACC_COMMAND.SAVELAST:
                     {
-                        ProjectileManager.Instance.SaveLastGrenade(player, args);
+                        ProjectileManager.SaveLastGrenade(player, args);
                         break;
                     }
                 case PRACC_COMMAND.CHECKPOINT:
@@ -207,26 +210,26 @@ namespace CSPracc.CommandHandler
                         PracticeMode.StartTimer(player);
                         break;
                     }
-                //case ".throw":
-                //    {
-
-                //        //               MemoryFunctionVoid<IntPtr, string, IntPtr, IntPtr, string, int> AcceptEntityInput =
-                //        // new(@"\x55\x48\x89\xE5\x41\x57\x49\x89\xFF\x41\x56\x48\x8D\x7D\xC0");
-
-
-                //        Server.PrintToConsole("creating smoke");
-                //        CChicken? smoke = Utilities.CreateEntityByName<CChicken>("chicken");
-                //        if(smoke == null)
-                //        {
-                //            Server.PrintToConsole("smoke is  null");
-                //        }
-                //        smoke.Teleport(player.PlayerPawn.Value.CBodyComponent.SceneNode.AbsOrigin, new QAngle(0, 0, 0), new Vector(0, 0, 0));
-                //        //smoke.TeamNum = player.TeamNum;
-                //        smoke.DispatchSpawn();
-                //        //AcceptEntityInput.Invoke(smoke.Handle, "InitializeSpawnFromWorld", player.Handle, player.Handle, "", 0);
-                //        //AcceptEntityInput.Invoke(smoke.Handle,"FireUser1",player.Handle,player.Handle,"",0);
-                //        break;
-                //    }
+                case PRACC_COMMAND.rethrow:
+                    {                                              
+                        ProjectileManager.ReThrow(player);
+                        break;
+                    }
+                case PRACC_COMMAND.flash:
+                    {       
+                        ProjectileManager.Flash(player);
+                        break;
+                    }
+                case PRACC_COMMAND.noflash:
+                    {
+                        ProjectileManager.NoFlash(player);
+                        break;
+                    }
+                case PRACC_COMMAND.stop:
+                    {
+                        ProjectileManager.Stop(player);
+                        break;
+                    }
                 default:
                     {
                         base.PlayerChat(@event, info);

@@ -2,6 +2,7 @@
 using CounterStrikeSharp.API.Core;
 using CSPracc.CommandHandler;
 using CSPracc.EventHandler;
+using CSPracc.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +14,13 @@ namespace CSPracc.Modes
 {
     public class PracticeMode : BaseMode
     {
+
+        ProjectileManager projectileManager;
+        PracticeBotManager PracticeBotManager;
         public PracticeMode() : base() 
         {
+            projectileManager = new ProjectileManager();
+            PracticeBotManager = new PracticeBotManager();
         }
 
         public void StartTimer(CCSPlayerController player)
@@ -27,15 +33,16 @@ namespace CSPracc.Modes
         {
             if (player == null) return;
             if(!player.IsValid) return;
-            GuiManager.AddMenu(player.SteamID, ProjectileManager.Instance.GetNadeMenu(player));            
+            GuiManager.AddMenu(player.SteamID, projectileManager.GetNadeMenu(player));            
         }
+
 
         public override void ConfigureEnvironment()
         {
             DataModules.Constants.Methods.MsgToServer("Loading practice mode.");
             Server.ExecuteCommand("exec CSPRACC\\pracc.cfg");
             EventHandler?.Dispose();
-            EventHandler = new PracticeEventHandler(CSPraccPlugin.Instance!, new PracticeCommandHandler(this));
+            EventHandler = new PracticeEventHandler(CSPraccPlugin.Instance!, new PracticeCommandHandler(this, ref projectileManager,ref PracticeBotManager),ref projectileManager, ref PracticeBotManager);
         }
     }
 }

@@ -15,6 +15,7 @@ using System.Net.Http.Headers;
 using CounterStrikeSharp.API.Modules.Memory;
 using System.Numerics;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
+using Microsoft.Extensions.Logging;
 
 namespace CSPracc.Managers
 {
@@ -59,8 +60,8 @@ namespace CSPracc.Managers
         public void Boost(CCSPlayerController player)
         {
             AddBot(player);
-            Logging.LogMessage("Elevating player");
-           CSPraccPlugin.Instance!.AddTimer(0.2f, () => ElevatePlayer(player));
+            CSPraccPlugin.Instance!.Logger.LogInformation($"Elevating player.");
+            CSPraccPlugin.Instance!.AddTimer(0.2f, () => ElevatePlayer(player));
         }
 
         /// <summary>
@@ -101,7 +102,7 @@ namespace CSPracc.Managers
                 }
                 if (botOwner.UserId == player.UserId)
                 {
-                    Logging.LogMessage("found bot of player");
+                    CSPraccPlugin.Instance!.Logger.LogInformation($"Found bot of player.");
                     if (closestBot == null)
                     {
                         closestBot = bot;
@@ -117,7 +118,7 @@ namespace CSPracc.Managers
             }
             if(closestBot != null)
             {
-                Logging.LogMessage($"kickid {closestBot.UserId}");
+                CSPraccPlugin.Instance!.Logger.LogInformation($"kickid {closestBot.UserId}");
                 Server.ExecuteCommand($"kickid {closestBot.UserId}");            
                 spawnedBots.Remove(closestBot.PlayerName!);
             }
@@ -151,7 +152,7 @@ namespace CSPracc.Managers
             {
                 distanceZ *= -1;
             }
-            Logging.LogMessage($"calculating distance {distanceX + distanceY + distanceZ}");
+            CSPraccPlugin.Instance!.Logger.LogInformation($"calculating distance {distanceX + distanceY + distanceZ}");
             return distanceX + distanceY + distanceZ;
         }
 
@@ -179,7 +180,7 @@ namespace CSPracc.Managers
         private void ElevatePlayer(CCSPlayerController player)
         {
                 player.PlayerPawn.Value.Teleport(new Vector(player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.X, player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.Y, player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.Z + 80.0f), player.PlayerPawn.Value.EyeAngles, new Vector(0, 0, 0));
-            Logging.LogMessage($"boosting player: {player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.X} - {player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.Y} - {player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.Z + 80.0f}");
+            CSPraccPlugin.Instance!.Logger.LogInformation($"boosting player: {player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.X} - {player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.Y} - {player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.Z + 80.0f}");
         }
 
         private void SpawnBot(CCSPlayerController botOwner, bool crouch = false)
@@ -193,7 +194,7 @@ namespace CSPracc.Managers
                 {
                     if (!spawnedBots.ContainsKey(tempPlayer.PlayerName) && unusedBotFound)
                     {
-                        Logging.LogMessage($"UNUSED BOT FOUND: {tempPlayer.UserId.Value} EXECUTING: kickid {tempPlayer.UserId.Value}");
+                        CSPraccPlugin.Instance!.Logger.LogInformation($"UNUSED BOT FOUND: {tempPlayer.UserId.Value} EXECUTING: kickid {tempPlayer.UserId.Value}");
                         // Kicking the unused bot. We have to do this because bot_add_t/bot_add_ct may add multiple bots but we need only 1, so we kick the remaining unused ones
                         Server.ExecuteCommand($"kickid {tempPlayer.UserId.Value}");
                         continue;
@@ -235,7 +236,6 @@ namespace CSPracc.Managers
 
         public HookResult OnPlayerSpawn(EventPlayerSpawn @event, GameEventInfo info)
         {
-            Logging.LogMessage("----OnPlayerSpawn BotManager---");
             var player = @event.Userid;
             // Respawing a bot where it was actually spawned during practice session
             if (player.IsValid && player.IsBot && player.UserId.HasValue)

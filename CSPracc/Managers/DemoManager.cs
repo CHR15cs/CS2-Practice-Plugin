@@ -4,6 +4,7 @@ using CounterStrikeSharp.API.Modules.Config;
 using CounterStrikeSharp.API.Modules.Menu;
 using CSPracc.DataModules;
 using CSPracc.DataModules.Constants;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -53,7 +54,7 @@ namespace CSPracc.Managers
             DemoManagerSettings.isRecording = false;
             if(DemoManagerSettings.AutomaticUpload)
             {
-                Logging.LogMessage("Starting Demo Upload");
+                CSPraccPlugin.Instance!.Logger.LogInformation($"Start demo upload.");
                 CSPraccPlugin.Instance.AddTimer(4.0f,()=>UploadDemo(DemoManagerSettings.LastDemoFile));                
             }
         }
@@ -69,7 +70,7 @@ namespace CSPracc.Managers
                 if(entity.IsHLTV)
                 {
                     isOnServer = true;
-                    Logging.LogMessage($"Found TV Server");
+                    CSPraccPlugin.Instance!.Logger.LogInformation($"Found TV server.");
                     break;
                 }
             }
@@ -100,15 +101,14 @@ namespace CSPracc.Managers
             varDemoMenu.AddMenuOption($"Recording Mode: {DemoManagerSettings.RecordingMode}", switchDemoMode);
             //string uploadOption = DemoManagerSettings.AutomaticUpload ? "yes" : "no";
             //varDemoMenu.AddMenuOption($"Automatic upload: {uploadOption}", switchAutomaticUpload);
-            Logging.LogMessage("record");
             if (DemoManagerSettings.isRecording)
             {
-                Logging.LogMessage("stop record");
+                CSPraccPlugin.Instance!.Logger.LogInformation($"stop recording.");
                 varDemoMenu.AddMenuOption("Stop recording", stopDemoRecordingOption);                
             }
             else
             {
-                Logging.LogMessage("start record");
+                CSPraccPlugin.Instance!.Logger.LogInformation($"Start recording.");
                 varDemoMenu.AddMenuOption("Start recording", startDemoRecordingOption);
             }          
             ChatMenus.OpenMenu(player, varDemoMenu);

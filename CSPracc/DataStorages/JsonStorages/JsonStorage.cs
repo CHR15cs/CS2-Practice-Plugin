@@ -1,5 +1,6 @@
 ﻿using CSPracc.DataModules;
 using CSPracc.Extensions;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace CSPracc.DataStorages.JsonStorages
                 }
                 catch
                 {
-                    Logging.LogMessage($"Could not read {JsonFile.Name}. Creating new dictonary.");
+                    CSPraccPlugin.Instance!.Logger.LogWarning($"Could not read {JsonFile.Name}. Creating new dictonary.");
                     Storage = new Dictionary<TKey, TValue>();
                 }
             }

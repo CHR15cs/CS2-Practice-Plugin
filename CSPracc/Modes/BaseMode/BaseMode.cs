@@ -19,6 +19,7 @@ namespace CSPracc.Modes
         {
             GuiManager = new GuiManager();
             List<KeyValuePair<string,Action>> list = new List<KeyValuePair<string, Action>>();
+            list.Add(new KeyValuePair<string, Action>("Standard", new Action(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Base))));
             list.Add(new KeyValuePair<string, Action>("Pracc", new Action(() =>CSPraccPlugin.SwitchMode(Enums.PluginMode.Pracc))));
             list.Add(new KeyValuePair<string, Action>("Match", new Action(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Match))));
             list.Add(new KeyValuePair<string, Action>("Dryrun", new Action(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.DryRun))));

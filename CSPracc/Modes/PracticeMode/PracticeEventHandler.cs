@@ -65,12 +65,6 @@ namespace CSPracc.EventHandler
             return HookResult.Continue;
         }
 
-        public HookResult OnSmokeDetonate(EventSmokegrenadeDetonate @event, GameEventInfo info)
-        {
-            ProjectileManager.ReferenceEquals(@event, info);
-            return HookResult.Continue;
-        }
-
         public override void Dispose()
         {            
             GameEventHandler<EventPlayerBlind> playerblind = OnPlayerBlind;

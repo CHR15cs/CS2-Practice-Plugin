@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using CounterStrikeSharp.API.Modules.Memory;
 using CSPracc.DataStorages.JsonStorages;
 using CSPracc.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace CSPracc
 {
@@ -45,17 +46,12 @@ namespace CSPracc
                     if(lastMap == String.Empty)
                     {
                         lastMap = Server.MapName;
-                        Logging.LogMessage("Map now : " + lastMap);
                     }
                     getSpawns(ref _spawns);
                 }
                 if(lastMap != Server.MapName)
                 {
                     getSpawns(ref _spawns);
-                }
-                else
-                {
-                    Logging.LogMessage("Map still : " +  lastMap);  
                 }
                 return _spawns;
             }
@@ -67,7 +63,6 @@ namespace CSPracc
         /// <param name="spawns">dictionary to store the spawns in</param>
         private static void getSpawns(ref Dictionary<byte,List<Position>> spawns)
         {
-            Logging.LogMessage("Getting spawns");
             _spawns!.Clear();
             _spawns = new Dictionary<byte, List<Position>>();
             _spawns.Add((byte)CsTeam.CounterTerrorist, new List<Position>());
@@ -126,7 +121,7 @@ namespace CSPracc
             }
             catch (Exception ex)
             {
-                Logging.LogMessage($"{ex.Message}");
+                CSPraccPlugin.Instance!.Logger.LogError($"{ex.Message}");
                 player.PrintToCenter("invalid parameter");
                 return;
             }
@@ -136,7 +131,7 @@ namespace CSPracc
                 player.PrintToCenter($"insufficient number of spawns found. spawns {SpawnManager.Spawns[(byte)targetTeam].Count} - {number}");
                 return;
             }
-            Logging.LogMessage($"teleport to: {SpawnManager.Spawns[(byte)targetTeam][number].PlayerPosition}");
+            CSPraccPlugin.Instance.Logger.LogInformation($"teleport to: {SpawnManager.Spawns[(byte)targetTeam][number].PlayerPosition}");
             Utils.RemoveNoClip(player);
             player.PlayerPawn.Value.Teleport(SpawnManager.Spawns[(byte)targetTeam][number].PlayerPosition, SpawnManager.Spawns[(byte)targetTeam][number].PlayerAngle, new Vector(0, 0, 0));
             

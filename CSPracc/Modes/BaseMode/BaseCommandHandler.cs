@@ -182,27 +182,37 @@ namespace CSPracc.CommandHandler
             
             switch (command)
             {
-                case PRACC_COMMAND.HELP:
+                case BASE_COMMAND.HELP:
                     {
                         PrintHelp(player);
                         break;
                     }
-                case PRACC_COMMAND.MODE:
+                case BASE_COMMAND.MODE:
                     {
                         BaseMode.ShowModeMenu(player);
                         break;
                     }
-                case PRACC_COMMAND.FAKERCON:
+                case BASE_COMMAND.FAKERCON:
                     {
                         OnFakeRcon(player, args);
                         break;
                     }
-                case PRACC_COMMAND.MAP:
+                case BASE_COMMAND.MAP:
                     {
                         BaseMode.ChangeMap(player, args);
                         break;
                     }
-                case PRACC_COMMAND.PRACC:
+                case BASE_COMMAND.Unload:
+                    {
+                        if (!player.IsAdmin())
+                        {
+                            player.PrintToCenter("Only admins can execute this command!");
+                            return false;
+                        }
+                        CSPraccPlugin.SwitchMode(Enums.PluginMode.Base);
+                        break;
+                    }
+                case BASE_COMMAND.PRACC:
                     {
                         if (!player.IsAdmin())
                         {
@@ -212,7 +222,7 @@ namespace CSPracc.CommandHandler
                         CSPraccPlugin.SwitchMode(Enums.PluginMode.Pracc);
                         break;
                     }
-                case PRACC_COMMAND.MATCH:
+                case BASE_COMMAND.MATCH:
                     {
                         if (!player.IsAdmin())
                         {
@@ -223,7 +233,7 @@ namespace CSPracc.CommandHandler
                         CSPraccPlugin.SwitchMode(Enums.PluginMode.Match);
                         break;
                     }
-                case PRACC_COMMAND.DryRun:
+                case BASE_COMMAND.DryRun:
                     {
                         if (!player.IsAdmin())
                         {
@@ -234,7 +244,7 @@ namespace CSPracc.CommandHandler
                         CSPraccPlugin.SwitchMode(Enums.PluginMode.DryRun);
                         break;
                     }
-                case ".retake":
+                case BASE_COMMAND.Retake:
                     {
                         if (!player.IsAdmin())
                         {
@@ -244,7 +254,7 @@ namespace CSPracc.CommandHandler
                         CSPraccPlugin.SwitchMode(Enums.PluginMode.Retake);
                         break;
                     }
-                case ".prefire":
+                case BASE_COMMAND.Prefire:
                     {
                         if (!player.IsAdmin())
                         {
@@ -254,7 +264,7 @@ namespace CSPracc.CommandHandler
                         CSPraccPlugin.SwitchMode(Enums.PluginMode.Prefire);
                         break;
                     }
-                case PRACC_COMMAND.SWAP:
+                case BASE_COMMAND.SWAP:
                     {
                         if (!player.IsAdmin())
                         {
@@ -264,7 +274,7 @@ namespace CSPracc.CommandHandler
                         Server.ExecuteCommand(COMMANDS.SWAP_TEAMS);
                         break;
                     }
-                case PRACC_COMMAND.ALIAS:
+                case BASE_COMMAND.ALIAS:
                     {
                         if (!player.IsAdmin())
                         {
@@ -282,7 +292,7 @@ namespace CSPracc.CommandHandler
                         CommandAliasManager.Instance.CreateAlias(player, ArgumentList[0], ArgumentList[1]);
                         break;
                     }
-                case PRACC_COMMAND.REMOVEALIAS:
+                case BASE_COMMAND.REMOVEALIAS:
                     {
                         if (!player.IsAdmin())
                         {
@@ -297,11 +307,22 @@ namespace CSPracc.CommandHandler
                         CommandAliasManager.Instance.RemoveAlias(player, args);
                         break;
                     }
-                case PRACC_COMMAND.DEMO:
+                case BASE_COMMAND.GOT:
                     {
-                        DemoManager.OpenDemoManagerMenu(player);
+                        player.ChangeTeam(CsTeam.Terrorist);
                         break;
                     }
+                case BASE_COMMAND.GOCT:
+                    {
+                        player.ChangeTeam(CsTeam.CounterTerrorist);
+                        break;
+                    }
+                case BASE_COMMAND.GOSPEC:
+                    {
+                        player.ChangeTeam(CsTeam.Spectator);
+                        break;
+                    }
+
                 default:
                     {
                         Logging.LogMessage("Could not find base command");
@@ -400,15 +421,20 @@ namespace CSPracc.CommandHandler
         {
             List<string> message = new List<string>();
             message.Add($" {CSPraccPlugin.Instance!.Config.ChatPrefix} Command list:");
-            message.Add($" {ChatColors.Green} {PRACC_COMMAND.PAUSE} {ChatColors.White} - Switching mode. Available modes: standard - unloading changes, pracc - loading practice config, match - loading match config");
-            message.Add($" {ChatColors.Green} {PRACC_COMMAND.UNPAUSE} {ChatColors.White} - Starting the match. Works only in the warmup during match mode.");
-            message.Add($" {ChatColors.Green} {PRACC_COMMAND.STOP}  {ChatColors.White} - Stopping the match.");
-            message.Add($" {ChatColors.Green} {PRACC_COMMAND.WARMUP} {ChatColors.White} - (Re)starting warmup. Works only during match.");
-            message.Add($" {ChatColors.Green} {PRACC_COMMAND.RESTART}  {ChatColors.White} - Restarting the match. Works only during a live match.");
-            message.Add($" {ChatColors.Green} {PRACC_COMMAND.READY}  {ChatColors.White} - Ready up as a player. Works only during a warmup of a  match.");
-            message.Add($" {ChatColors.Green} {PRACC_COMMAND.FORCEREADY}  {ChatColors.White} - Forcing all players to ready up. Works only during a warmup of a  match.");
-            message.Add($" {ChatColors.Green} {PRACC_COMMAND.SPAWN}  {ChatColors.White} - Works only in practice mode. Teleports you to spawn number X");
-            message.Add($" {ChatColors.Green} {PRACC_COMMAND.HELP}  {ChatColors.White} - Prints the help command.");
+            message.Add($" {ChatColors.Green}{BASE_COMMAND.MODE}{ChatColors.White} Opening menu to switch modes.");
+            message.Add($" {ChatColors.Green}{BASE_COMMAND.MAP}{ChatColors.Red} 'mapname'{ChatColors.White}. Switch to given map.");
+            message.Add($" {ChatColors.Green}{BASE_COMMAND.MATCH}{ChatColors.White} Switching to match mode.");
+            message.Add($" {ChatColors.Green}{BASE_COMMAND.PRACC}{ChatColors.White} Switching to practice mode.");
+            message.Add($" {ChatColors.Green}{BASE_COMMAND.Prefire}{ChatColors.White} Switching to prefire mode.");
+            message.Add($" {ChatColors.Green}{BASE_COMMAND.DryRun}{ChatColors.White} Switching to dry run mode.");
+            message.Add($" {ChatColors.Green}{BASE_COMMAND.ALIAS}{ChatColors.Red} '.new alias' '.old alias'{ChatColors.White}. Creates a personal alias for a command.");
+            message.Add($" {ChatColors.Green}{BASE_COMMAND.REMOVEALIAS}{ChatColors.Red} '.aliasToRemove'{ChatColors.White}. Removes given alias.");
+            message.Add($" {ChatColors.Green}{BASE_COMMAND.FAKERCON}{ChatColors.Red} 'server command'{ChatColors.White}. Execute given server command.");
+            message.Add($" {ChatColors.Green}{BASE_COMMAND.SWAP}{ChatColors.White} Swap teams.");
+            message.Add($" {ChatColors.Green}{BASE_COMMAND.GOCT}{ChatColors.White} Switch to ct.");
+            message.Add($" {ChatColors.Green}{BASE_COMMAND.GOT}{ChatColors.White} Switch to t.");
+            message.Add($" {ChatColors.Green}{BASE_COMMAND.GOSPEC}{ChatColors.White} Switch to spectator.");
+            message.Add($" {ChatColors.Green}{BASE_COMMAND.HELP}{ChatColors.White} This command.");
             foreach (string s in message)
             {
                 player?.PrintToChat(s);

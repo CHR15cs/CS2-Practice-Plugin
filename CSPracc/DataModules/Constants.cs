@@ -42,11 +42,29 @@ namespace CSPracc.DataModules.Constants
         public const string restart = ".restart";
     }
 
-    public class PRACC_COMMAND
+
+    public class BASE_COMMAND
     {
         public const string MODE = ".menu";
         public const string PRACC = ".pracc";
         public const string MATCH = ".match";
+        public const string DryRun = ".dryrun";
+        public const string Prefire = ".prefire";
+        public const string Retake = ".retake";
+        public const string Unload = ".unload";
+        public const string HELP = ".help";
+        public const string FAKERCON = ".rcon";
+        public const string MAP = ".map";
+        public const string GOT = ".t";
+        public const string GOCT = ".ct";
+        public const string GOSPEC = ".spec";
+        public const string SWAP = ".swap";
+        public const string ALIAS = ".alias";
+        public const string REMOVEALIAS = ".ralias";
+    }
+
+    public class MATCH_COMMAND
+    {
         public const string PAUSE = ".pause";
         public const string UNPAUSE = ".unpause";
         public const string READY = ".ready";
@@ -54,21 +72,32 @@ namespace CSPracc.DataModules.Constants
         public const string FORCEREADY = ".forceready";
         public const string STOP = ".stop";
         public const string WARMUP = ".warmup";
-        public const string HELP = ".help";
         public const string RESTART = ".restart";
-        public const string SPAWN = ".spawn";
-        public const string TSPAWN = ".tspawn";
-        public const string CTSPAWN = ".ctspawn";
         public const string COACH = ".coach";
         public const string STOPCOACH = ".stopcoach";
-        public const string FAKERCON = ".rcon";
         public const string BACKUPMENU = ".backup";
-        public const string NADES = ".nades";
-        public const string SAVE = ".save";
-        public const string REMOVE = ".remove";
-        public const string MAP = ".map";
         public const string RESTORE = ".restore";
         public const string FORCEUNPAUSE = ".forceunpause";
+        public const string DEMO = ".demo";
+    }
+
+    public class DRYRUN_COMMAND
+    {
+        public const string refill = ".refill";
+        public const string ak = ".ak";
+        public const string m4 = ".m4";
+        public const string awp = ".awp";
+        public const string m4a1 = ".m4a1";
+    }
+
+    public class PRACC_COMMAND
+    {      
+        public const string SPAWN = ".spawn";
+        public const string TSPAWN = ".tspawn";
+        public const string CTSPAWN = ".ctspawn";           
+        public const string NADES = ".nades";
+        public const string SAVE = ".save";
+        public const string REMOVE = ".remove";               
         public const string BOT = ".bot";
         public const string BOOST = ".boost";
         public const string WATCHME = ".watchme";
@@ -76,20 +105,13 @@ namespace CSPracc.DataModules.Constants
         public const string CLEARBOTS = ".clearbots";
         public const string CROUCHBOT = ".crouchbot";
         public const string CROUCHBOOST = ".crouchboost";
-        public const string GOT = ".t";
-        public const string GOCT = ".ct";
-        public const string GOSPEC = ".spec";
-        public const string SWAP = ".swap";
-        public const string ALIAS = ".alias";
-        public const string REMOVEALIAS = ".ralias";
+       
         public const string CLEAR = ".clear";
-        public const string ClearAll = ".clearall";
-        public const string DEMO = ".demo";
+        public const string ClearAll = ".clearall";       
         public const string SAVELAST = ".savelast";
         public const string CHECKPOINT = ".checkpoint";
         public const string BACK = ".back";
-        public const string UserRole = ".userrole";
-        public const string DryRun = ".dryrun";
+        public const string UserRole = ".userrole";        
         public const string timer = ".timer";
         public const string rethrow = ".throw";
         public const string flash = ".flash";

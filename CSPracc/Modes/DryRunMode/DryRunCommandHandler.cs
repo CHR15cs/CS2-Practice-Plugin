@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.DataModules.Constants;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace CSPracc.CommandHandler
             }
             switch (command)
             {
-                case ".refill":
+                case DRYRUN_COMMAND.refill:
                     {
                         int index = 0;
                         bool molotov = false;
@@ -70,22 +71,22 @@ namespace CSPracc.CommandHandler
 
                         break;
                     }
-                case ".ak":
+                case DRYRUN_COMMAND.ak:
                     {
                         player.GiveNamedItem("weapon_ak47");
                         break;
                     }
-                case ".awp":
+                case DRYRUN_COMMAND.awp:
                     {
                         player.GiveNamedItem("weapon_awp");
                         break;
                     }
-                case ".m4a1":
+                case DRYRUN_COMMAND.m4a1:
                     {
                         player.GiveNamedItem("weapon_m4a1_silencer");
                         break;
                     }
-                case ".m4":
+                case DRYRUN_COMMAND.m4:
                     {
                         player.GiveNamedItem("weapon_m4a1");
                         break;
@@ -97,6 +98,22 @@ namespace CSPracc.CommandHandler
                     }
             }
             return true;
+        }
+
+
+        public override void PrintHelp(CCSPlayerController? player)
+        {
+            base.PrintHelp(player);
+            List<string> message = new List<string>();
+            message.Add($" {ChatColors.Green}{DRYRUN_COMMAND.refill}{ChatColors.White} Refills your utility.");
+            message.Add($" {ChatColors.Green}{DRYRUN_COMMAND.ak}{ChatColors.White} Drop yourself an ak.");
+            message.Add($" {ChatColors.Green}{DRYRUN_COMMAND.awp}{ChatColors.White} Drop yourself an awp.");
+            message.Add($" {ChatColors.Green}{DRYRUN_COMMAND.m4a1}{ChatColors.White} Drop yourself an m4a1-s.");
+            message.Add($" {ChatColors.Green}{DRYRUN_COMMAND.m4}{ChatColors.White} Drop yourself an m4a4.");
+            foreach (string s in message)
+            {
+                player?.PrintToChat(s);
+            }
         }
     }
 }

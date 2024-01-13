@@ -1,6 +1,7 @@
 # CS2-Practice-Plugin
 Open Source Plugin for Counterstrike 2 based on [CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp)
-
+## Discord
+[![Discord](https://discordapp.com/api/guilds/1195726804837736468/widget.png?style=banner2)](https://discord.gg/HHzqY8Uvma)
 ## Important
 Currently in an early stage of development.<br>
 Plugin might be unstable or not working.<br>

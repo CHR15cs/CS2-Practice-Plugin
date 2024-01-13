@@ -45,7 +45,7 @@ Modes planned for the future or are already in progress:<br>
     - Take part in the execution
 
 ## Installation Guide
-[![Installation Guide](https://img.youtube.com/vi/ucQsRX_pEXw/0.jpg)](https://www.youtube.com/watch?v=YucQsRX_pEXw) <br>
+[![Installation Guide](https://img.youtube.com/vi/ucQsRX_pEXw/0.jpg)](https://www.youtube.com/watch?v=ucQsRX_pEXw) <br>
 Or see the [wiki](https://github.com/CHR15cs/CS2-Practice-Plugin/wiki/Installation)<br>
 
 ## Configuration

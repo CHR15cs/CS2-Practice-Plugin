@@ -1,6 +1,8 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.DataModules.Constants;
+using CSPracc.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,67 +27,72 @@ namespace CSPracc.CommandHandler
             }
             switch (command)
             {
-                case PRACC_COMMAND.WARMUP:
+                case MATCH_COMMAND.WARMUP:
                     {
                         MatchMode.Rewarmup(player);
                         break;
                     }
-                case PRACC_COMMAND.PAUSE:
+                case MATCH_COMMAND.PAUSE:
                     {
                         MatchMode.Pause();
                         break;
                     }
-                case PRACC_COMMAND.UNPAUSE:
+                case MATCH_COMMAND.UNPAUSE:
                     {
                         MatchMode.Unpause(player);
                         break;
                     }
-                case PRACC_COMMAND.READY:
+                case MATCH_COMMAND.READY:
                     {
                         MatchMode.Ready(player);
                         break;
                     }
-                case PRACC_COMMAND.UNREADY:
+                case MATCH_COMMAND.UNREADY:
                     {
                         MatchMode.UnReady(player);
                         break;
                     }
-                case PRACC_COMMAND.FORCEREADY:
+                case MATCH_COMMAND.FORCEREADY:
                     {
                         MatchMode.Start(player);
                         break;
                     }
-                case PRACC_COMMAND.COACH:
+                case MATCH_COMMAND.COACH:
                     {
                         MatchMode.AddCoach(player);
                         break;
                     }
-                case PRACC_COMMAND.STOPCOACH:
+                case MATCH_COMMAND.STOPCOACH:
                     {
                         MatchMode.StopCoach(player);
                         break;
                     }
-                case PRACC_COMMAND.BACKUPMENU:
+                case MATCH_COMMAND.BACKUPMENU:
                     {
                         MatchMode.RestoreBackup(player);
                         break;
                     }
-                case PRACC_COMMAND.RESTORE:
+                case MATCH_COMMAND.RESTORE:
                     {
                         MatchMode.RestoreLastRound(player);
                         break;
                     }
-                case PRACC_COMMAND.FORCEUNPAUSE:
+                case MATCH_COMMAND.FORCEUNPAUSE:
                     {
                         MatchMode.ForceUnpause(player);
                         break;
                     }
-                case PRACC_COMMAND.RESTART:
+                case MATCH_COMMAND.RESTART:
                     {
                         MatchMode.Restart(player);
                         break;
                     }
-                 default:
+                case MATCH_COMMAND.DEMO:
+                    {
+                        DemoManager.OpenDemoManagerMenu(player);
+                        break;
+                    }
+                default:
                     {
                         base.PlayerChat(@event, info);
                         return false;
@@ -97,6 +104,30 @@ namespace CSPracc.CommandHandler
         public override void Dispose()
         {
             base.Dispose();
+        }
+
+
+        public override void PrintHelp(CCSPlayerController? player)
+        {
+            base.PrintHelp(player);
+            List<string> message = new List<string>();
+            message.Add($" {ChatColors.Green} {MATCH_COMMAND.WARMUP}{ChatColors.White} Switches to warmup.");
+            message.Add($" {ChatColors.Green} {MATCH_COMMAND.PAUSE}{ChatColors.White} Pauses the match.");
+            message.Add($" {ChatColors.Green} {MATCH_COMMAND.UNPAUSE}{ChatColors.White} Unpauses the match.");
+            message.Add($" {ChatColors.Green} {MATCH_COMMAND.FORCEUNPAUSE}{ChatColors.White} Forcing unpause of the match.");
+            message.Add($" {ChatColors.Green} {MATCH_COMMAND.READY}{ChatColors.White} Ready up the entire team.");
+            message.Add($" {ChatColors.Green} {MATCH_COMMAND.UNREADY}{ChatColors.White} Unready the entire team.");
+            message.Add($" {ChatColors.Green} {MATCH_COMMAND.FORCEREADY}{ChatColors.White} Forcing game to start.");
+            message.Add($" {ChatColors.Green} {MATCH_COMMAND.COACH}{ChatColors.White} Switch to coach slot.");
+            message.Add($" {ChatColors.Green} {MATCH_COMMAND.STOPCOACH}{ChatColors.White} Switch to player slot.");
+            message.Add($" {ChatColors.Green} {MATCH_COMMAND.BACKUPMENU}{ChatColors.White} Open backup menu.");
+            message.Add($" {ChatColors.Green} {MATCH_COMMAND.RESTORE}{ChatColors.White} Restoring last round.");
+            message.Add($" {ChatColors.Green} {MATCH_COMMAND.RESTART}{ChatColors.White} Restarting match from 0-0.");
+            message.Add($" {ChatColors.Green} {MATCH_COMMAND.DEMO}{ChatColors.White} Demo menu.");
+            foreach (string s in message)
+            {
+                player?.PrintToChat(s);
+            }
         }
     }
 }

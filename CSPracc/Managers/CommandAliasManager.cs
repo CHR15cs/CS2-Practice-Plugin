@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace CSPracc.Managers
 {
@@ -55,11 +56,11 @@ namespace CSPracc.Managers
             CommandAliasStorage personalCommandAliasStorage = GetOrAddPersonalAliasStorage(commandIssuer);
             if (personalCommandAliasStorage.Get(command, out replacedCommand))
             {
-                Logging.LogMessage($"Replaced command {command} from personal storage.");
+                CSPraccPlugin.Instance!.Logger.LogInformation($"Replaced command {command} from personal storage.");
                 return true;
             }
             else if(GlobalCommandAliasStorage.Get(command, out replacedCommand)){
-                Logging.LogMessage($"Replaced command {command} from global storage.");
+                CSPraccPlugin.Instance!.Logger.LogInformation($"Replaced command {command} from global storage.");
                 return true;
             }
             else

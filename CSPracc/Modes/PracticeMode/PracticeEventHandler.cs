@@ -2,7 +2,9 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
+using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Events;
+using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.CommandHandler;
 using CSPracc.DataModules;
 using CSPracc.DataModules.Constants;
@@ -19,62 +21,66 @@ namespace CSPracc.EventHandler
 {
     public class PracticeEventHandler : BaseEventHandler
     {
-        BotManager BotManager { get; set; }
+        PracticeBotManager BotManager { get; set; }
 
+        ProjectileManager ProjectileManager { get; set; }
         ~PracticeEventHandler()
         {
 
         }
         PracticeCommandHandler PracticeCommandHandler { get; set; }
-        public PracticeEventHandler(CSPraccPlugin plugin, PracticeCommandHandler pch) : base(plugin,pch)
+        public PracticeEventHandler(CSPraccPlugin plugin, PracticeCommandHandler pch,ref ProjectileManager projectileManager,ref PracticeBotManager botManager) : base(plugin,pch)
         {
-            plugin.RegisterListener<Listeners.OnEntitySpawned>(entity => ProjectileManager.Instance.OnEntitySpawned(entity));          
-            plugin.RegisterEventHandler<EventPlayerBlind>(OnPlayerBlind, hookMode: HookMode.Post);
+            ProjectileManager = projectileManager;
+            plugin.RegisterListener<Listeners.OnEntitySpawned>(entity => ProjectileManager.OnEntitySpawned(entity));          
+            plugin.RegisterEventHandler<EventPlayerBlind>(OnPlayerBlind, hookMode: HookMode.Pre);
             plugin.RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn, hookMode: HookMode.Post);
-            plugin.RegisterEventHandler<EventSmokegrenadeDetonate>(ProjectileManager.Instance.OnSmokeDetonate,hookMode: HookMode.Post);
+            plugin.RegisterEventHandler<EventSmokegrenadeDetonate>(ProjectileManager.OnSmokeDetonate,hookMode: HookMode.Post);
             Plugin = plugin;
-            BotManager = new BotManager();
+            BotManager = botManager;
             PracticeCommandHandler = pch;
         }
 
         public HookResult OnPlayerBlind(EventPlayerBlind @event, GameEventInfo info)
         {
-            Methods.MsgToServer($"Player {@event.Attacker.PlayerName} flashed {@event.Userid.PlayerName} for {@event.BlindDuration.ToString("0.00")}s");
+            Methods.MsgToServer($" {ChatColors.Red}{@event.Attacker.PlayerName}{ChatColors.White} flashed {ChatColors.Blue}{@event.Userid.PlayerName}{ChatColors.White} for {ChatColors.Green}{@event.BlindDuration.ToString("0.00")}s");
+            if (ProjectileManager.NoFlashList.Contains(@event.Userid.SteamID))
+            {
+                @event.Userid.PlayerPawn.Value!.FlashMaxAlpha = 0.5f;
+
+            }
             return HookResult.Continue;
         }
 
         public HookResult OnPlayerHurt(EventPlayerHurt @event, GameEventInfo info)
         {
-            Methods.MsgToServer($"Player {@event.Attacker.PlayerName} damaged {@event.Userid.PlayerName} for {@event.DmgHealth}hp with {@event.Weapon}");
+            Methods.MsgToServer($" {ChatColors.Red}{@event.Attacker.PlayerName}{ChatColors.White} damaged {ChatColors.Blue}{@event.Userid.PlayerName}{ChatColors.White} for {ChatColors.Green}{@event.DmgHealth}{ChatColors.White}hp with {ChatColors.Green}{@event.Weapon}");
             return HookResult.Continue;
         }
 
         public HookResult OnPlayerSpawn(EventPlayerSpawn @event, GameEventInfo info)
         {
             BotManager!.OnPlayerSpawn(@event, info);
-            return HookResult.Continue;
-        }
-
-        public HookResult OnSmokeDetonate(EventSmokegrenadeDetonate @event, GameEventInfo info)
-        {
-            ProjectileManager.ReferenceEquals(@event, info);
+            Server.PrintToChatAll("OnPlayerSpawn");
             return HookResult.Continue;
         }
 
         public override void Dispose()
         {            
             GameEventHandler<EventPlayerBlind> playerblind = OnPlayerBlind;
-            Plugin.DeregisterEventHandler("player_blind", playerblind, true);
+            Plugin.DeregisterEventHandler("player_blind", playerblind, false);
 
             GameEventHandler<EventPlayerHurt> playerhurt = OnPlayerHurt;
             Plugin.DeregisterEventHandler("player_hurt", playerhurt, true);
 
             GameEventHandler<EventPlayerSpawn> playerspawn = OnPlayerSpawn;
-            Plugin.DeregisterEventHandler("player_spawn", playerhurt, true);
+            Plugin.DeregisterEventHandler("player_spawn", playerspawn, true);
 
-            GameEventHandler<EventSmokegrenadeDetonate> smokegrenadedetonate = ProjectileManager.Instance.OnSmokeDetonate;
+            GameEventHandler<EventSmokegrenadeDetonate> smokegrenadedetonate = ProjectileManager.OnSmokeDetonate;
             Plugin.DeregisterEventHandler("smokegrenade_detonate", smokegrenadedetonate, true);
+
+            Plugin.RemoveListener("OnEntitySpawned", ProjectileManager.OnEntitySpawned);
 
             base.Dispose();
         }

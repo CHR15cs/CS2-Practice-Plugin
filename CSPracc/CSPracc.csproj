@@ -9,8 +9,16 @@
     <Version>0.9.1.1</Version>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants);unsafe</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DefineConstants>$(DefineConstants);unsafe</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="CounterStrikeSharp.API" Version="1.0.90" />
+    <PackageReference Include="CounterStrikeSharp.API" Version="1.0.141" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 </Project>

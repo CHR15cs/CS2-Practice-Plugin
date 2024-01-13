@@ -31,11 +31,12 @@ namespace CSPracc.DataModules
         }
         public enum PluginMode
         {
-            Standard,
+            Base,
             Pracc,
             Match,
             DryRun,
-            Retake
+            Retake,
+            Prefire
         }
     }
 }

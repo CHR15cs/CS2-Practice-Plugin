@@ -1,7 +1,9 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CSPracc.CommandHandler;
+using CSPracc.DataModules;
 using CSPracc.EventHandler;
+using CSPracc.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +15,13 @@ namespace CSPracc.Modes
 {
     public class PracticeMode : BaseMode
     {
+
+        ProjectileManager projectileManager;
+        PracticeBotManager PracticeBotManager;
         public PracticeMode() : base() 
         {
+            projectileManager = new ProjectileManager();
+            PracticeBotManager = new PracticeBotManager();
         }
 
         public void StartTimer(CCSPlayerController player)
@@ -23,11 +30,27 @@ namespace CSPracc.Modes
             base.GuiManager.StartTimer(player);
         }
 
-        public void ShowNadeMenu(CCSPlayerController player)
+        public void AddCountdown(CCSPlayerController player, int countdown)
+        {
+            if (player == null) return;
+            base.GuiManager.StartCountdown(player,countdown);
+        }
+
+        public void ShowPlayerBasedNadeMenu(CCSPlayerController player,string tag = "")
         {
             if (player == null) return;
             if(!player.IsValid) return;
-            GuiManager.AddMenu(player.SteamID, ProjectileManager.Instance.GetNadeMenu(player));            
+
+            GuiManager.AddMenu(player.SteamID, projectileManager.GetPlayerBasedNadeMenu(player,tag));            
+        }
+
+
+        public void ShowCompleteNadeMenu(CCSPlayerController player)
+        {
+            if (player == null) return;
+            if (!player.IsValid) return;
+
+            GuiManager.AddMenu(player.SteamID, projectileManager.GetNadeMenu(player));
         }
 
         public override void ConfigureEnvironment()
@@ -35,7 +58,7 @@ namespace CSPracc.Modes
             DataModules.Constants.Methods.MsgToServer("Loading practice mode.");
             Server.ExecuteCommand("exec CSPRACC\\pracc.cfg");
             EventHandler?.Dispose();
-            EventHandler = new PracticeEventHandler(CSPraccPlugin.Instance!, new PracticeCommandHandler(this));
+            EventHandler = new PracticeEventHandler(CSPraccPlugin.Instance!, new PracticeCommandHandler(this, ref projectileManager,ref PracticeBotManager),ref projectileManager, ref PracticeBotManager);
         }
     }
 }

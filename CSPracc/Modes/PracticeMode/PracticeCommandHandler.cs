@@ -15,6 +15,7 @@ using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Memory;
 using CSPracc.Modes;
 using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
+using System.Reflection.Metadata.Ecma335;
 
 namespace CSPracc.CommandHandler
 {
@@ -22,12 +23,15 @@ namespace CSPracc.CommandHandler
     {
 
         Dictionary<CCSPlayerController, Position> checkpoints = new Dictionary<CCSPlayerController, Position>();
-        BotManager BotManager {  get; set; }
+        PracticeBotManager BotManager {  get; set; }
         PracticeMode PracticeMode { get; set; }
-        public PracticeCommandHandler(PracticeMode mode): base(mode)
+
+        ProjectileManager ProjectileManager { get; set; }
+        public PracticeCommandHandler(PracticeMode mode,ref ProjectileManager projectileManager, ref PracticeBotManager botManager): base(mode)
         {
             PracticeMode = mode;
-            BotManager = new BotManager();
+            BotManager = botManager;
+            ProjectileManager =  projectileManager;
             CSPraccPlugin.Instance.AddCommand("css_pracc_smokecolor_enabled", "Enables / disabled smoke color", PraccSmokecolorEnabled);
         }
 
@@ -80,29 +84,49 @@ namespace CSPracc.CommandHandler
                     {
                         if (args.Length > 0)
                         {
-                            if (int.TryParse(args, out int id))
+                            if(args.Trim().ToLower() == "all")
                             {
-                                ProjectileManager.Instance.RestoreSnapshot(player, id);
+                                PracticeMode.ShowCompleteNadeMenu(player);
+                                break;
+                            }
+                            else if (int.TryParse(args, out int id))
+                            {
+                                ProjectileManager.RestoreSnapshot(player, id);
+                                break;
+                            }
+                            else
+                            {
+                                PracticeMode.ShowPlayerBasedNadeMenu(player,args);
                                 break;
                             }
                             player.PrintToCenter("Could not parse argument for nade menu");
                         }
-                        PracticeMode.ShowNadeMenu(player);
+                        PracticeMode.ShowPlayerBasedNadeMenu(player);
                         break;
                     }
                 case PRACC_COMMAND.SAVE:
                     {
-                        ProjectileManager.Instance.SaveSnapshot(player, args);
+                        ProjectileManager.SaveSnapshot(player, args);
                         break;
                     }
-                case PRACC_COMMAND.REMOVE:
+                case PRACC_COMMAND.Delete:
                     {
-                        ProjectileManager.Instance.RemoveSnapshot(player, args);
+                        ProjectileManager.RemoveSnapshot(player, args);
                         break;
                     }
                 case PRACC_COMMAND.BOT:
                     {
                         BotManager.AddBot(player);
+                        break;
+                    }
+                case PRACC_COMMAND.tBOT:
+                    {
+                        BotManager.AddBot(player,false,CsTeam.Terrorist);
+                        break;
+                    }
+                case PRACC_COMMAND.ctBOT:
+                    {
+                        BotManager.AddBot(player, false, CsTeam.CounterTerrorist);
                         break;
                     }
                 case PRACC_COMMAND.BOOST:
@@ -145,21 +169,6 @@ namespace CSPracc.CommandHandler
                         BotManager.CrouchingBoostBot(player);
                         break;
                     }
-                case PRACC_COMMAND.GOT:
-                    {
-                        player.ChangeTeam(CsTeam.Terrorist);
-                        break;
-                    }
-                case PRACC_COMMAND.GOCT:
-                    {
-                        player.ChangeTeam(CsTeam.CounterTerrorist);
-                        break;
-                    }
-                case PRACC_COMMAND.GOSPEC:
-                    {
-                        player.ChangeTeam(CsTeam.Spectator);
-                        break;
-                    }
                 case PRACC_COMMAND.CLEAR:
                     {
                         Utils.RemoveGrenadeEntitiesFromPlayer(player);
@@ -172,7 +181,7 @@ namespace CSPracc.CommandHandler
                     }
                 case PRACC_COMMAND.SAVELAST:
                     {
-                        ProjectileManager.Instance.SaveLastGrenade(player, args);
+                        ProjectileManager.SaveLastGrenade(player, args);
                         break;
                     }
                 case PRACC_COMMAND.CHECKPOINT:
@@ -189,7 +198,7 @@ namespace CSPracc.CommandHandler
                         }
                         break;
                     }
-                case PRACC_COMMAND.BACK:
+                case PRACC_COMMAND.TELEPORT:
                     {
                         if (!checkpoints.ContainsKey(player))
                         {
@@ -207,26 +216,120 @@ namespace CSPracc.CommandHandler
                         PracticeMode.StartTimer(player);
                         break;
                     }
-                //case ".throw":
-                //    {
-
-                //        //               MemoryFunctionVoid<IntPtr, string, IntPtr, IntPtr, string, int> AcceptEntityInput =
-                //        // new(@"\x55\x48\x89\xE5\x41\x57\x49\x89\xFF\x41\x56\x48\x8D\x7D\xC0");
-
-
-                //        Server.PrintToConsole("creating smoke");
-                //        CChicken? smoke = Utilities.CreateEntityByName<CChicken>("chicken");
-                //        if(smoke == null)
-                //        {
-                //            Server.PrintToConsole("smoke is  null");
-                //        }
-                //        smoke.Teleport(player.PlayerPawn.Value.CBodyComponent.SceneNode.AbsOrigin, new QAngle(0, 0, 0), new Vector(0, 0, 0));
-                //        //smoke.TeamNum = player.TeamNum;
-                //        smoke.DispatchSpawn();
-                //        //AcceptEntityInput.Invoke(smoke.Handle, "InitializeSpawnFromWorld", player.Handle, player.Handle, "", 0);
-                //        //AcceptEntityInput.Invoke(smoke.Handle,"FireUser1",player.Handle,player.Handle,"",0);
-                //        break;
-                //    }
+                case PRACC_COMMAND.countdown:
+                    {
+                        if (args.Length > 0)
+                        {
+                            if (int.TryParse(args, out int time))
+                            {
+                                PracticeMode.AddCountdown(player, time);
+                                break;
+                            }
+                        }
+                        Utils.ClientChatMessage($"{ChatColors.Red}Could not parse parameter", player);
+                        break;
+                    }
+                case PRACC_COMMAND.rethrow:
+                    {                                              
+                        ProjectileManager.ReThrow(player);
+                        break;
+                    }
+                case PRACC_COMMAND.flash:
+                    {       
+                        ProjectileManager.Flash(player);
+                        break;
+                    }
+                case PRACC_COMMAND.noflash:
+                    {
+                        ProjectileManager.NoFlash(player);
+                        break;
+                    }
+                case PRACC_COMMAND.stop:
+                    {
+                        ProjectileManager.Stop(player);
+                        break;
+                    }
+                case PRACC_COMMAND.Description:
+                    {
+                        ProjectileManager.AddDescription(player.SteamID, args);
+                        break;
+                    }
+                case PRACC_COMMAND.Rename:
+                    {
+                        ProjectileManager.RenameLastSnapshot(player.SteamID, args);
+                        break;
+                    }
+                case PRACC_COMMAND.AddTag:
+                    {
+                        ProjectileManager.AddTagToLastGrenade(player.SteamID, args);
+                        break;
+                    }
+                case PRACC_COMMAND.RemoveTag:
+                    {
+                        ProjectileManager.RemoveTagFromLastGrenade(player.SteamID, args);
+                        break;
+                    }
+                case PRACC_COMMAND.ClearTags:
+                    {
+                        ProjectileManager.ClearTagsFromLastGrenade(player.SteamID);
+                        break;
+                    }
+                case PRACC_COMMAND.DeleteTag:
+                    {
+                        ProjectileManager.DeleteTagFromAllNades(player.SteamID,args);
+                        break;
+                    }
+                case PRACC_COMMAND.Last:
+                    {
+                        ProjectileManager.RestorePlayersLastThrownGrenade(player,-1); 
+                        break;
+                    }
+                case PRACC_COMMAND.BACK:
+                    {
+                        if (args.Length > 0)
+                        {
+                            if (int.TryParse(args, out int id))
+                            {
+                                ProjectileManager.RestorePlayersLastThrownGrenade(player,id);
+                                break;
+                            }
+                        }
+                        ProjectileManager.RestorePlayersLastThrownGrenade(player);
+                        break;
+                    }
+                case PRACC_COMMAND.forward:
+                    {
+                        if (args.Length > 0)
+                        {
+                            if (int.TryParse(args, out int id))
+                            {
+                                ProjectileManager.RestoreNextPlayersLastThrownGrenade(player,id);
+                                break;
+                            }
+                        }
+                        ProjectileManager.RestoreNextPlayersLastThrownGrenade(player);
+                        break;
+                    }
+                case PRACC_COMMAND.bestspawn:
+                    {
+                        SpawnManager.TeleportToBestSpawn(player);
+                        break;
+                    }
+                case PRACC_COMMAND.worstspawn:
+                    {
+                        SpawnManager.TeleportToWorstSpawn(player);
+                        break;
+                    }
+                case PRACC_COMMAND.SwapBot:
+                    {
+                        BotManager.SwapBot(player);
+                        break;
+                    }
+                case PRACC_COMMAND.MoveBot:
+                    {
+                        BotManager.MoveBot(player);
+                        break;
+                    }
                 default:
                     {
                         base.PlayerChat(@event, info);
@@ -240,6 +343,39 @@ namespace CSPracc.CommandHandler
         {
             CSPraccPlugin.Instance.RemoveCommand("css_pracc_smokecolor_enabled", PraccSmokecolorEnabled);
             base.Dispose();
+        }
+
+        public override void PrintHelp(CCSPlayerController? player)
+        {
+            base.PrintHelp(player);
+            List<string> message = new List<string>();
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.SPAWN}{ChatColors.Red} 'number'{ChatColors.White}. Teleports you to the given spawn of your current team.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.TSPAWN}{ChatColors.White}{ChatColors.Red} 'number'{ChatColors.White}. Teleports you to the given spawn of the terrorist team.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.CTSPAWN}{ChatColors.White}{ChatColors.Red} 'number'{ChatColors.White}. Teleports you to the given spawn of the counter-terrorist team.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.NADES}{ChatColors.White}{ChatColors.Blue} [id]{ChatColors.White}. If id is passed an available. Teleport to given nade lineup. Else open nade menu.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.SAVE}{ChatColors.White}{ChatColors.Red} 'name'{ChatColors.White}. Saves current lineup.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.SAVELAST}{ChatColors.White}{ChatColors.Red} 'name'{ChatColors.White}. Saves  lineup of last thrown nade.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.rethrow}{ChatColors.White} Rethrows your last grenade.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.BOT}{ChatColors.White} Spawns bot at your current location.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.BOOST}{ChatColors.White} Spawns bot at your current location and teleports you ontop.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.CROUCHBOT}{ChatColors.White} Spawns a croucing bot at your current location.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.CROUCHBOOST}{ChatColors.White} Spawns a croucing bot at your current location and teleports you ontop.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.NOBOT}{ChatColors.White} Removes closest bot to your location that you spawned.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.CLEARBOTS}{ChatColors.White} Clears all of your bots.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.CLEAR}{ChatColors.White} Clear your smokes / molotovs.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.ClearAll}{ChatColors.White} Clear all smokes / molotovs on the server");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.flash}{ChatColors.White} Save current position, if flash is thrown, then you will be teleported back to the position.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.stop}{ChatColors.White} Stop the flash command.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.noflash}{ChatColors.White} Removing flash effect.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.timer}{ChatColors.White} Toggle Timer. Use command again to stop timer.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.CHECKPOINT}{ChatColors.White} Save current position as checkpoint. Use .back to return.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.BACK}{ChatColors.White} Return to saved checkpoint.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.WATCHME}{ChatColors.White} Moves all players except you to spectator.");
+
+            foreach (string s in message)
+            {
+                player?.PrintToChat(s);
+            }
         }
     }
 }

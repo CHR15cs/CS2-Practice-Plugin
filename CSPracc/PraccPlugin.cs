@@ -24,7 +24,8 @@ using CSPracc.Managers;
 using System.Drawing;
 using CSPracc.Modes;
 using static CSPracc.DataModules.Enums;
-
+using System.Resources;
+using Microsoft.Extensions.Logging;
 
 [MinimumApiVersion(80)]
 public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
@@ -36,14 +37,14 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
     {
         get
         {
-            return "CSPraccPlugin";
+            return "Practice Plugin";
         }
     }
     public override string ModuleVersion
     {
         get
         {
-            return "0.9.1.1";
+            return "0.9.2.0";
         }
     }
 
@@ -69,9 +70,9 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
 
     private static FileInfo? configManagerFile = null;
 
-    public CSPraccConfig Config { get; set; }
+    public CSPraccConfig? Config { get; set; }
 
-    public static BaseMode PluginMode { get; set; }
+    public static BaseMode? PluginMode { get; set; }
     #endregion
 
     public override void Load(bool hotReload)
@@ -83,12 +84,8 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
             Reset();
         });
         Instance = this;
-        SwitchMode(Enums.PluginMode.Standard);
-    }
-
-    public static void WriteConfig()
-    {
-       
+        SwitchMode(Config!.ModeToLoad);
+        Logger.LogInformation("Pracitce Plugin loaded.");
     }
 
     /// <summary>
@@ -96,7 +93,7 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
     /// </summary>
     private void Reset()
     {
-        SwitchMode(Enums.PluginMode.Standard);
+        SwitchMode(Config!.ModeToLoad);
     }
 
     public static void SwitchMode(PluginMode pluginMode)
@@ -104,9 +101,8 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
         PluginMode?.Dispose();
         switch (pluginMode)
         {
-            case Enums.PluginMode.Standard:
+            case Enums.PluginMode.Base:
                 {
-
                     PluginMode = new BaseMode();
                     break;
                 }
@@ -130,6 +126,11 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
                     PluginMode = new RetakeMode();
                     break;
                 }
+            case Enums.PluginMode.Prefire:
+                {
+                    PluginMode = new PrefireMode();
+                    break;
+                }
             default:
                 {
                     PluginMode = new BaseMode();
@@ -144,6 +145,11 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
         if(config == null)
         {
             return;
+        }
+        if(config.Version == null || config.Version == 0)
+        {
+            config.AdminRequirement = true;
+            config.ModeToLoad = Enums.PluginMode.Base;
         }
         Config = config;
         DemoManager.DemoManagerSettings = config.DemoManagerSettings;

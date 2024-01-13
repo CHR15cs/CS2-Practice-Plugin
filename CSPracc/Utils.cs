@@ -7,6 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using CounterStrikeSharp.API.Modules.Entities;
+using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
+using System.Runtime.InteropServices;
 
 namespace CSPracc
 {
@@ -23,11 +26,11 @@ namespace CSPracc
                 if (entity != null)
                 {
                     CCSPlayerController thrower = new CCSPlayerController(entity.Thrower.Value.Controller.Value.Handle);
-                    if(thrower.Handle == player.Handle)
+                    if (thrower.Handle == player.Handle)
                     {
                         entity.Remove();
                     }
-                    
+
                 }
             }
             var mollys = Utilities.FindAllEntitiesByDesignerName<CSmokeGrenadeProjectile>("molotov_projectile");
@@ -106,6 +109,16 @@ namespace CSPracc
             player.PrintToChat($"{CSPraccPlugin.Instance!.Config.ChatPrefix} {message}");
         }
 
+
+        public static void ClientChatMessage(string message, ulong steamid)
+        {
+            CCSPlayerController? player = Utilities.GetPlayerFromSteamId(steamid);
+            if (player != null && player.IsValid)
+            {
+                player.PrintToChat($"{CSPraccPlugin.Instance!.Config!.ChatPrefix} {message}");
+            }
+        }
+
         public static Color GetTeamColor(CCSPlayerController playerController)
         {
             Logging.LogMessage($"Getting Color of player {playerController.CompTeammateColor}");
@@ -126,4 +139,5 @@ namespace CSPracc
             }
         }
     }
+
 }

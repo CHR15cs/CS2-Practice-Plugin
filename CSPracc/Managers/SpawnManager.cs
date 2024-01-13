@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using CounterStrikeSharp.API.Modules.Memory;
 using CSPracc.DataStorages.JsonStorages;
 using CSPracc.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace CSPracc
 {
@@ -45,17 +46,12 @@ namespace CSPracc
                     if(lastMap == String.Empty)
                     {
                         lastMap = Server.MapName;
-                        Logging.LogMessage("Map now : " + lastMap);
                     }
                     getSpawns(ref _spawns);
                 }
                 if(lastMap != Server.MapName)
                 {
                     getSpawns(ref _spawns);
-                }
-                else
-                {
-                    Logging.LogMessage("Map still : " +  lastMap);  
                 }
                 return _spawns;
             }
@@ -67,7 +63,6 @@ namespace CSPracc
         /// <param name="spawns">dictionary to store the spawns in</param>
         private static void getSpawns(ref Dictionary<byte,List<Position>> spawns)
         {
-            Logging.LogMessage("Getting spawns");
             _spawns!.Clear();
             _spawns = new Dictionary<byte, List<Position>>();
             _spawns.Add((byte)CsTeam.CounterTerrorist, new List<Position>());
@@ -126,7 +121,7 @@ namespace CSPracc
             }
             catch (Exception ex)
             {
-                Logging.LogMessage($"{ex.Message}");
+                CSPraccPlugin.Instance!.Logger.LogError($"{ex.Message}");
                 player.PrintToCenter("invalid parameter");
                 return;
             }
@@ -136,7 +131,7 @@ namespace CSPracc
                 player.PrintToCenter($"insufficient number of spawns found. spawns {SpawnManager.Spawns[(byte)targetTeam].Count} - {number}");
                 return;
             }
-            Logging.LogMessage($"teleport to: {SpawnManager.Spawns[(byte)targetTeam][number].PlayerPosition}");
+            CSPraccPlugin.Instance.Logger.LogInformation($"teleport to: {SpawnManager.Spawns[(byte)targetTeam][number].PlayerPosition}");
             Utils.RemoveNoClip(player);
             player.PlayerPawn.Value.Teleport(SpawnManager.Spawns[(byte)targetTeam][number].PlayerPosition, SpawnManager.Spawns[(byte)targetTeam][number].PlayerAngle, new Vector(0, 0, 0));
             
@@ -146,6 +141,72 @@ namespace CSPracc
         public static void ClearUsedSpawns()
         {
             spawnPointStorage.ResetUsedSpawns();
+        }
+
+        public static void TeleportToBestSpawn(CCSPlayerController player)
+        {
+            if (player == null || !player.IsValid || player.IsBot) return;
+
+            List<Position> points = SpawnManager.Spawns[player.TeamNum];
+            float closestDistance = absolutDistance(player,points.FirstOrDefault());
+            int closestIndex = 0;
+            for(int i = 0; i < points.Count; i++) 
+            {
+               float maybeCloser = absolutDistance(player, points[i]); 
+                if(maybeCloser< closestDistance ) 
+                { 
+                    closestIndex = i;
+                    closestDistance = maybeCloser;
+                    continue;
+                }
+            }
+            player.TeleportToPosition(points[closestIndex]);
+        }
+
+        public static void TeleportToWorstSpawn(CCSPlayerController player)
+        {
+            if (player == null || !player.IsValid || player.IsBot) return;
+
+            List<Position> points = SpawnManager.Spawns[player.TeamNum];
+            float maxDistance = absolutDistance(player, points.FirstOrDefault());
+            int maxIndex = 0;
+            for (int i = 0; i < points.Count; i++)
+            {
+                float maybeCloser = absolutDistance(player, points[i]);
+                if (maybeCloser > maxDistance)
+                {
+                    maxIndex = i;
+                    maxDistance = maybeCloser;
+                    continue;
+                }
+            }
+            player.TeleportToPosition(points[maxIndex]);
+        }
+
+        private static float absolutDistance(CCSPlayerController player, Position spawnPoint)
+        {
+            float distanceX = 0;
+            float distanceY = 0;
+            float distanceZ = 0;
+            Vector playerPos = player.PlayerPawn!.Value.CBodyComponent!.SceneNode!.AbsOrigin;
+            Vector botPos = spawnPoint.PlayerPosition;
+            distanceX = playerPos.X - botPos.X;
+            distanceY = playerPos.Y - botPos.Y;
+            distanceZ = playerPos.Z - botPos.Z;
+            if (distanceX < 0)
+            {
+                distanceX *= -1;
+            }
+            if (distanceY < 0)
+            {
+                distanceY *= -1;
+            }
+            if (distanceZ < 0)
+            {
+                distanceZ *= -1;
+            }
+            CSPraccPlugin.Instance!.Logger.LogInformation($"calculating distance {distanceX + distanceY + distanceZ}");
+            return distanceX + distanceY + distanceZ;
         }
 
         public static bool TeleportToUnusedSpawn(CCSPlayerController player,string bombsite)

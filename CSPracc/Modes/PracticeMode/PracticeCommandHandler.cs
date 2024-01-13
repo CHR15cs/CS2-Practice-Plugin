@@ -15,6 +15,7 @@ using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Memory;
 using CSPracc.Modes;
 using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
+using System.Reflection.Metadata.Ecma335;
 
 namespace CSPracc.CommandHandler
 {
@@ -83,14 +84,24 @@ namespace CSPracc.CommandHandler
                     {
                         if (args.Length > 0)
                         {
-                            if (int.TryParse(args, out int id))
+                            if(args.Trim().ToLower() == "all")
+                            {
+                                PracticeMode.ShowCompleteNadeMenu(player);
+                                break;
+                            }
+                            else if (int.TryParse(args, out int id))
                             {
                                 ProjectileManager.RestoreSnapshot(player, id);
                                 break;
                             }
+                            else
+                            {
+                                PracticeMode.ShowPlayerBasedNadeMenu(player,args);
+                                break;
+                            }
                             player.PrintToCenter("Could not parse argument for nade menu");
                         }
-                        PracticeMode.ShowNadeMenu(player);
+                        PracticeMode.ShowPlayerBasedNadeMenu(player);
                         break;
                     }
                 case PRACC_COMMAND.SAVE:
@@ -98,7 +109,7 @@ namespace CSPracc.CommandHandler
                         ProjectileManager.SaveSnapshot(player, args);
                         break;
                     }
-                case PRACC_COMMAND.REMOVE:
+                case PRACC_COMMAND.Delete:
                     {
                         ProjectileManager.RemoveSnapshot(player, args);
                         break;
@@ -106,6 +117,16 @@ namespace CSPracc.CommandHandler
                 case PRACC_COMMAND.BOT:
                     {
                         BotManager.AddBot(player);
+                        break;
+                    }
+                case PRACC_COMMAND.tBOT:
+                    {
+                        BotManager.AddBot(player,false,CsTeam.Terrorist);
+                        break;
+                    }
+                case PRACC_COMMAND.ctBOT:
+                    {
+                        BotManager.AddBot(player, false, CsTeam.CounterTerrorist);
                         break;
                     }
                 case PRACC_COMMAND.BOOST:
@@ -177,7 +198,7 @@ namespace CSPracc.CommandHandler
                         }
                         break;
                     }
-                case PRACC_COMMAND.BACK:
+                case PRACC_COMMAND.TELEPORT:
                     {
                         if (!checkpoints.ContainsKey(player))
                         {
@@ -193,6 +214,19 @@ namespace CSPracc.CommandHandler
                 case PRACC_COMMAND.timer:
                     {
                         PracticeMode.StartTimer(player);
+                        break;
+                    }
+                case PRACC_COMMAND.countdown:
+                    {
+                        if (args.Length > 0)
+                        {
+                            if (int.TryParse(args, out int time))
+                            {
+                                PracticeMode.AddCountdown(player, time);
+                                break;
+                            }
+                        }
+                        Utils.ClientChatMessage($"{ChatColors.Red}Could not parse parameter", player);
                         break;
                     }
                 case PRACC_COMMAND.rethrow:
@@ -213,6 +247,87 @@ namespace CSPracc.CommandHandler
                 case PRACC_COMMAND.stop:
                     {
                         ProjectileManager.Stop(player);
+                        break;
+                    }
+                case PRACC_COMMAND.Description:
+                    {
+                        ProjectileManager.AddDescription(player.SteamID, args);
+                        break;
+                    }
+                case PRACC_COMMAND.Rename:
+                    {
+                        ProjectileManager.RenameLastSnapshot(player.SteamID, args);
+                        break;
+                    }
+                case PRACC_COMMAND.AddTag:
+                    {
+                        ProjectileManager.AddTagToLastGrenade(player.SteamID, args);
+                        break;
+                    }
+                case PRACC_COMMAND.RemoveTag:
+                    {
+                        ProjectileManager.RemoveTagFromLastGrenade(player.SteamID, args);
+                        break;
+                    }
+                case PRACC_COMMAND.ClearTags:
+                    {
+                        ProjectileManager.ClearTagsFromLastGrenade(player.SteamID);
+                        break;
+                    }
+                case PRACC_COMMAND.DeleteTag:
+                    {
+                        ProjectileManager.DeleteTagFromAllNades(player.SteamID,args);
+                        break;
+                    }
+                case PRACC_COMMAND.Last:
+                    {
+                        ProjectileManager.RestorePlayersLastThrownGrenade(player,-1); 
+                        break;
+                    }
+                case PRACC_COMMAND.BACK:
+                    {
+                        if (args.Length > 0)
+                        {
+                            if (int.TryParse(args, out int id))
+                            {
+                                ProjectileManager.RestorePlayersLastThrownGrenade(player,id);
+                                break;
+                            }
+                        }
+                        ProjectileManager.RestorePlayersLastThrownGrenade(player);
+                        break;
+                    }
+                case PRACC_COMMAND.forward:
+                    {
+                        if (args.Length > 0)
+                        {
+                            if (int.TryParse(args, out int id))
+                            {
+                                ProjectileManager.RestoreNextPlayersLastThrownGrenade(player,id);
+                                break;
+                            }
+                        }
+                        ProjectileManager.RestoreNextPlayersLastThrownGrenade(player);
+                        break;
+                    }
+                case PRACC_COMMAND.bestspawn:
+                    {
+                        SpawnManager.TeleportToBestSpawn(player);
+                        break;
+                    }
+                case PRACC_COMMAND.worstspawn:
+                    {
+                        SpawnManager.TeleportToWorstSpawn(player);
+                        break;
+                    }
+                case PRACC_COMMAND.SwapBot:
+                    {
+                        BotManager.SwapBot(player);
+                        break;
+                    }
+                case PRACC_COMMAND.MoveBot:
+                    {
+                        BotManager.MoveBot(player);
                         break;
                     }
                 default:

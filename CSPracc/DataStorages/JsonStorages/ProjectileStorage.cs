@@ -28,6 +28,22 @@ namespace CSPracc.DataStorages.JsonStorages
             }
             return id;
         }
+
+        public int Add(CCSPlayerController player, CBaseCSGrenadeProjectile? projectile, string title, string map)
+        {
+            ProjectileSnapshot? snapshot = null;
+            if (projectile != null)
+            {
+                snapshot = new ProjectileSnapshot(player, projectile, title, "", GrenadeType_t.GRENADE_TYPE_SMOKE);
+            }
+            else
+            {
+                snapshot = new ProjectileSnapshot(player.PlayerPawn.Value!.CBodyComponent!.SceneNode!.AbsOrigin.ToVector3(), player.PlayerPawn.Value!.CBodyComponent!.SceneNode!.AbsOrigin.ToVector3(), player.PlayerPawn.Value!.EyeAngles.ToVector3(),new Vector3(0,0,0), title, "", GrenadeType_t.GRENADE_TYPE_SMOKE,player.SteamID);
+            }
+            
+            return Add(snapshot);
+        }
+
         public void Add(Vector playerPosition, Vector projectilePosition, QAngle playerAngle, Vector velocity,string title, string description, string map)
         {
             ProjectileSnapshot snapshot = new ProjectileSnapshot(playerPosition.ToVector3(), projectilePosition.ToVector3(), playerAngle.ToVector3(), velocity.ToVector3(), title, description,GrenadeType_t.GRENADE_TYPE_SMOKE);
@@ -39,9 +55,11 @@ namespace CSPracc.DataStorages.JsonStorages
             Add(snapshot);
         }
 
-        public void Add(ProjectileSnapshot snapshot)
+        public int Add(ProjectileSnapshot snapshot)
         {
-            SetOrAdd(GetUnusedKey(), snapshot);
+            int newkey = GetUnusedKey();
+            SetOrAdd(newkey, snapshot);
+            return newkey;
         }
         public override bool Get(int id, out ProjectileSnapshot snapshot)
         {

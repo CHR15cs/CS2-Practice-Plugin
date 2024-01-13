@@ -143,6 +143,72 @@ namespace CSPracc
             spawnPointStorage.ResetUsedSpawns();
         }
 
+        public static void TeleportToBestSpawn(CCSPlayerController player)
+        {
+            if (player == null || !player.IsValid || player.IsBot) return;
+
+            List<Position> points = SpawnManager.Spawns[player.TeamNum];
+            float closestDistance = absolutDistance(player,points.FirstOrDefault());
+            int closestIndex = 0;
+            for(int i = 0; i < points.Count; i++) 
+            {
+               float maybeCloser = absolutDistance(player, points[i]); 
+                if(maybeCloser< closestDistance ) 
+                { 
+                    closestIndex = i;
+                    closestDistance = maybeCloser;
+                    continue;
+                }
+            }
+            player.TeleportToPosition(points[closestIndex]);
+        }
+
+        public static void TeleportToWorstSpawn(CCSPlayerController player)
+        {
+            if (player == null || !player.IsValid || player.IsBot) return;
+
+            List<Position> points = SpawnManager.Spawns[player.TeamNum];
+            float maxDistance = absolutDistance(player, points.FirstOrDefault());
+            int maxIndex = 0;
+            for (int i = 0; i < points.Count; i++)
+            {
+                float maybeCloser = absolutDistance(player, points[i]);
+                if (maybeCloser > maxDistance)
+                {
+                    maxIndex = i;
+                    maxDistance = maybeCloser;
+                    continue;
+                }
+            }
+            player.TeleportToPosition(points[maxIndex]);
+        }
+
+        private static float absolutDistance(CCSPlayerController player, Position spawnPoint)
+        {
+            float distanceX = 0;
+            float distanceY = 0;
+            float distanceZ = 0;
+            Vector playerPos = player.PlayerPawn!.Value.CBodyComponent!.SceneNode!.AbsOrigin;
+            Vector botPos = spawnPoint.PlayerPosition;
+            distanceX = playerPos.X - botPos.X;
+            distanceY = playerPos.Y - botPos.Y;
+            distanceZ = playerPos.Z - botPos.Z;
+            if (distanceX < 0)
+            {
+                distanceX *= -1;
+            }
+            if (distanceY < 0)
+            {
+                distanceY *= -1;
+            }
+            if (distanceZ < 0)
+            {
+                distanceZ *= -1;
+            }
+            CSPraccPlugin.Instance!.Logger.LogInformation($"calculating distance {distanceX + distanceY + distanceZ}");
+            return distanceX + distanceY + distanceZ;
+        }
+
         public static bool TeleportToUnusedSpawn(CCSPlayerController player,string bombsite)
         {
             if (player == null || !player.IsValid || player.IsBot) return false;

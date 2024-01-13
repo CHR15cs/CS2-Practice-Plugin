@@ -16,6 +16,7 @@ using CounterStrikeSharp.API.Modules.Memory;
 using System.Numerics;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 using Microsoft.Extensions.Logging;
+using CSPracc.Extensions;
 
 namespace CSPracc.Managers
 {
@@ -26,25 +27,39 @@ namespace CSPracc.Managers
         /// <summary>
         /// Dict of a bots Key = userid of bot
         /// </summary>
-        private  Dictionary<string, Dictionary<string, object>> spawnedBots = new Dictionary<string, Dictionary<string, object>>();
+        private  Dictionary<string, Dictionary<string, object>> spawnedBots { get; set; } =new Dictionary<string, Dictionary<string, object>>();
+
+        private Dictionary<ulong,string> lastBotSpawned {  get; set; } = new Dictionary<ulong,string>();
 
         /// <summary>
         /// Following code is heavily inspired by https://github.com/shobhit-pathak/MatchZy/blob/main/PracticeMode.cs
         /// </summary>
         /// <param name="player">play who added the bot</param>
-        public  void AddBot(CCSPlayerController player,bool crouch = false)
+        public  void AddBot(CCSPlayerController player,bool crouch = false,CsTeam team = CsTeam.None)
         {
-            if (player.TeamNum == (byte)CsTeam.Terrorist)
+            switch (team)
             {
-                Server.ExecuteCommand("bot_join_team T");
-                Server.ExecuteCommand("bot_add_t");
+                case CsTeam.CounterTerrorist:
+                    Server.ExecuteCommand("bot_join_team CT");
+                    Server.ExecuteCommand("bot_add_ct");
+                    break;
+                case CsTeam.Terrorist:
+                    Server.ExecuteCommand("bot_join_team T");
+                    Server.ExecuteCommand("bot_add_t");
+                    break;
+                default:
+                    if (player.TeamNum == (byte)CsTeam.Terrorist)
+                    {
+                        Server.ExecuteCommand("bot_join_team T");
+                        Server.ExecuteCommand("bot_add_t");
+                    }
+                    else if (player.TeamNum == (byte)CsTeam.CounterTerrorist)
+                    {
+                        Server.ExecuteCommand("bot_join_team CT");
+                        Server.ExecuteCommand("bot_add_ct");
+                    }
+                    break;
             }
-            else if (player.TeamNum == (byte)CsTeam.CounterTerrorist)
-            {
-                Server.ExecuteCommand("bot_join_team CT");
-                Server.ExecuteCommand("bot_add_ct");
-            }
-
             // Adding a small timer so that bot can be added in the world
             // Once bot is added, we teleport it to the requested position
             CSPraccPlugin.Instance!.AddTimer(0.1f, () => SpawnBot(player,crouch));
@@ -89,14 +104,64 @@ namespace CSPracc.Managers
         /// <param name="player">player called the command</param>
         public void NoBot(CCSPlayerController player)
         {
+            CCSPlayerController? closestBot = getClosestBotOfPlayer(player);
+            if(closestBot != null)
+            {
+                CSPraccPlugin.Instance!.Logger.LogInformation($"kickid {closestBot.UserId}");
+                Server.ExecuteCommand($"kickid {closestBot.UserId}");            
+                spawnedBots.Remove(closestBot.PlayerName!);
+            }
+        }
+
+        /// <summary>
+        /// Remove closest bot to the player
+        /// </summary>
+        /// <param name="player">player called the command</param>
+        public void SwapBot(CCSPlayerController player)
+        {
+            CCSPlayerController? closestBot = getClosestBotOfPlayer(player);
+            if (closestBot != null)
+            {
+                Position positionPlayer = new Position(player.PlayerPawn.Value.CBodyComponent.SceneNode.AbsOrigin, player.PlayerPawn.Value.EyeAngles);
+                Position positionBot = new Position(closestBot.PlayerPawn.Value.CBodyComponent.SceneNode.AbsOrigin, closestBot.PlayerPawn.Value.EyeAngles);
+                player.TeleportToPosition(positionBot);
+                closestBot.TeleportToPosition(positionPlayer);
+                Utils.ClientChatMessage($"Swapped your current position with bot {closestBot.PlayerName}", player);
+            }
+        }
+
+        public void MoveBot(CCSPlayerController player)
+        {
+            if(!lastBotSpawned.TryGetValue(player.SteamID,out string botname))
+            {
+                Utils.ClientChatMessage($"Could not get last bot spawned.", player);
+                return;
+            }
+            if (botname == null || botname == "") return;
+            spawnedBots[botname]["position"] = player.GetCurrentPosition()!;
+            CCSPlayerController? bot = spawnedBots[botname]["controller"] as CCSPlayerController;
+            if(bot == null || !bot.IsValid)
+            {
+                Utils.ClientChatMessage($"Could not get last bot spawned.", player);
+                return;
+            }
+            bot.TeleportToPosition(player.GetCurrentPosition()!);
+            Utils.ClientChatMessage("Moved bot to your current position.", player);
+        }
+        /// <summary>
+        /// get closest bot to the player
+        /// </summary>
+        /// <param name="player">player called the command</param>
+        private CCSPlayerController? getClosestBotOfPlayer(CCSPlayerController player)
+        {
             CCSPlayerController? closestBot = null;
             float Distance = 0;
             foreach (Dictionary<string, object> botDict in spawnedBots.Values)
             {
-                
+
                 CCSPlayerController botOwner = (CCSPlayerController)botDict["owner"];
                 CCSPlayerController bot = (CCSPlayerController)botDict["controller"];
-                if(!bot.IsValid)
+                if (!bot.IsValid)
                 {
                     continue;
                 }
@@ -109,19 +174,15 @@ namespace CSPracc.Managers
                         Distance = absolutDistance(botOwner, bot);
                     }
                     float tempDistance = absolutDistance(botOwner, bot);
-                    if(tempDistance< Distance) 
+                    if (tempDistance < Distance)
                     {
                         Distance = tempDistance;
                         closestBot = bot;
                     }
                 }
             }
-            if(closestBot != null)
-            {
-                CSPraccPlugin.Instance!.Logger.LogInformation($"kickid {closestBot.UserId}");
-                Server.ExecuteCommand($"kickid {closestBot.UserId}");            
-                spawnedBots.Remove(closestBot.PlayerName!);
-            }
+
+            return closestBot;
         }
 
         /// <summary>
@@ -196,7 +257,7 @@ namespace CSPracc.Managers
                     {
                         CSPraccPlugin.Instance!.Logger.LogInformation($"UNUSED BOT FOUND: {tempPlayer.UserId.Value} EXECUTING: kickid {tempPlayer.UserId.Value}");
                         // Kicking the unused bot. We have to do this because bot_add_t/bot_add_ct may add multiple bots but we need only 1, so we kick the remaining unused ones
-                        Server.ExecuteCommand($"kickid {tempPlayer.UserId.Value}");
+                        //Server.ExecuteCommand($"kickid {tempPlayer.UserId.Value}");
                         continue;
                     }
                     if (spawnedBots.ContainsKey(tempPlayer.PlayerName))
@@ -224,7 +285,8 @@ namespace CSPracc.Managers
                         CSPraccPlugin.Instance!.AddTimer(0.2f, () => movementService.DuckAmount = 1);
                         CSPraccPlugin.Instance!.AddTimer(0.3f, () => bot.IsCrouching = true);
 
-                    }                 
+                    }
+                    lastBotSpawned.SetOrAdd(botOwner.SteamID, tempPlayer.PlayerName);
                     unusedBotFound = true;
                 }
             }

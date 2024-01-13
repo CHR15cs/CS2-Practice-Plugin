@@ -62,6 +62,7 @@ namespace CSPracc.EventHandler
         public HookResult OnPlayerSpawn(EventPlayerSpawn @event, GameEventInfo info)
         {
             BotManager!.OnPlayerSpawn(@event, info);
+            Server.PrintToChatAll("OnPlayerSpawn");
             return HookResult.Continue;
         }
 
@@ -74,7 +75,7 @@ namespace CSPracc.EventHandler
             Plugin.DeregisterEventHandler("player_hurt", playerhurt, true);
 
             GameEventHandler<EventPlayerSpawn> playerspawn = OnPlayerSpawn;
-            Plugin.DeregisterEventHandler("player_spawn", playerhurt, true);
+            Plugin.DeregisterEventHandler("player_spawn", playerspawn, true);
 
             GameEventHandler<EventSmokegrenadeDetonate> smokegrenadedetonate = ProjectileManager.OnSmokeDetonate;
             Plugin.DeregisterEventHandler("smokegrenade_detonate", smokegrenadedetonate, true);

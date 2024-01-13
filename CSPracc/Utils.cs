@@ -26,11 +26,11 @@ namespace CSPracc
                 if (entity != null)
                 {
                     CCSPlayerController thrower = new CCSPlayerController(entity.Thrower.Value.Controller.Value.Handle);
-                    if(thrower.Handle == player.Handle)
+                    if (thrower.Handle == player.Handle)
                     {
                         entity.Remove();
                     }
-                    
+
                 }
             }
             var mollys = Utilities.FindAllEntitiesByDesignerName<CSmokeGrenadeProjectile>("molotov_projectile");
@@ -109,6 +109,16 @@ namespace CSPracc
             player.PrintToChat($"{CSPraccPlugin.Instance!.Config.ChatPrefix} {message}");
         }
 
+
+        public static void ClientChatMessage(string message, ulong steamid)
+        {
+            CCSPlayerController? player = Utilities.GetPlayerFromSteamId(steamid);
+            if (player != null && player.IsValid)
+            {
+                player.PrintToChat($"{CSPraccPlugin.Instance!.Config!.ChatPrefix} {message}");
+            }
+        }
+
         public static Color GetTeamColor(CCSPlayerController playerController)
         {
             Logging.LogMessage($"Getting Color of player {playerController.CompTeammateColor}");
@@ -128,33 +138,6 @@ namespace CSPracc
                     return Color.Red;
             }
         }
-
-        public static string acceptInputWindowsSig = "\\x48\\x89\\x5C\\x24\\x10\\x48\\x89\\x74\\x24\\x18\\x57\\x48\\x83\\xEC\\x40\\x49\\x8B\\xF0";
-        public static string acceptInputLinuxSig = "\\x55\\x48\\x89\\xE5\\x41\\x57\\x49\\x89\\xFF\\x41\\x56\\x48\\x8D\\x7D\\xC0";
-
-        public static MemoryFunctionVoid<IntPtr, string, IntPtr, IntPtr, string, int> AcceptEntityInputFunc = new(RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? acceptInputLinuxSig : acceptInputWindowsSig);
-
-        public static Action<IntPtr, string, IntPtr, IntPtr, string, int> AcceptEntityInput = AcceptEntityInputFunc.Invoke;
-
-        //Thanks to WD- for the AcceptInput implementation
-        public static void AcceptInput(IntPtr handle, string inputName, IntPtr activator, IntPtr caller, string value)
-        {
-            AcceptEntityInput(handle, inputName, activator, caller, value, 0);
-        }
-
-        public static void BreakProps(CCSPlayerController player)
-        {
-            if (player == null) return;
-            var entities = Utilities.FindAllEntitiesByDesignerName<CBreakable>("prop_dynamic");
-            foreach (var entity in entities)
-            {
-                AcceptInput(entity.Handle, "Break", player.Handle, player.Handle, "");
-            }
-            entities = Utilities.FindAllEntitiesByDesignerName<CBreakable>("func_breakable");
-            foreach (var entity in entities)
-            {
-                AcceptInput(entity.Handle, "Break", player.Handle, player.Handle, "");
-            }
-        }
     }
+
 }

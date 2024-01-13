@@ -1,6 +1,7 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CSPracc.CommandHandler;
+using CSPracc.DataModules;
 using CSPracc.EventHandler;
 using CSPracc.Managers;
 using System;
@@ -29,13 +30,28 @@ namespace CSPracc.Modes
             base.GuiManager.StartTimer(player);
         }
 
-        public void ShowNadeMenu(CCSPlayerController player)
+        public void AddCountdown(CCSPlayerController player, int countdown)
+        {
+            if (player == null) return;
+            base.GuiManager.StartCountdown(player,countdown);
+        }
+
+        public void ShowPlayerBasedNadeMenu(CCSPlayerController player,string tag = "")
         {
             if (player == null) return;
             if(!player.IsValid) return;
-            GuiManager.AddMenu(player.SteamID, projectileManager.GetNadeMenu(player));            
+
+            GuiManager.AddMenu(player.SteamID, projectileManager.GetPlayerBasedNadeMenu(player,tag));            
         }
 
+
+        public void ShowCompleteNadeMenu(CCSPlayerController player)
+        {
+            if (player == null) return;
+            if (!player.IsValid) return;
+
+            GuiManager.AddMenu(player.SteamID, projectileManager.GetNadeMenu(player));
+        }
 
         public override void ConfigureEnvironment()
         {

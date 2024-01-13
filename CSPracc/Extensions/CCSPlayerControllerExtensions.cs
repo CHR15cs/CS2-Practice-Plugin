@@ -19,6 +19,10 @@ namespace CSPracc
     {
         public static bool IsAdmin(this CCSPlayerController playerController)
         {     
+            if(!CSPraccPlugin.Instance!.Config!.AdminRequirement)
+            {
+                return true;
+            }
             return AdminManager.PlayerHasPermissions(playerController, AdminFlags.Standard);
         }
 
@@ -52,6 +56,17 @@ namespace CSPracc
                 return;
             }
             playerController.PlayerPawn.Value!.Teleport(jsonSpawnPoint.Position.ToCSVector(), jsonSpawnPoint.QAngle.ToCSQAngle(), new Vector(0, 0, 0));
+        }
+
+        public static void TeleportToPosition(this CCSPlayerController playerController, Position? position)
+        {
+            if (playerController == null) { return; }
+            if (!playerController.IsValid) { return; }
+            if (position == null)
+            {
+                return;
+            }
+            playerController.PlayerPawn.Value!.Teleport(position.PlayerPosition,position.PlayerAngle, new Vector(0, 0, 0));
         }
 
         public static void HtmlMessage(this  CCSPlayerController playerController,string message,int timetodisplay = 5)

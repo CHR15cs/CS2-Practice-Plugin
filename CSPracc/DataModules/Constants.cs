@@ -97,22 +97,40 @@ namespace CSPracc.DataModules.Constants
         public const string CTSPAWN = ".ctspawn";           
         public const string NADES = ".nades";
         public const string SAVE = ".save";
-        public const string REMOVE = ".remove";               
+        public const string Description = ".desc";
+        public const string Rename = ".rename";
+        public const string AddTag = ".addtag";
+        public const string RemoveTag = ".removetag";
+        public const string ClearTags = ".cleartags";
+        public const string DeleteTag = ".deletetag";
+        public const string Last = ".last";
+        public const string BACK = ".back";
+        public const string forward = ".forward";
+        public const string bestspawn = ".bestspawn";
+        public const string worstspawn = ".worstspawn";
+
+        public const string Delete = ".delete";               
         public const string BOT = ".bot";
+        public const string tBOT = ".tbot";
+        public const string ctBOT = ".ctbot";
         public const string BOOST = ".boost";
         public const string WATCHME = ".watchme";
         public const string NOBOT = ".nobot";
         public const string CLEARBOTS = ".clearbots";
         public const string CROUCHBOT = ".crouchbot";
         public const string CROUCHBOOST = ".crouchboost";
-       
+        public const string SwapBot = ".swapbot";
+        public const string MoveBot = ".movebot";
+
         public const string CLEAR = ".clear";
         public const string ClearAll = ".clearall";       
         public const string SAVELAST = ".savelast";
         public const string CHECKPOINT = ".checkpoint";
-        public const string BACK = ".back";
+        public const string TELEPORT = ".tp";
+       
         public const string UserRole = ".userrole";        
         public const string timer = ".timer";
+        public const string countdown = ".countdown";
         public const string rethrow = ".throw";
         public const string flash = ".flash";
         public const string noflash = ".noflash";

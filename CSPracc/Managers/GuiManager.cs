@@ -18,6 +18,7 @@ namespace CSPracc.Managers
         public static GuiManager? Instance { get; private set; }
 
         Dictionary<ulong,DateTime> Timers = new Dictionary<ulong,DateTime>();
+        Dictionary<ulong, DateTime> Countdown = new Dictionary<ulong, DateTime>();
         Dictionary<ulong,HtmlMenu> htmlMenus = new Dictionary<ulong, HtmlMenu> ();
         Dictionary<ulong,HtmlMessage> htmlMessage = new Dictionary<ulong, HtmlMessage> ();  
 
@@ -67,6 +68,12 @@ namespace CSPracc.Managers
                 Utils.ClientChatMessage($"Timer started", playerController);
                 Timers.Add(playerController.SteamID, DateTime.Now);
             }
+        }
+
+        public void StartCountdown(CCSPlayerController playerController, int time)
+        {
+            Utils.ClientChatMessage($"Countdown started", playerController);
+            Countdown.Add(playerController.SteamID, DateTime.Now.AddSeconds(time));
         }
 
         public void AddMenu(ulong id, HtmlMenu menu)
@@ -161,6 +168,20 @@ namespace CSPracc.Managers
                 if (player == null) continue;
 
                 player.PrintToCenter($" {ChatColors.Green} Timer {ChatColors.White} {(DateTime.Now - Timers[key]).TotalSeconds.ToString("0.00")}s");
+            }
+
+
+            foreach (var key in Countdown.Keys)
+            {
+                CCSPlayerController? player = Utilities.GetPlayerFromSteamId(key);
+                if (player == null) continue;
+
+                player.PrintToCenterHtml($"Countdown <font color=\"green\">{(Countdown[key] - DateTime.Now).TotalSeconds.ToString("0.00")}s</font> ");
+                if(DateTime.Now >= Countdown[key])
+                {
+                    Countdown.Remove(key);
+                    Utils.ClientChatMessage("Timer finished", player);
+                }
             }
         }
 

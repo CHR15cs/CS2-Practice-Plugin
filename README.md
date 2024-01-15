@@ -23,7 +23,9 @@ Already useable modes:<br>
     - Flash Practice
     - Throw (Known Issue: smokes are only working with sv_rethrow_last_grenade)
     - Spawn Commands
-    - ToDo: Bot Mimic
+    - ToDo: Bot Mimic<br>
+    Practicemode Guide:<br>
+  [![Practicemode Guide](https://img.youtube.com/vi/23x0a3QIE_w/0.jpg)](https://www.youtube.com/watch?v=23x0a3QIE_w) <br>
 - [x] DryRun Mode (.dryrun)
     - Refill nades
     - Short Freezetime

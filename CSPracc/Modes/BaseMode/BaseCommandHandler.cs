@@ -244,26 +244,26 @@ namespace CSPracc.CommandHandler
                         CSPraccPlugin.SwitchMode(Enums.PluginMode.DryRun);
                         break;
                     }
-                case BASE_COMMAND.Retake:
-                    {
-                        if (!player.IsAdmin())
-                        {
-                            player.PrintToCenter("Only admins can execute this command!");
-                            return false;
-                        }
-                        CSPraccPlugin.SwitchMode(Enums.PluginMode.Retake);
-                        break;
-                    }
-                case BASE_COMMAND.Prefire:
-                    {
-                        if (!player.IsAdmin())
-                        {
-                            player.PrintToCenter("Only admins can execute this command!");
-                            return false;
-                        }
-                        CSPraccPlugin.SwitchMode(Enums.PluginMode.Prefire);
-                        break;
-                    }
+                //case BASE_COMMAND.Retake:
+                //    {
+                //        if (!player.IsAdmin())
+                //        {
+                //            player.PrintToCenter("Only admins can execute this command!");
+                //            return false;
+                //        }
+                //        CSPraccPlugin.SwitchMode(Enums.PluginMode.Retake);
+                //        break;
+                //    }
+                //case BASE_COMMAND.Prefire:
+                //    {
+                //        if (!player.IsAdmin())
+                //        {
+                //            player.PrintToCenter("Only admins can execute this command!");
+                //            return false;
+                //        }
+                //        CSPraccPlugin.SwitchMode(Enums.PluginMode.Prefire);
+                //        break;
+                //    }
                 case BASE_COMMAND.SWAP:
                     {
                         if (!player.IsAdmin())
@@ -425,7 +425,7 @@ namespace CSPracc.CommandHandler
             message.Add($" {ChatColors.Green}{BASE_COMMAND.MAP}{ChatColors.Red} 'mapname'{ChatColors.White}. Switch to given map.");
             message.Add($" {ChatColors.Green}{BASE_COMMAND.MATCH}{ChatColors.White} Switching to match mode.");
             message.Add($" {ChatColors.Green}{BASE_COMMAND.PRACC}{ChatColors.White} Switching to practice mode.");
-            message.Add($" {ChatColors.Green}{BASE_COMMAND.Prefire}{ChatColors.White} Switching to prefire mode.");
+            //message.Add($" {ChatColors.Green}{BASE_COMMAND.Prefire}{ChatColors.White} Switching to prefire mode.");
             message.Add($" {ChatColors.Green}{BASE_COMMAND.DryRun}{ChatColors.White} Switching to dry run mode.");
             message.Add($" {ChatColors.Green}{BASE_COMMAND.ALIAS}{ChatColors.Red} '.new alias' '.old alias'{ChatColors.White}. Creates a personal alias for a command.");
             message.Add($" {ChatColors.Green}{BASE_COMMAND.REMOVEALIAS}{ChatColors.Red} '.aliasToRemove'{ChatColors.White}. Removes given alias.");

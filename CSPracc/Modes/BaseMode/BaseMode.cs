@@ -23,8 +23,8 @@ namespace CSPracc.Modes
             list.Add(new KeyValuePair<string, Action>("Pracc", new Action(() =>CSPraccPlugin.SwitchMode(Enums.PluginMode.Pracc))));
             list.Add(new KeyValuePair<string, Action>("Match", new Action(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Match))));
             list.Add(new KeyValuePair<string, Action>("Dryrun", new Action(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.DryRun))));
-            list.Add(new KeyValuePair<string, Action>("Retake", new Action(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Retake))));
-            list.Add(new KeyValuePair<string, Action>("Prefire", new Action(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Prefire))));
+            //list.Add(new KeyValuePair<string, Action>("Retake", new Action(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Retake))));
+            //list.Add(new KeyValuePair<string, Action>("Prefire", new Action(() => CSPraccPlugin.SwitchMode(Enums.PluginMode.Prefire))));
             ModeMenu = new HtmlMenu("Select Mode", list);
         }
 

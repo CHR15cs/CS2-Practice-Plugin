@@ -146,7 +146,7 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
         {
             return;
         }
-        if(config.Version == null || config.Version == 0)
+        if(config.Version == null || config.Version == 1)
         {
             config.AdminRequirement = true;
             config.ModeToLoad = Enums.PluginMode.Base;

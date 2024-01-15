@@ -31,23 +31,6 @@ Already useable modes:<br>
     - Short Freezetime
     - Anything that works in Match mode
 <br>
-Modes planned for the future or are already in progress:<br>
-- Prefire Mode (.prefire)<br>
-    - Add userdefined routes<br>
-    - Weapon menu<br>
-    - Make Bots glow for easy visability<br>
-    - Provide basic prefire routes for competitiv maps<br>
-    - Create a difficulty level (easy/medium/hard)<br>
-<br>
-- Retake mode (.retake) <br>
-    - Create your own retake scenarios<br>
-    - Autoplant bomb<br>
-    - Autodefuse bomb<br>
-<br>
-- Execute mode<br>
-    - Create your own executes<br>
-    - Defend against rushing bots<br>
-    - Take part in the execution<br>
 
 ## Installation Guide
 [![Installation Guide](https://img.youtube.com/vi/ucQsRX_pEXw/0.jpg)](https://www.youtube.com/watch?v=ucQsRX_pEXw) <br>

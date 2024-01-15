@@ -330,6 +330,9 @@ namespace CSPracc.CommandHandler
                         BotManager.MoveBot(player);
                         break;
                     }
+                case PRACC_COMMAND.settings:
+                    PracticeMode.ShowPracticeMenu(player);
+                    break;
                 default:
                     {
                         base.PlayerChat(@event, info);
@@ -352,8 +355,19 @@ namespace CSPracc.CommandHandler
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.SPAWN}{ChatColors.Red} 'number'{ChatColors.White}. Teleports you to the given spawn of your current team.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.TSPAWN}{ChatColors.White}{ChatColors.Red} 'number'{ChatColors.White}. Teleports you to the given spawn of the terrorist team.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.CTSPAWN}{ChatColors.White}{ChatColors.Red} 'number'{ChatColors.White}. Teleports you to the given spawn of the counter-terrorist team.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.bestspawn}{ChatColors.White} Go to the closest spawn of your position.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.worstspawn}{ChatColors.White} Go to the worst spawn of your position.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.NADES}{ChatColors.White}{ChatColors.Blue} [id]{ChatColors.White}. If id is passed an available. Teleport to given nade lineup. Else open nade menu.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.SAVE}{ChatColors.White}{ChatColors.Red} 'name'{ChatColors.White}. Saves current lineup.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.Last}{ChatColors.White} Goto last thrown grenade position.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.BACK}{ChatColors.White}{ChatColors.Blue} [number]{ChatColors.White} Go back in your grenade history, can give a number on how many positions.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.forward}{ChatColors.White}{ChatColors.Blue} [number]{ChatColors.White} Go forward in your grenade history, can give a number on how many positions.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.Rename}{ChatColors.White}{ChatColors.Red} 'new name'{ChatColors.White} Re-name last saved grenade.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.Description}{ChatColors.White}{ChatColors.Red} 'decription'{ChatColors.White} Add description to your last saved grenade.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.AddTag}{ChatColors.White}{ChatColors.Red} 'tag'{ChatColors.White} Add a tag to your last saved grenade.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.RemoveTag}{ChatColors.White}{ChatColors.Red} 'tag'{ChatColors.White} Remove a tag from your last saved grenade.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.ClearTags}{ChatColors.White} Remove all tags from your last saved grenade.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.DeleteTag}{ChatColors.White}{ChatColors.Red} 'tag'{ChatColors.White} Delete a tag from all of your nades.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.SAVELAST}{ChatColors.White}{ChatColors.Red} 'name'{ChatColors.White}. Saves  lineup of last thrown nade.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.rethrow}{ChatColors.White} Rethrows your last grenade.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.BOT}{ChatColors.White} Spawns bot at your current location.");
@@ -361,6 +375,8 @@ namespace CSPracc.CommandHandler
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.CROUCHBOT}{ChatColors.White} Spawns a croucing bot at your current location.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.CROUCHBOOST}{ChatColors.White} Spawns a croucing bot at your current location and teleports you ontop.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.NOBOT}{ChatColors.White} Removes closest bot to your location that you spawned.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.SwapBot}{ChatColors.White} Swap your current position with the closest bot.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.MoveBot}{ChatColors.White} Change the position of the last added bot to your current one.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.CLEARBOTS}{ChatColors.White} Clears all of your bots.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.CLEAR}{ChatColors.White} Clear your smokes / molotovs.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.ClearAll}{ChatColors.White} Clear all smokes / molotovs on the server");
@@ -368,8 +384,9 @@ namespace CSPracc.CommandHandler
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.stop}{ChatColors.White} Stop the flash command.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.noflash}{ChatColors.White} Removing flash effect.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.timer}{ChatColors.White} Toggle Timer. Use command again to stop timer.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.countdown}{ChatColors.Red} 'time in seconds'{ChatColors.White}. Run countdown with given parameter.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.CHECKPOINT}{ChatColors.White} Save current position as checkpoint. Use .back to return.");
-            message.Add($" {ChatColors.Green}{PRACC_COMMAND.BACK}{ChatColors.White} Return to saved checkpoint.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.TELEPORT}{ChatColors.White} Return to saved checkpoint.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.WATCHME}{ChatColors.White} Moves all players except you to spectator.");
 
             foreach (string s in message)

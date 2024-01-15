@@ -62,7 +62,6 @@ namespace CSPracc.EventHandler
         public HookResult OnPlayerSpawn(EventPlayerSpawn @event, GameEventInfo info)
         {
             BotManager!.OnPlayerSpawn(@event, info);
-            Server.PrintToChatAll("OnPlayerSpawn");
             return HookResult.Continue;
         }
 

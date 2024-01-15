@@ -77,5 +77,18 @@ namespace CSPracc
             HtmlMessage htmlMessage = new HtmlMessage(message, timetodisplay);
             GuiManager.Instance!.ShowHtmlMessage(htmlMessage, playerController);
         }
+
+        public static bool GetValueOfCookie(this CCSPlayerController playerController,string Cookie,out string? value)
+        {
+            value = null;
+            if (playerController == null || !playerController.IsValid) { return false; }
+            return CookieManager.GetValueOfCookie(playerController, Cookie, out value);
+        }
+
+        public static bool SetOrAddValueOfCookie(this CCSPlayerController playerController, string Cookie, string value)
+        {
+            if (playerController == null || !playerController.IsValid) { return false; }
+            return CookieManager.AddOrSetValueOfCookie(playerController, Cookie, value);
+        }
     }
 }

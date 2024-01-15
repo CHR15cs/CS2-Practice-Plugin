@@ -135,6 +135,8 @@ namespace CSPracc.DataModules.Constants
         public const string flash = ".flash";
         public const string noflash = ".noflash";
         public const string stop = ".stop";
+
+        public const string settings = ".settings";
     }
 
     public class AdminFlags

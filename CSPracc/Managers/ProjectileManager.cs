@@ -154,14 +154,39 @@ namespace CSPracc
         {
             List<KeyValuePair<string, Action>> nadeOptions = new List<KeyValuePair<string, Action>>();
 
-            foreach (KeyValuePair<int, ProjectileSnapshot> entry in getAllNadesFromPlayer(player.SteamID))
+            player.GetValueOfCookie("PersonalizedNadeMenu", out string? value);
+            string MenuTitle = string.Empty;
+            if(value == null || value == "yes" )
             {
-                if(entry.Value.Tags.Contains(tag) || tag == "")
+                MenuTitle = "Personal Nade Menu";
+                foreach (KeyValuePair<int, ProjectileSnapshot> entry in getAllNadesFromPlayer(player.SteamID))
                 {
-                    nadeOptions.Add(new KeyValuePair<string, Action>($"{entry.Value.Title} ID:{entry.Key}", new Action(() => RestoreSnapshot(player, entry.Key))));
-                }               
+                    if (entry.Value.Tags.Contains(tag) || tag == "" || entry.Value.Title.Contains(tag))
+                    {
+                        nadeOptions.Add(new KeyValuePair<string, Action>($"{entry.Value.Title} ID:{entry.Key}", new Action(() => RestoreSnapshot(player, entry.Key))));
+                    }
+                }
             }
-            HtmlMenu htmlNadeMenu = new HtmlMenu($"Nade Menu [{tag}]", nadeOptions, false); ;
+            else
+            {
+                MenuTitle = "Global Nade Menu";
+                foreach (KeyValuePair<int, ProjectileSnapshot> entry in CurrentProjectileStorage.GetAll())
+                {
+                    if (entry.Value.Tags.Contains(tag) || tag == "")
+                        nadeOptions.Add(new KeyValuePair<string, Action>($"{entry.Value.Title} ID:{entry.Key}", new Action(() => RestoreSnapshot(player, entry.Key))));
+                }
+            }
+
+
+            HtmlMenu htmlNadeMenu;
+            if (tag == "")
+            {
+                htmlNadeMenu = new HtmlMenu($"{MenuTitle}", nadeOptions, false);
+            }
+            else
+            {
+                htmlNadeMenu = new HtmlMenu($"{MenuTitle} [{tag}]", nadeOptions, false);
+            }
             return htmlNadeMenu;
         }
 
@@ -498,7 +523,7 @@ namespace CSPracc
                     if ( projectile.Globalname != "custom" )
                     {
                         ProjectileSnapshot tmpSnapshot = new ProjectileSnapshot(playerPosition.ToVector3(), projectile.InitialPosition.ToVector3(), playerAngle.ToVector3(), projectile.InitialVelocity.ToVector3(), name, description, type);
-                        List<ProjectileSnapshot>? projectileSnapshots = new List<ProjectileSnapshot>();
+                        List<ProjectileSnapshot>? projectileSnapshots = new List<ProjectileSnapshot>();                        
                         if (LastThrownGrenade.ContainsKey((player.SteamID)) && LastThrownGrenade.TryGetValue(player.SteamID, out projectileSnapshots))
                         {
                             if(projectileSnapshots== null)
@@ -506,12 +531,14 @@ namespace CSPracc
                                 projectileSnapshots = new List<ProjectileSnapshot>();
                             }
                             projectileSnapshots.Insert(0, tmpSnapshot);
+                   
                         }
                         else
                         {
                             LastThrownGrenade.SetOrAdd(player.SteamID, new List<ProjectileSnapshot>() { tmpSnapshot });
                         }                      
                     }
+
                 });
 
             if (!PracticeCommandHandler.PraccSmokeColorEnabled) return;
@@ -620,7 +647,6 @@ namespace CSPracc
                         //player.HtmlMessage($".throw does not work for smokegrenades yet!<br>Use \".rcon sv_rethrow_last_grenade\" for those");
                         //return false;
                         cGrenade = Utilities.CreateEntityByName<CSmokeGrenadeProjectile>(DesignerNames.ProjectileSmoke);
-                       
                         cGrenade!.IsSmokeGrenade = true;
                         break;
                     }

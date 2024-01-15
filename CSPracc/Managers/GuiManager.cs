@@ -119,10 +119,10 @@ namespace CSPracc.Managers
                     continue;
                 }
                 string menuText = $"<font color=\"green\">{menu.Title}</font><br>";
-                menuText += $"--------------<br>";
+                //menuText += $"--------------<br>";
                 if (menu.Options == null) continue;
 
-                int maxItemsPerSite = 4;
+                int maxItemsPerSite = 6;
                 for(int i = 0;i< maxItemsPerSite; i++)
                 {
                     if(menu.Options.Count > i + (menu.Page * maxItemsPerSite))
@@ -135,7 +135,7 @@ namespace CSPracc.Managers
                     }
                 }
                 menuText += "<br>";
-                menuText += "_____________<br>";
+               // menuText += "_____________<br>";
                 if(menu.Page > 0) menuText += $"<font color=\"green\">!7</font> - Prev";
                 if((menu.Page +1) * maxItemsPerSite  <  menu.Options.Count) menuText += $"<font color=\"green\">!8</font> - Next";
                 menuText += $"<font color=\"green\">!9</font> - Close";
@@ -212,7 +212,7 @@ namespace CSPracc.Managers
                     return;
                 }
             }
-            if(index == 8 && menu.Page +1 <= menu.Options.Count / 4 )
+            if(index == 8 && menu.Page +1 <= menu.Options.Count / 6 )
             {
                 menu.Page++;
                 return;
@@ -224,7 +224,7 @@ namespace CSPracc.Managers
             }
             if (menu.Options.Count >= index) 
             {
-                Server.NextFrame(menu.Options[menu.Page * 4 + index - 1].Value);
+                Server.NextFrame(menu.Options[menu.Page * 6 + index - 1].Value);
                 if (menu.CloseOnSelect)
                 {
                     htmlMenus.Remove(player.SteamID);

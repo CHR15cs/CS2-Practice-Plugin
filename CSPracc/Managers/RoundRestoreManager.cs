@@ -108,7 +108,6 @@ namespace CSPracc.Managers
             team2 += Convert.ToInt32(firsthalfScore[3]);
             if (content.Contains("SecondHalfScore"))
             {
-                Server.PrintToChatAll("contains second half score");
                  startOfScore = content.IndexOf('{', content.IndexOf("SecondHalfScore")) + 1;
                  endOfScore = content.IndexOf('}', startOfScore) - 1;
                  length = endOfScore - startOfScore;

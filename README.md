@@ -47,3 +47,6 @@ https://github.com/splewis/get5<br>
 https://github.com/splewis/csgo-practice-mode<br>
 Coach Slot: https://github.com/marqdevx/mm-cs2-coach <br>
 
+## Support the work
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V7QB5ZW)
+

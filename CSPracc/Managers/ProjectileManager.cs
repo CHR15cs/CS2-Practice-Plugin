@@ -33,9 +33,9 @@ namespace CSPracc
         /// <summary>
         /// Save history of thrown grenades
         /// </summary>
-        public Dictionary<ulong,List< ProjectileSnapshot>> LastThrownGrenade
+        public Dictionary<ulong, List<ProjectileSnapshot>> LastThrownGrenade
         {
-            get;set;
+            get; set;
         } = new Dictionary<ulong, List<ProjectileSnapshot>>();
         /// <summary>
         /// List of plugin re-thrown grenades
@@ -54,7 +54,7 @@ namespace CSPracc
         /// <summary>
         /// Saved positions for .flash command
         /// </summary>
-        Dictionary<ulong,Position> FlashPosition
+        Dictionary<ulong, Position> FlashPosition
         {
             get; set;
         } = new Dictionary<ulong, Position>();
@@ -132,16 +132,16 @@ namespace CSPracc
 
 
             ProjectileSnapshot? latestSnapshot = getLatestProjectileSnapshot(player.SteamID);
-            if(latestSnapshot != null)
+            if (latestSnapshot != null)
             {
                 nadeOptions.Add(new KeyValuePair<string, Action>($"Your last thrown projectile", new Action(() => RestorePlayersLastThrownGrenade(player))));
             }
 
             foreach (KeyValuePair<int, ProjectileSnapshot> entry in CurrentProjectileStorage.GetAll())
             {
-                nadeOptions.Add(new KeyValuePair<string, Action>($"{entry.Value.Title} ID:{entry.Key}", new Action(() => RestoreSnapshot(player, entry.Key))));              
+                nadeOptions.Add(new KeyValuePair<string, Action>($"{entry.Value.Title} ID:{entry.Key}", new Action(() => RestoreSnapshot(player, entry.Key))));
             }
-           HtmlMenu htmlNadeMenu =  new HtmlMenu("Nade Menu", nadeOptions, false); ;        
+            HtmlMenu htmlNadeMenu = new HtmlMenu("Nade Menu", nadeOptions, false); ;
             return htmlNadeMenu;
         }
 
@@ -150,18 +150,18 @@ namespace CSPracc
         /// </summary>
         /// <param name="player">player who called the nade menu</param>
         /// <returns></returns>
-        public HtmlMenu GetPlayerBasedNadeMenu(CCSPlayerController player,string tag)
+        public HtmlMenu GetPlayerBasedNadeMenu(CCSPlayerController player, string tag, string name = "")
         {
             List<KeyValuePair<string, Action>> nadeOptions = new List<KeyValuePair<string, Action>>();
 
             player.GetValueOfCookie("PersonalizedNadeMenu", out string? value);
             string MenuTitle = string.Empty;
-            if(value == null || value == "yes" )
+            if (value == null || value == "yes")
             {
                 MenuTitle = "Personal Nade Menu";
                 foreach (KeyValuePair<int, ProjectileSnapshot> entry in getAllNadesFromPlayer(player.SteamID))
                 {
-                    if (entry.Value.Tags.Contains(tag) || tag == "" || entry.Value.Title.Contains(tag))
+                    if (entry.Value.Tags.Contains(tag) || tag == "" || entry.Value.Title.Contains(tag) && entry.Value.Title.Contains(name))
                     {
                         nadeOptions.Add(new KeyValuePair<string, Action>($"{entry.Value.Title} ID:{entry.Key}", new Action(() => RestoreSnapshot(player, entry.Key))));
                     }
@@ -172,12 +172,10 @@ namespace CSPracc
                 MenuTitle = "Global Nade Menu";
                 foreach (KeyValuePair<int, ProjectileSnapshot> entry in CurrentProjectileStorage.GetAll())
                 {
-                    if (entry.Value.Tags.Contains(tag) || tag == "")
+                    if (entry.Value.Tags.Contains(tag) || tag == "" && entry.Value.Title.Contains(name))
                         nadeOptions.Add(new KeyValuePair<string, Action>($"{entry.Value.Title} ID:{entry.Key}", new Action(() => RestoreSnapshot(player, entry.Key))));
                 }
             }
-
-
             HtmlMenu htmlNadeMenu;
             if (tag == "")
             {
@@ -188,7 +186,7 @@ namespace CSPracc
                 htmlNadeMenu = new HtmlMenu($"{MenuTitle} [{tag}]", nadeOptions, false);
             }
             return htmlNadeMenu;
-        }
+        }     
 
         /// <summary>
         /// Restoring the last thrown smoke
@@ -196,25 +194,25 @@ namespace CSPracc
         /// <param name="player"></param>
         public void RestorePlayersLastThrownGrenade(CCSPlayerController player, int count = 1)
         {
-            if(player == null || !player.IsValid) return;
+            if (player == null || !player.IsValid) return;
 
-            if(!LastThrownGrenade.TryGetValue(player.SteamID,out List<ProjectileSnapshot>? snapshots))
+            if (!LastThrownGrenade.TryGetValue(player.SteamID, out List<ProjectileSnapshot>? snapshots))
             {
                 Utils.ClientChatMessage($"{ChatColors.Red}Failed to get your last grenades", player);
                 return;
             }
-            if(snapshots == null)
+            if (snapshots == null)
             {
                 Utils.ClientChatMessage($"{ChatColors.Red}You did not throw any grenades yet.", player);
                 return;
             }
 
-            if(!playerGrenadeHistorePosition.TryGetValue(player.SteamID,out int pos))
+            if (!playerGrenadeHistorePosition.TryGetValue(player.SteamID, out int pos))
             {
                 pos = -1;
                 playerGrenadeHistorePosition.SetOrAdd(player.SteamID, pos);
             }
-            if(count == -1)
+            if (count == -1)
             {
                 snapshots[0].Restore(player);
                 return;
@@ -226,7 +224,7 @@ namespace CSPracc
                 Utils.ClientChatMessage($"You did not throw that many grenades yet", player);
             }
             ProjectileSnapshot? snapshot = snapshots[pos];
-            if(snapshot != null)
+            if (snapshot != null)
             {
                 playerGrenadeHistorePosition.SetOrAdd(player.SteamID, pos);
                 snapshot.Restore(player);
@@ -275,6 +273,64 @@ namespace CSPracc
             player.PrintToCenter("You did not throw a projectile yet!");
         }
 
+
+        /// <summary>
+        /// Get the last projectilesnapshot a player added
+        /// </summary>
+        /// <param name="steamId">player</param>
+        /// <returns>snapshot</returns>
+        public void ShowAllAvailableTags(ulong steamId)
+        {
+            CCSPlayerController? player = Utilities.GetPlayerFromSteamId(steamId);
+            if (player == null || !player.IsValid) return;
+
+            List<string> tags = new List<string>();
+            player.GetValueOfCookie("PersonalizedNadeMenu", out string? value);
+            string MenuTitle = string.Empty;
+            List<KeyValuePair<int, ProjectileSnapshot>> nadeList = new List<KeyValuePair<int, ProjectileSnapshot>>();
+            if (value == null || value == "yes")
+            {
+                nadeList = getAllNadesFromPlayer(steamId);
+            }
+            else
+            {
+                nadeList = CurrentProjectileStorage.GetAll();
+            }
+
+            foreach(KeyValuePair<int,ProjectileSnapshot> nade in nadeList)
+            {
+                foreach(string tag in nade.Value.Tags)
+                {
+                    if(!tags.Contains(tag))
+                    {
+                        tags.Add(tag);
+                    }
+                }
+            }
+            Utils.ClientChatMessage($"Your currently available tags: {ChatColors.Green}{String.Join(", ",tags)}", player);
+        }
+
+
+        /// <summary>
+        /// Set the last projectilesnapshot a player added
+        /// </summary>
+        /// <param name="steamId">player</param>
+        /// <returns>snapshot</returns>
+        public void SetLastAddedProjectileSnapshot(ulong steamId, int snapshotid)
+        {
+            if(CurrentProjectileStorage.Get(snapshotid, out ProjectileSnapshot? snapshot))
+            {
+                if(snapshot != null)
+                {
+                    if(snapshot.initialThrower == 0 || snapshot.initialThrower == steamId)
+                    {
+                        lastSavedNade.SetOrAdd(steamId, snapshotid);
+                        Utils.ClientChatMessage($"You can now edit {snapshot.Title}",steamId);
+                    }
+                }               
+            }
+        }
+                
         /// <summary>
         /// Get the last projectilesnapshot a player added
         /// </summary>
@@ -292,7 +348,7 @@ namespace CSPracc
             CurrentProjectileStorage.Get(snapshotid, out ProjectileSnapshot? snapshot);
 
             if(snapshot == null) return new KeyValuePair<int, ProjectileSnapshot>();
-            if (snapshot.initialThrower != steamId)
+            if (snapshot.initialThrower != steamId && snapshot.initialThrower != 0)
             {
                 return new KeyValuePair<int, ProjectileSnapshot>();
             }

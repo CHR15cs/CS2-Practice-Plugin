@@ -88,12 +88,12 @@ namespace CSPracc.Modes
             base.GuiManager.StartCountdown(player,countdown);
         }
 
-        public void ShowPlayerBasedNadeMenu(CCSPlayerController player,string tag = "")
+        public void ShowPlayerBasedNadeMenu(CCSPlayerController player,string tag = "",string name="")
         {
             if (player == null) return;
             if(!player.IsValid) return;
 
-            GuiManager.AddMenu(player.SteamID, projectileManager.GetPlayerBasedNadeMenu(player,tag));            
+            GuiManager.AddMenu(player.SteamID, projectileManager.GetPlayerBasedNadeMenu(player,tag,name));            
         }
 
 

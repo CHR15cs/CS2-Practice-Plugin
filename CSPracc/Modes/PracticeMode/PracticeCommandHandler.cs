@@ -333,6 +333,23 @@ namespace CSPracc.CommandHandler
                 case PRACC_COMMAND.settings:
                     PracticeMode.ShowPracticeMenu(player);
                     break;
+                case PRACC_COMMAND.editnade:
+                    if (args.Length > 0)
+                    {
+                        if (int.TryParse(args, out int id))
+                        {
+                            ProjectileManager.SetLastAddedProjectileSnapshot(player.SteamID,id);
+                            break;
+                        }
+                        Utils.ClientChatMessage("Invalid parameter id", player);                       
+                    }                  
+                    break;
+                case PRACC_COMMAND.showtags:
+                    ProjectileManager.ShowAllAvailableTags(player.SteamID);
+                    break;
+                case PRACC_COMMAND.find:
+                    PracticeMode.ShowPlayerBasedNadeMenu(player, "", args);
+                    break;
                 default:
                     {
                         base.PlayerChat(@event, info);
@@ -359,15 +376,18 @@ namespace CSPracc.CommandHandler
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.worstspawn}{ChatColors.White} Go to the worst spawn of your position.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.NADES}{ChatColors.White}{ChatColors.Blue} [id]{ChatColors.White}. If id is passed an available. Teleport to given nade lineup. Else open nade menu.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.SAVE}{ChatColors.White}{ChatColors.Red} 'name'{ChatColors.White}. Saves current lineup.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.settings}{ChatColors.White} Switch between global or personalized nade menu.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.Last}{ChatColors.White} Goto last thrown grenade position.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.BACK}{ChatColors.White}{ChatColors.Blue} [number]{ChatColors.White} Go back in your grenade history, can give a number on how many positions.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.forward}{ChatColors.White}{ChatColors.Blue} [number]{ChatColors.White} Go forward in your grenade history, can give a number on how many positions.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.Rename}{ChatColors.White}{ChatColors.Red} 'new name'{ChatColors.White} Re-name last saved grenade.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.editnade}{ChatColors.White}{ChatColors.Red} 'nade id'{ChatColors.White} Select the specified nade to using editing commands.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.Description}{ChatColors.White}{ChatColors.Red} 'decription'{ChatColors.White} Add description to your last saved grenade.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.AddTag}{ChatColors.White}{ChatColors.Red} 'tag'{ChatColors.White} Add a tag to your last saved grenade.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.RemoveTag}{ChatColors.White}{ChatColors.Red} 'tag'{ChatColors.White} Remove a tag from your last saved grenade.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.ClearTags}{ChatColors.White} Remove all tags from your last saved grenade.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.DeleteTag}{ChatColors.White}{ChatColors.Red} 'tag'{ChatColors.White} Delete a tag from all of your nades.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.showtags}{ChatColors.White} Show all available tags from your currently selected nade menu. To change the nade menu use .settings .");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.SAVELAST}{ChatColors.White}{ChatColors.Red} 'name'{ChatColors.White}. Saves  lineup of last thrown nade.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.rethrow}{ChatColors.White} Rethrows your last grenade.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.BOT}{ChatColors.White} Spawns bot at your current location.");

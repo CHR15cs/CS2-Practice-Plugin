@@ -96,6 +96,7 @@ namespace CSPracc.DataModules.Constants
         public const string TSPAWN = ".tspawn";
         public const string CTSPAWN = ".ctspawn";           
         public const string NADES = ".nades";
+        public const string find = ".find";
         public const string SAVE = ".save";
         public const string Description = ".desc";
         public const string Rename = ".rename";
@@ -137,6 +138,8 @@ namespace CSPracc.DataModules.Constants
         public const string stop = ".stop";
 
         public const string settings = ".settings";
+        public const string editnade = ".editnade";
+        public const string showtags = ".showtags";
     }
 
     public class AdminFlags

@@ -138,6 +138,19 @@ namespace CSPracc
                     return Color.Red;
             }
         }
+
+        public static void BreakAll()
+        {
+            var props = Utilities.FindAllEntitiesByDesignerName<CBreakable>("prop_dynamic")
+                .Concat(Utilities.FindAllEntitiesByDesignerName<CBreakable>("func_breakable"));
+            foreach(var prop in props)
+            {
+                if(prop != null && prop.IsValid)
+                {
+                    prop.AcceptInput("break");
+                }
+            }
+        }
     }
 
 }

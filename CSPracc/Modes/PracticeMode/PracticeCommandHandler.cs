@@ -16,6 +16,7 @@ using CounterStrikeSharp.API.Modules.Memory;
 using CSPracc.Modes;
 using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
 using System.Reflection.Metadata.Ecma335;
+using CounterStrikeSharp.API.Modules.Cvars;
 
 namespace CSPracc.CommandHandler
 {
@@ -92,6 +93,7 @@ namespace CSPracc.CommandHandler
                             else if (int.TryParse(args, out int id))
                             {
                                 ProjectileManager.RestoreSnapshot(player, id);
+                                ProjectileManager.SetLastAddedProjectileSnapshot(player.SteamID, id);
                                 break;
                             }
                             else
@@ -350,6 +352,24 @@ namespace CSPracc.CommandHandler
                 case PRACC_COMMAND.find:
                     PracticeMode.ShowPlayerBasedNadeMenu(player, "", args);
                     break;
+                case PRACC_COMMAND.breakstuff:
+                    Utils.BreakAll();
+                    break;
+                case PRACC_COMMAND.impacts:
+                    ConVar? showimpacts = ConVar.Find("sv_showimpacts");
+                    if (showimpacts == null) return false;
+                    int currVal = showimpacts.GetPrimitiveValue<int>();
+                    if(currVal != 0)
+                    {
+                        Utils.ServerMessage("Disabling impacts.");
+                        Server.ExecuteCommand("sv_showimpacts 0");
+                    }
+                    else
+                    {
+                        Utils.ServerMessage("Enabling impacts.");
+                        Server.ExecuteCommand("sv_showimpacts 1");
+                    }
+                    break;
                 default:
                     {
                         base.PlayerChat(@event, info);
@@ -375,6 +395,7 @@ namespace CSPracc.CommandHandler
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.bestspawn}{ChatColors.White} Go to the closest spawn of your position.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.worstspawn}{ChatColors.White} Go to the worst spawn of your position.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.NADES}{ChatColors.White}{ChatColors.Blue} [id]{ChatColors.White}. If id is passed an available. Teleport to given nade lineup. Else open nade menu.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.find}{ChatColors.White}{ChatColors.Red} 'name'{ChatColors.White}. Open nade menu containing nades which contain the given keyword.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.SAVE}{ChatColors.White}{ChatColors.Red} 'name'{ChatColors.White}. Saves current lineup.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.settings}{ChatColors.White} Switch between global or personalized nade menu.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.Last}{ChatColors.White} Goto last thrown grenade position.");
@@ -408,6 +429,8 @@ namespace CSPracc.CommandHandler
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.CHECKPOINT}{ChatColors.White} Save current position as checkpoint. Use .back to return.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.TELEPORT}{ChatColors.White} Return to saved checkpoint.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.WATCHME}{ChatColors.White} Moves all players except you to spectator.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.breakstuff}{ChatColors.White} Breaks all breakable stuff.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.impacts}{ChatColors.White} Toggle impacts.");
 
             foreach (string s in message)
             {

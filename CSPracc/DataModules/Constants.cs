@@ -140,6 +140,9 @@ namespace CSPracc.DataModules.Constants
         public const string settings = ".settings";
         public const string editnade = ".editnade";
         public const string showtags = ".showtags";
+
+        public const string breakstuff = ".break";
+        public const string impacts = ".impacts";
     }
 
     public class AdminFlags

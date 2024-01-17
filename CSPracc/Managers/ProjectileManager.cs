@@ -139,7 +139,13 @@ namespace CSPracc
 
             foreach (KeyValuePair<int, ProjectileSnapshot> entry in CurrentProjectileStorage.GetAll())
             {
-                nadeOptions.Add(new KeyValuePair<string, Action>($"{entry.Value.Title} ID:{entry.Key}", new Action(() => RestoreSnapshot(player, entry.Key))));
+                nadeOptions.Add(new KeyValuePair<string, Action>($"{entry.Value.Title} ID:{entry.Key}", new Action(() =>
+
+                {
+
+                    RestoreSnapshot(player, entry.Key);
+                    SetLastAddedProjectileSnapshot(player.SteamID, entry.Key);
+                    })));
             }
             HtmlMenu htmlNadeMenu = new HtmlMenu("Nade Menu", nadeOptions, false); ;
             return htmlNadeMenu;
@@ -163,7 +169,11 @@ namespace CSPracc
                 {
                     if (entry.Value.Tags.Contains(tag) || tag == "" || entry.Value.Title.Contains(tag) && entry.Value.Title.Contains(name))
                     {
-                        nadeOptions.Add(new KeyValuePair<string, Action>($"{entry.Value.Title} ID:{entry.Key}", new Action(() => RestoreSnapshot(player, entry.Key))));
+                        nadeOptions.Add(new KeyValuePair<string, Action>($"{entry.Value.Title} ID:{entry.Key}", new Action(() => {
+
+                            RestoreSnapshot(player, entry.Key);
+                            SetLastAddedProjectileSnapshot(player.SteamID, entry.Key);
+                        })));
                     }
                 }
             }
@@ -173,7 +183,11 @@ namespace CSPracc
                 foreach (KeyValuePair<int, ProjectileSnapshot> entry in CurrentProjectileStorage.GetAll())
                 {
                     if (entry.Value.Tags.Contains(tag) || tag == "" && entry.Value.Title.Contains(name))
-                        nadeOptions.Add(new KeyValuePair<string, Action>($"{entry.Value.Title} ID:{entry.Key}", new Action(() => RestoreSnapshot(player, entry.Key))));
+                        nadeOptions.Add(new KeyValuePair<string, Action>($"{entry.Value.Title} ID:{entry.Key}", new Action(() => {
+
+                            RestoreSnapshot(player, entry.Key);
+                            SetLastAddedProjectileSnapshot(player.SteamID, entry.Key);
+                        })));
                 }
             }
             HtmlMenu htmlNadeMenu;
@@ -453,14 +467,16 @@ namespace CSPracc
         public void RemoveSnapshot(CCSPlayerController player, string args)
         {
             if (player == null) return;
-            if (args == String.Empty) return;
+            //if (args == String.Empty) return;
             args = args.Trim();
             int id = -1;
-            if(args.Length == 0)
+            if(args == String.Empty)
             {
                KeyValuePair<int,ProjectileSnapshot> snapshot = getLastAddedProjectileSnapshot(player.SteamID);
                 CurrentProjectileStorage.RemoveKey(snapshot.Key);
+                CurrentProjectileStorage.Save();
                 player.PrintToCenter($"Removed the last added grenade: {snapshot.Value.Title}");
+                return;
             }
             try
             {

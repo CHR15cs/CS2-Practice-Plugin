@@ -475,7 +475,7 @@ namespace CSPracc
                KeyValuePair<int,ProjectileSnapshot> snapshot = getLastAddedProjectileSnapshot(player.SteamID);
                 CurrentProjectileStorage.RemoveKey(snapshot.Key);
                 CurrentProjectileStorage.Save();
-                player.PrintToCenter($"Removed the last added grenade: {snapshot.Value.Title}");
+                Utils.ClientChatMessage($"Removed the last added grenade: {snapshot.Value.Title}",player);
                 return;
             }
             try

@@ -65,6 +65,7 @@ namespace CSPracc.Modes
 
         public virtual void Dispose()
         {
+            GuiManager.Dispose();
             EventHandler?.Dispose();
         }
 

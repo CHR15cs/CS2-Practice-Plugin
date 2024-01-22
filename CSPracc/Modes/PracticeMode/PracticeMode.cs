@@ -15,7 +15,7 @@ namespace CSPracc.Modes
 {
     public class PracticeMode : BaseMode
     {
-
+        BotReplayManager BotReplayManager { get; set; }
         public HtmlMenu GetPracticeSettingsMenu(CCSPlayerController ccsplayerController)
         {
             HtmlMenu practiceMenu;
@@ -74,6 +74,7 @@ namespace CSPracc.Modes
         {
             projectileManager = new ProjectileManager();
             PracticeBotManager = new PracticeBotManager();
+            BotReplayManager = new BotReplayManager(ref PracticeBotManager, ref projectileManager);  
         }
 
         public void StartTimer(CCSPlayerController player)
@@ -118,6 +119,26 @@ namespace CSPracc.Modes
             if (player == null) return;
             if (!player.IsValid) return;
             GuiManager.AddMenu(player.SteamID,GetPracticeSettingsMenu(player));
+        }
+
+        public void Record(CCSPlayerController playerController)
+        {
+            BotReplayManager.RecordPlayer(playerController);
+        }
+
+        public void StopRecord(CCSPlayerController playerController)
+        {
+            BotReplayManager.StopRecording(playerController);
+        }
+
+        public void ReplayLastRecord(CCSPlayerController playerController)
+        {
+            BotReplayManager.ReplayLastReplay(playerController);
+        }
+        public override void Dispose()
+        {
+            projectileManager.Dispose();
+            base.Dispose();
         }
     }
 }

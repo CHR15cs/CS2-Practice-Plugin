@@ -79,7 +79,8 @@ namespace CSPracc.EventHandler
             GameEventHandler<EventSmokegrenadeDetonate> smokegrenadedetonate = ProjectileManager.OnSmokeDetonate;
             Plugin.DeregisterEventHandler("smokegrenade_detonate", smokegrenadedetonate, true);
 
-            Plugin.RemoveListener("OnEntitySpawned", ProjectileManager.OnEntitySpawned);
+            Listeners.OnEntitySpawned onEntitySpawned = new Listeners.OnEntitySpawned(ProjectileManager.OnEntitySpawned);
+            Plugin.RemoveListener("OnEntitySpawned", onEntitySpawned);
 
             base.Dispose();
         }

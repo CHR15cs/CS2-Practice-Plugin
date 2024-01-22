@@ -4,9 +4,11 @@ using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Menu;
 using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.DataModules;
+using CSPracc.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -94,7 +96,8 @@ namespace CSPracc.Managers
 
         public void Dispose()
         {
-            CSPraccPlugin.Instance!.RemoveListener("OnTick", OnTick);
+            Listeners.OnTick onTick = new Listeners.OnTick(OnTick);
+            CSPraccPlugin.Instance!.RemoveListener("OnTick", onTick);
             CSPraccPlugin.Instance!.RemoveCommand("css_1", Selection);
             CSPraccPlugin.Instance!.RemoveCommand("css_2", Selection);
             CSPraccPlugin.Instance!.RemoveCommand("css_3", Selection);
@@ -119,25 +122,21 @@ namespace CSPracc.Managers
                     continue;
                 }
                 string menuText = $"<font color=\"green\">{menu.Title}</font><br>";
-                //menuText += $"--------------<br>";
                 if (menu.Options == null) continue;
 
-                int maxItemsPerSite = 6;
-                for(int i = 0;i< maxItemsPerSite; i++)
+                for(int option = 0; option < menu.MenuPages[menu.Page].Count;option++)
                 {
-                    if(menu.Options.Count > i + (menu.Page * maxItemsPerSite))
+                    menuText += $"<font color=\"green\">!{option + 1}</font>) {menu.MenuPages[menu.Page][option].Key}";
+                    if(option +1 < menu.MenuPages[menu.Page].Count)
                     {
-                        menuText += $"<font color=\"green\">!{i+1}</font> - {menu.Options[i + (menu.Page * maxItemsPerSite)].Key}";
-                        if (i +1 < maxItemsPerSite)
-                        {
-                            menuText += "<br>";
-                        }
+                        menuText += "<br>";
                     }
                 }
+
                 menuText += "<br>";
                // menuText += "_____________<br>";
                 if(menu.Page > 0) menuText += $"<font color=\"green\">!7</font> - Prev";
-                if((menu.Page +1) * maxItemsPerSite  <  menu.Options.Count) menuText += $"<font color=\"green\">!8</font> - Next";
+                if(menu.MenuPages.Count > menu.Page +1) menuText += $"<font color=\"green\">!8</font> - Next";
                 menuText += $"<font color=\"green\">!9</font> - Close";
                 player.PrintToCenterHtml(menuText);
             }
@@ -187,34 +186,38 @@ namespace CSPracc.Managers
 
         public void Selection(CCSPlayerController? player, CommandInfo command)
         {
-            if(player == null) return;
+            if (player == null) return;
             if (!player.IsValid) return;
 
             if (!htmlMenus.TryGetValue(player.SteamID, out HtmlMenu? menu))
             {
                 return;
             }
-            if(menu == null) return;
+            if (menu == null) return;
             string selectedOption = command.GetCommandString;
             if (selectedOption.StartsWith("css_"))
             {
-               selectedOption = selectedOption.Substring(4);
+                selectedOption = selectedOption.Substring(4);
             }
-            if(!int.TryParse(selectedOption, out int index))
+            if (!int.TryParse(selectedOption, out int index))
             {
                 return;
             }
+            int maxItems = menu.MenuPages[menu.Page].Count;
             if(index == 7)
             {
                 if(menu.Page > 0)
                 {
-                    menu.Page--;
-                    return;
+                    menu.Page--;                  
                 }
+                return;
             }
-            if(index == 8 && menu.Page +1 <= menu.Options.Count / 6 )
+            if (index == 8)
             {
-                menu.Page++;
+                if(menu.Page + 1 < menu.MenuPages.Count)
+                {
+                    menu.Page++;
+                }               
                 return;
             }
             if(index == 9)
@@ -222,9 +225,9 @@ namespace CSPracc.Managers
                 htmlMenus.Remove(player.SteamID);
                 return;
             }
-            if (menu.Options.Count >= index) 
+            if (menu.MenuPages[menu.Page].Count >= index)
             {
-                Server.NextFrame(menu.Options[menu.Page * 6 + index - 1].Value);
+                Server.NextFrame(menu.MenuPages[menu.Page][index-1].Value);
                 if (menu.CloseOnSelect)
                 {
                     htmlMenus.Remove(player.SteamID);

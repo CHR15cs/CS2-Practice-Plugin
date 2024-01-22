@@ -173,12 +173,14 @@ namespace CSPracc.CommandHandler
                     }
                 case PRACC_COMMAND.CLEAR:
                     {
-                        Utils.RemoveGrenadeEntitiesFromPlayer(player);
+                        ProjectileManager.ClearNades(player, false);
+                        //Utils.RemoveGrenadeEntitiesFromPlayer(player);
                         break;
                     }
                 case PRACC_COMMAND.ClearAll:
                     {
-                        Utils.RemoveGrenadeEntities();
+                        ProjectileManager.ClearNades(player, true);
+                        //Utils.RemoveGrenadeEntities();
                         break;
                     }
                 case PRACC_COMMAND.SAVELAST:
@@ -233,7 +235,7 @@ namespace CSPracc.CommandHandler
                     }
                 case PRACC_COMMAND.rethrow:
                     {                                              
-                        ProjectileManager.ReThrow(player);
+                        ProjectileManager.ReThrow(player,args);
                         break;
                     }
                 case PRACC_COMMAND.flash:
@@ -369,6 +371,18 @@ namespace CSPracc.CommandHandler
                         Utils.ServerMessage("Enabling impacts.");
                         Server.ExecuteCommand("sv_showimpacts 1");
                     }
+                    break;
+                case ".record":
+                    PracticeMode.Record(player);
+                    player.HtmlMessage("Recording replay");
+                    break;
+                case ".stoprecord":
+                    PracticeMode.StopRecord(player);
+                    player.HtmlMessage("Stopped recording.");
+                    break;
+                case ".replay":
+                    PracticeMode.ReplayLastRecord(player);
+                    player.HtmlMessage("Start replaying.");
                     break;
                 default:
                     {

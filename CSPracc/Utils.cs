@@ -25,7 +25,11 @@ namespace CSPracc
             {
                 if (entity != null)
                 {
-                    CCSPlayerController thrower = new CCSPlayerController(entity.Thrower.Value.Controller.Value.Handle);
+                    CCSPlayerController? thrower = new CCSPlayerController(entity.Thrower.Value.Controller.Value.Handle);
+                    if(thrower == null)
+                    {                      
+                        return;
+                    }
                     if (thrower.Handle == player.Handle)
                     {
                         entity.Remove();

@@ -184,7 +184,7 @@ namespace CSPracc.CommandHandler
             {
                 case BASE_COMMAND.HELP:
                     {
-                        PrintHelp(player);
+                        PrintHelp(player, args.Trim());
                         break;
                     }
                 case BASE_COMMAND.MODE:
@@ -417,7 +417,7 @@ namespace CSPracc.CommandHandler
             Server.ExecuteCommand(args);
         }
 
-        public virtual void PrintHelp(CCSPlayerController? player)
+        public virtual void PrintHelp(CCSPlayerController? player, string args = "")
         {
             List<string> message = new List<string>();
             message.Add($" {CSPraccPlugin.Instance!.Config.ChatPrefix} Command list:");
@@ -437,7 +437,10 @@ namespace CSPracc.CommandHandler
             message.Add($" {ChatColors.Green}{BASE_COMMAND.HELP}{ChatColors.White} This command.");
             foreach (string s in message)
             {
-                player?.PrintToChat(s);
+                if( args == "" || s.ToLower().Contains(args.ToLower()))
+                {
+                    player?.PrintToChat(s);
+                }                
             }
         }
 

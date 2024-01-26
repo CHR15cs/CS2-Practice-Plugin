@@ -90,5 +90,11 @@ namespace CSPracc
             if (playerController == null || !playerController.IsValid) { return false; }
             return CookieManager.AddOrSetValueOfCookie(playerController, Cookie, value);
         }
+
+        public static void ChatMessage(this CCSPlayerController playerController, string message)
+        {
+            if (playerController == null || !playerController.IsValid) { return; }
+            playerController.PrintToChat($"{CSPraccPlugin.Instance!.Config!.ChatPrefix} {message}");
+        }
     }
 }

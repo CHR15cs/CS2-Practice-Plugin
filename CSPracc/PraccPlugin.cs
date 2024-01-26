@@ -44,7 +44,7 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
     {
         get
         {
-            return "0.9.2.1";
+            return "1.0.0.0";
         }
     }
 

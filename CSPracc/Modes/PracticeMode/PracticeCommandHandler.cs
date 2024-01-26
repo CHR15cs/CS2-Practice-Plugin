@@ -98,7 +98,7 @@ namespace CSPracc.CommandHandler
                             }
                             else
                             {
-                                PracticeMode.ShowPlayerBasedNadeMenu(player,args);
+                                PracticeMode.ShowPlayerBasedNadeMenu(player,args.ToLower());
                                 break;
                             }
                             player.PrintToCenter("Could not parse argument for nade menu");
@@ -173,17 +173,12 @@ namespace CSPracc.CommandHandler
                     }
                 case PRACC_COMMAND.CLEAR:
                     {
-                        Utils.RemoveGrenadeEntitiesFromPlayer(player);
+                        ProjectileManager.ClearNades(player, false);
                         break;
                     }
                 case PRACC_COMMAND.ClearAll:
                     {
-                        Utils.RemoveGrenadeEntities();
-                        break;
-                    }
-                case PRACC_COMMAND.SAVELAST:
-                    {
-                        ProjectileManager.SaveLastGrenade(player, args);
+                        ProjectileManager.ClearNades(player, true);
                         break;
                     }
                 case PRACC_COMMAND.CHECKPOINT:
@@ -233,7 +228,7 @@ namespace CSPracc.CommandHandler
                     }
                 case PRACC_COMMAND.rethrow:
                     {                                              
-                        ProjectileManager.ReThrow(player);
+                        ProjectileManager.ReThrow(player,args);
                         break;
                     }
                 case PRACC_COMMAND.flash:
@@ -254,6 +249,11 @@ namespace CSPracc.CommandHandler
                 case PRACC_COMMAND.Description:
                     {
                         ProjectileManager.AddDescription(player.SteamID, args);
+                        break;
+                    }
+                case PRACC_COMMAND.delay:
+                    {
+                        ProjectileManager.SetDelay(player.SteamID, args);
                         break;
                     }
                 case PRACC_COMMAND.Rename:
@@ -370,6 +370,27 @@ namespace CSPracc.CommandHandler
                         Server.ExecuteCommand("sv_showimpacts 1");
                     }
                     break;
+                case PRACC_COMMAND.mimic_menu:
+                    PracticeMode.ShowMimicMenu(player);
+                    break;
+                case PRACC_COMMAND.create_replay:
+                    PracticeMode.CreateReplay(player, args);
+                    break;
+                case PRACC_COMMAND.record_role:
+                    PracticeMode.Record(player,args);
+                    break;
+                case PRACC_COMMAND.stoprecord:
+                    PracticeMode.StopRecord(player);
+                    break;
+                case PRACC_COMMAND.store_replay:
+                    PracticeMode.StoreLastReplay(player);
+                    break;
+                case PRACC_COMMAND.rename_replayset:
+                    PracticeMode.RenameCurrentReplaySet(player, args);
+                    break;
+                case PRACC_COMMAND.replay_menu:
+                    PracticeMode.ShowMimcReplays(player);
+                    break;
                 default:
                     {
                         base.PlayerChat(@event, info);
@@ -385,9 +406,9 @@ namespace CSPracc.CommandHandler
             base.Dispose();
         }
 
-        public override void PrintHelp(CCSPlayerController? player)
+        public override void PrintHelp(CCSPlayerController? player, string args = "")
         {
-            base.PrintHelp(player);
+            base.PrintHelp(player, args);
             List<string> message = new List<string>();
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.SPAWN}{ChatColors.Red} 'number'{ChatColors.White}. Teleports you to the given spawn of your current team.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.TSPAWN}{ChatColors.White}{ChatColors.Red} 'number'{ChatColors.White}. Teleports you to the given spawn of the terrorist team.");
@@ -434,7 +455,10 @@ namespace CSPracc.CommandHandler
 
             foreach (string s in message)
             {
-                player?.PrintToChat(s);
+                if (args == "" || s.ToLower().Contains(args.ToLower()))
+                {
+                    player?.PrintToChat(s);
+                }
             }
         }
     }

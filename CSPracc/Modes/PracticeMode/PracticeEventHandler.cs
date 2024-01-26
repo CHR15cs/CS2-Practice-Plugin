@@ -41,7 +41,7 @@ namespace CSPracc.EventHandler
             BotManager = botManager;
             PracticeCommandHandler = pch;
         }
-
+        
         public HookResult OnPlayerBlind(EventPlayerBlind @event, GameEventInfo info)
         {
             Methods.MsgToServer($" {ChatColors.Red}{@event.Attacker.PlayerName}{ChatColors.White} flashed {ChatColors.Blue}{@event.Userid.PlayerName}{ChatColors.White} for {ChatColors.Green}{@event.BlindDuration.ToString("0.00")}s");
@@ -79,7 +79,8 @@ namespace CSPracc.EventHandler
             GameEventHandler<EventSmokegrenadeDetonate> smokegrenadedetonate = ProjectileManager.OnSmokeDetonate;
             Plugin.DeregisterEventHandler("smokegrenade_detonate", smokegrenadedetonate, true);
 
-            Plugin.RemoveListener("OnEntitySpawned", ProjectileManager.OnEntitySpawned);
+            Listeners.OnEntitySpawned onEntitySpawned = new Listeners.OnEntitySpawned(ProjectileManager.OnEntitySpawned);
+            Plugin.RemoveListener("OnEntitySpawned", onEntitySpawned);
 
             base.Dispose();
         }

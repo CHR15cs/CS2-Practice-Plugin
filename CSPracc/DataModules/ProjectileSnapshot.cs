@@ -25,6 +25,8 @@ namespace CSPracc.DataModules
         public System.Numerics.Vector3 Velocity { get; init; } = new Vector3(0, 0, 0);
         public string Title { get; set; } = "";
         public string Description { get; set; } = "";
+        public float Delay { get; set; } = 0.0f;
+
         public ProjectileSnapshot() { }
         public ProjectileSnapshot(CCSPlayerController player,CBaseCSGrenadeProjectile grenadeProjectile,string title, string description, GrenadeType_t type)
         {

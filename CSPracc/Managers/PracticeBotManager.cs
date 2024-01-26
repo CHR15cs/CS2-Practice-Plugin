@@ -108,7 +108,7 @@ namespace CSPracc.Managers
             if(closestBot != null)
             {
                 CSPraccPlugin.Instance!.Logger.LogInformation($"kickid {closestBot.UserId}");
-                Server.ExecuteCommand($"kickid {closestBot.UserId}");            
+                Server.ExecuteCommand($"kickid {closestBot.UserId}");      
                 spawnedBots.Remove(closestBot.PlayerName!);
             }
         }

@@ -452,6 +452,13 @@ namespace CSPracc.CommandHandler
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.WATCHME}{ChatColors.White} Moves all players except you to spectator.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.breakstuff}{ChatColors.White} Breaks all breakable stuff.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.impacts}{ChatColors.White} Toggle impacts.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.mimic_menu}{ChatColors.White} Open the bot mimic menu.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.create_replay}{ChatColors.White}{ChatColors.Blue} [replayset name]{ChatColors.White} Creates a new replayset.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.record_role}{ChatColors.White}{ChatColors.Blue} [role name]{ChatColors.White} Records a new role.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.stoprecord}{ChatColors.White} Stops the current recording.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.store_replay}{ChatColors.White} Save the last recording permanently.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.rename_replayset}{ChatColors.White}{ChatColors.Red} 'new name'{ChatColors.White} Rename the current replay set.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.replay_menu}{ChatColors.White} Open menu with all replays.");
 
             foreach (string s in message)
             {

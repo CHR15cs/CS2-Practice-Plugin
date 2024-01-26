@@ -28,3 +28,4 @@ Alot of ideas for match and pracitce mode:<br>
 https://github.com/splewis/get5<br>
 https://github.com/splewis/csgo-practice-mode<br>
 Coach Slot: https://github.com/marqdevx/mm-cs2-coach <br>
+Throwing Smokes: https://github.com/zwolof <br>

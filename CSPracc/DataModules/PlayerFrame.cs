@@ -4,27 +4,28 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace CSPracc.DataModules
 {
     public class PlayerFrame
     {
-        public Position Position {  get; set; }
+        public JsonSpawnPoint Position {  get; set; }
         public PlayerButtons PlayerButtons { get; set; }
 
-        public CBasePlayerWeapon ActivePlayerWeapon { get; set; }
+        public bool shoot { get; set; } = false;
 
-        public bool shoot = false;
-
-        public PlayerFrame(CCSPlayerController cCSPlayerController,ProjectileSnapshot? projectileSnapshot = null) 
+        public PlayerFrame(CCSPlayerController cCSPlayerController, ProjectileSnapshot? projectileSnapshot = null)
         {
-            Position = cCSPlayerController.GetCurrentPosition()!;
+            Position = cCSPlayerController.GetCurrentPositionAsJsonSpawnPoint()!;
             PlayerButtons = cCSPlayerController.Buttons;
             ProjectileSnapshot = projectileSnapshot;
-            ActivePlayerWeapon = cCSPlayerController.PlayerPawn.Value.WeaponServices.ActiveWeapon.Value;
         }
 
-        public ProjectileSnapshot? ProjectileSnapshot { get; set; }
+        public PlayerFrame() { }
+
+
+        public ProjectileSnapshot? ProjectileSnapshot { get; set; } = null;
     }
 }

@@ -49,8 +49,8 @@ namespace CSPracc.Modes
             {
                 mapName = "de_" + mapName;
             }
-            Server.ExecuteCommand($"say Changing map to {mapName}");
-            Server.ExecuteCommand($"changelevel {mapName}");
+            Utils.ServerMessage($"Changing map in {CSPraccPlugin.Instance!.Config!.DelayMapChange}s to {mapName}");
+            CSPraccPlugin.Instance!.AddTimer(CSPraccPlugin.Instance!.Config!.DelayMapChange, () => Server.ExecuteCommand($"changelevel {mapName}"));
 
         }
 

@@ -99,14 +99,13 @@ namespace CSPracc
         }
         public ProjectileManager()
         {
-            CSPraccPlugin.Instance.RegisterListener<Listeners.OnTick>(OnTick);
+            //CSPraccPlugin.Instance.RegisterListener<Listeners.OnTick>(OnTick);
         }
 
 
         public void Dispose()
         {
-            Listeners.OnTick onTick = new Listeners.OnTick(OnTick);
-            CSPraccPlugin.Instance!.RemoveListener("OnTick", onTick);
+            
         }
         /// <summary>
         /// Gets or Adds Projectile Storage for given map
@@ -160,6 +159,7 @@ namespace CSPracc
         /// <returns></returns>
         public HtmlMenu GetPlayerBasedNadeMenu(CCSPlayerController player, string tag, string name = "")
         {
+            tag = tag.ToLower();
             List<KeyValuePair<string, Action>> nadeOptions = new List<KeyValuePair<string, Action>>();
 
             player.GetValueOfCookie("PersonalizedNadeMenu", out string? value);
@@ -169,7 +169,7 @@ namespace CSPracc
                 MenuTitle = "Personal Nade Menu";
                 foreach (KeyValuePair<int, ProjectileSnapshot> entry in getAllNadesFromPlayer(player.SteamID))
                 {
-                    if (entry.Value.Tags.Contains(tag) || tag == "" || entry.Value.Title.Contains(tag) && entry.Value.Title.Contains(name))
+                    if (snapshotContainTag(entry.Value,tag) || tag == "" || entry.Value.Title.Contains(tag) && entry.Value.Title.Contains(name))
                     {
                         nadeOptions.Add(new KeyValuePair<string, Action>($"{entry.Value.Title} ID:{entry.Key}", new Action(() => {
 
@@ -184,7 +184,7 @@ namespace CSPracc
                 MenuTitle = "Global Nade Menu";
                 foreach (KeyValuePair<int, ProjectileSnapshot> entry in CurrentProjectileStorage.GetAll())
                 {
-                    if (entry.Value.Tags.Contains(tag) || tag == "" && entry.Value.Title.Contains(name))
+                    if (snapshotContainTag(entry.Value, tag) || tag == "" && entry.Value.Title.Contains(name))
                         nadeOptions.Add(new KeyValuePair<string, Action>($"{entry.Value.Title} ID:{entry.Key}", new Action(() => {
 
                             RestoreSnapshot(player, entry.Key);
@@ -203,6 +203,15 @@ namespace CSPracc
             }
             return htmlNadeMenu;
         }     
+
+        private bool snapshotContainTag(ProjectileSnapshot snapshot, string tagToSearch)
+        {
+            foreach(string tag in snapshot.Tags)
+            {
+                if(tag.ToLower() ==tagToSearch.ToLower()) return true;
+            }
+            return false;
+        }
 
         /// <summary>
         /// Restoring the last thrown smoke
@@ -234,10 +243,11 @@ namespace CSPracc
                 return;
             }
             pos += count;
-            if (pos > snapshots.Count)
+            if (pos >= snapshots.Count)
             {
                 pos--;
                 Utils.ClientChatMessage($"You did not throw that many grenades yet", player);
+                return;
             }
             ProjectileSnapshot? snapshot = snapshots[pos];
             if (snapshot != null)
@@ -289,6 +299,22 @@ namespace CSPracc
             player.PrintToCenter("You did not throw a projectile yet!");
         }
 
+
+        private List<KeyValuePair<int, ProjectileSnapshot>> getCurrentPlayerNades(CCSPlayerController player)
+        {
+            player.GetValueOfCookie("PersonalizedNadeMenu", out string? value);
+            string MenuTitle = string.Empty;
+            List<KeyValuePair<int, ProjectileSnapshot>> nadeList = new List<KeyValuePair<int, ProjectileSnapshot>>();
+            if (value == null || value == "yes")
+            {
+                nadeList = getAllNadesFromPlayer(player.SteamID);
+            }
+            else
+            {
+                nadeList = CurrentProjectileStorage.GetAll();
+            }
+            return nadeList;
+        }
 
         /// <summary>
         /// Get the last projectilesnapshot a player added
@@ -455,9 +481,15 @@ namespace CSPracc
             CounterStrikeSharp.API.Modules.Utils.Vector projectilePosition = new CounterStrikeSharp.API.Modules.Utils.Vector();
             QAngle playerAngle = player.PlayerPawn.Value.EyeAngles;
             string name = args;
-           
-            
-            lastSavedNade.SetOrAdd(player.SteamID, CurrentProjectileStorage.Add(player, null, name, Server.MapName));
+
+            ProjectileSnapshot? snapshotToAdd = getLatestProjectileSnapshot(player.SteamID);
+            if(snapshotToAdd == null)
+            {
+                Utils.ClientChatMessage("Could not save lasth thrown projectile.",player);
+                return;
+            }
+            snapshotToAdd.Title = name;
+            lastSavedNade.SetOrAdd(player.SteamID, CurrentProjectileStorage.Add(snapshotToAdd));        
             player.PrintToCenter($"Successfully added grenade {name}");
         }
 
@@ -504,7 +536,9 @@ namespace CSPracc
             }
 
         }
-        public static MemoryFunctionWithReturn<IntPtr, IntPtr, IntPtr, IntPtr, IntPtr, IntPtr, IntPtr, int> CSmokeGrenadeProjectile_CreateFunc = new(@"\x55\x4c\x89\xc1\x48\x89\xe5\x41\x57\x41\x56\x49\x89\xd6\x48\x89\xf2\x48\x89\xfe\x41\x55\x45\x89\xcd\x41\x54\x4d\x89\xc4\x53\x48\x83\xec\x28\x48\x89\x7d\xb8\x48");
+        public static MemoryFunctionWithReturn<IntPtr, IntPtr, IntPtr, IntPtr, IntPtr, IntPtr, IntPtr, int> CSmokeGrenadeProjectile_CreateFuncWindows = new(@"\x48\x89\x5C\x24\x08\x48\x89\x6C\x24\x10\x48\x89\x74\x24\x18\x57\x41\x56\x41\x57\x48\x83\xEC\x50\x4C\x8B\xB4\x24\x90\x00\x00\x00\x49\x8B\xF8");
+
+        public static MemoryFunctionWithReturn<IntPtr, IntPtr, IntPtr, IntPtr, IntPtr, IntPtr, IntPtr, int> CSmokeGrenadeProjectile_CreateFuncLinux = new(@"\x55\x4c\x89\xc1\x48\x89\xe5\x41\x57\x41\x56\x49\x89\xd6\x48\x89\xf2\x48\x89\xfe\x41\x55\x45\x89\xcd\x41\x54\x4d\x89\xc4\x53\x48\x83\xec\x28\x48\x89\x7d\xb8\x48");
         public void OnEntitySpawned(CEntityInstance entity)
         {
             if(entity == null) return;
@@ -671,12 +705,6 @@ namespace CSPracc
         /// <param name="player">player who issued the command</param>
         public void ReThrow(CCSPlayerController player, string tag = "")
         {
-        //    if(!LastThrownGrenade.ContainsKey(player.SteamID))
-        //    {
-        //        player.PrintToCenter("Could not get last thrown nade");
-        //        return;
-        //    }
-
             if(tag == "")
             {
                 ProjectileSnapshot? grenade = getLatestProjectileSnapshot(player.SteamID);
@@ -699,20 +727,17 @@ namespace CSPracc
             }
             else
             {
+                tag = tag.Trim().ToLower();
                 Utils.ClientChatMessage($"Throwing all grenades containing tag: {ChatColors.Green}{tag}", player);
-                List<KeyValuePair<int, ProjectileSnapshot>> nades = getAllNadesFromPlayer(player.SteamID);
-                foreach(var kvp in nades)
+                List<KeyValuePair<int, ProjectileSnapshot>> nades = getCurrentPlayerNades(player);
+                foreach (var kvp in nades)
                 {
-                    if(kvp.Value.Tags.Contains(tag))
+                    if(snapshotContainTag(kvp.Value, tag))
                     {
-                        Utils.ClientChatMessage($"Throwing nade {kvp.Value.Title}",player);
                         CSPraccPlugin.Instance!.AddTimer(kvp.Value.Delay, ()=>ThrowGrenadePojectile(kvp.Value, player));
                     }
                 }
             }
-
-            //CSPraccPlugin.Instance.AddTimer(1.5f, () => Server.ExecuteCommand("sv_rethrow_last_grenade"));
-           // CSPraccPlugin.Instance.AddTimer(2.0f, () => cGrenade.Remove()); 
         }
         public bool ThrowGrenadePojectile(ProjectileSnapshot projectile, CCSPlayerController player)
         {
@@ -731,11 +756,11 @@ namespace CSPracc
                     }
                 case GrenadeType_t.GRENADE_TYPE_SMOKE:
                     {
-                        //player.HtmlMessage($".throw does not work for smokegrenades yet!<br>Use \".rcon sv_rethrow_last_grenade\" for those");
-                        //return false;
                         cGrenade = Utilities.CreateEntityByName<CSmokeGrenadeProjectile>(DesignerNames.ProjectileSmoke);
                         cGrenade!.IsSmokeGrenade = true;
-                        nint ptr =CSmokeGrenadeProjectile_CreateFunc.Invoke(
+                        if(OperatingSystem.IsLinux())
+                        {
+                            CSmokeGrenadeProjectile_CreateFuncLinux.Invoke(
     projectile.ProjectilePosition.ToCSVector().Handle,
     projectile.ProjectilePosition.ToCSVector().Handle,
     projectile.Velocity.ToCSVector().Handle,
@@ -744,9 +769,26 @@ namespace CSPracc
     45,
     player.TeamNum
 );
-                        
+
+                        }
+                        else if(OperatingSystem.IsWindows())
+                        {
+                            CSmokeGrenadeProjectile_CreateFuncWindows.Invoke(
+projectile.ProjectilePosition.ToCSVector().Handle,
+projectile.ProjectilePosition.ToCSVector().Handle,
+projectile.Velocity.ToCSVector().Handle,
+projectile.Velocity.ToCSVector().Handle,
+player.Pawn.Value.Handle,
+45,
+player.TeamNum
+);
+                        }
+                        else
+                        {
+                            Utils.ServerMessage($"{ChatColors.Red}Unknown operating system");
+                            return false;
+                        }          
                         return true;
-                        break;
                     }
                 case GrenadeType_t.GRENADE_TYPE_FIRE:
                     {
@@ -793,84 +835,6 @@ namespace CSPracc
             cGrenade.OwnerEntity.Raw = player.PlayerPawn.Raw;
             SelfThrownGrenade.Add(cGrenade);
             return true;
-        }
-
-
-        /// <summary>
-        /// OnTick Listener, looking for projectiles which are thrown by the plugin
-        /// </summary>
-        public void OnTick()
-        {
-            for (int i =0;i<SelfThrownGrenade.Count;i++) 
-            {
-                CBaseCSGrenadeProjectile? projectile = SelfThrownGrenade[i];
-                if (projectile == null || !projectile.IsValid) 
-                {
-                    SelfThrownGrenade.RemoveAt(i);
-                    i--;
-                    continue;
-                }              
-                //Smoke projectiles are somewhat special since they need some extra manipulation
-                if(projectile.IsSmokeGrenade) 
-                {
-                    CSmokeGrenadeProjectile? cSmoke = new CSmokeGrenadeProjectile(projectile.Handle);
-                    if (cSmoke == null)
-                    {
-                        SelfThrownGrenade.RemoveAt(i);
-                        i--;
-                        continue;
-                    }
-                    if (cSmoke.AbsVelocity.X == 0.0f && cSmoke.AbsVelocity.Y == 0.0f && cSmoke.AbsVelocity.Z == 0.0f)
-                    {                       
-                        cSmoke.SmokeEffectTickBegin = Server.TickCount + 1;
-                        CInstancedSceneEntity? scene = Utilities.CreateEntityByName<CInstancedSceneEntity>("instanced_scripted_scene");
-                        if(scene == null)
-                        {
-                            Server.PrintToChatAll("scene is null");
-                            SelfThrownGrenade.RemoveAt(i);
-                            i--;
-                            continue;
-                        }
-
-                        scene.CBodyComponent.SceneNode.RenderOrigin.X = cSmoke.PrevVPhysicsUpdatePos.X;
-                        scene.CBodyComponent.SceneNode.RenderOrigin.Y = cSmoke.PrevVPhysicsUpdatePos.Y;
-                        scene.CBodyComponent.SceneNode.RenderOrigin.Z = cSmoke.PrevVPhysicsUpdatePos.Z;
-                        scene.CBodyComponent.SceneNode.RenderOrigin.Add(new Vector(638, 528, 859));
-                        //scene.CBodyComponent.SceneNode.RenderOrigin.Add(new Vector(811, 704, 183));
-                        //scene.CBodyComponent.SceneNode.RenderOrigin.Add(new Vector(484, 516, 925));
-                        //scene.CBodyComponent.SceneNode.RenderOrigin.Add(new Vector(440.00f, 340, 282));
-                        //scene.CBodyComponent.SceneNode.RenderOrigin.Add(new Vector(346, 638, 528));
-                        //scene.CBodyComponent.SceneNode.RenderOrigin.Add(new Vector(859, 811, 704));
-                        //scene.CBodyComponent.SceneNode.RenderOrigin.Add(new Vector(183, 484, 516));
-                        //scene.CBodyComponent.SceneNode.RenderOrigin.Add(new Vector(925, 440.00f, 340));
-                        //scene.CBodyComponent.SceneNode.RenderOrigin.Add(new Vector(282, 346, 638));
-                        //scene.CBodyComponent.SceneNode.RenderOrigin.Add(new Vector(528, 859, 811));
-                        //scene.CBodyComponent.SceneNode.RenderOrigin.Add(new Vector(704, 183, 484));
-                        //scene.CBodyComponent.SceneNode.RenderOrigin.Add(new Vector(516, 925, 440.00f));
-                        scene.DispatchSpawn();
-                        scene.AcceptInput("FireUser1", cSmoke, cSmoke, "");
-                        scene.AcceptInput("InitializeSpawnFromWorld", null, null, "");
-                        //cSmoke.SmokeDetonationPos.X = cSmoke.AbsOrigin.X;
-                        //cSmoke.SmokeDetonationPos.Y = cSmoke.AbsOrigin.Y;
-                        //cSmoke.SmokeDetonationPos.Z = cSmoke.AbsOrigin.Z;
-                        //cSmoke.DidSmokeEffect = true;
-                        //Utilities.SetStateChanged(cSmoke, "CSmokeGrenadeProjectile", "m_nSmokeEffectTickBegin");
-                        //Utilities.SetStateChanged(cSmoke, "CSmokeGrenadeProjectile", "m_vSmokeDetonationPos");
-                        //Utilities.SetStateChanged(cSmoke, "CSmokeGrenadeProjectile", "m_bDidSmokeEffect");
-                        CSPraccPlugin.Instance!.AddTimer(17.0f, () => cSmoke.Remove());    
-                        
-                        SelfThrownGrenade.RemoveAt(i);
-                        i--;
-                        continue;
-                    }
-                }
-                else 
-                {            
-                    //Non Smoke projectiles like HE, Flash or Molotov can be removed, does not need extra attention
-                    SelfThrownGrenade.RemoveAt(i);
-                    i--;
-                }
-            }
         }
 
         /// <summary>
@@ -971,6 +935,29 @@ namespace CSPracc
         /// Adds description to your last saved nade
         /// </summary>
         /// <param name="steamId">player who issued the command</param>
+        /// <param name="description">description</param>
+        public void SetDelay(ulong steamId, string delay)
+        {
+            KeyValuePair<int, ProjectileSnapshot> lastSnapshot = getLastAddedProjectileSnapshot(steamId);
+            if (lastSnapshot.Key != 0)
+            {
+                if (lastSnapshot.Value != null)
+                {
+                    if(!float.TryParse(delay, out float delayInSeconds))
+                    {
+                        Utils.ClientChatMessage($"Could not parse delay.", steamId);
+                    }
+                    lastSnapshot.Value.Delay = delayInSeconds;
+                    CurrentProjectileStorage.SetOrAdd(lastSnapshot.Key, lastSnapshot.Value);
+                    Utils.ClientChatMessage($"Updating grenade delay to {delayInSeconds}", steamId);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds description to your last saved nade
+        /// </summary>
+        /// <param name="steamId">player who issued the command</param>
         /// <param name="title">description</param>
         public void RenameLastSnapshot(ulong steamId, string title)
         {
@@ -994,6 +981,11 @@ namespace CSPracc
             {
                 if (lastSnapshot.Value != null)
                 {
+                    if(snapshotContainTag(lastSnapshot.Value,tag))
+                    {
+                        Utils.ClientChatMessage($"Grenade already contains tag {tag}", steamid);
+                        return;
+                    }
                     lastSnapshot.Value.Tags.Add(tag);
                     CurrentProjectileStorage.SetOrAdd(lastSnapshot.Key, lastSnapshot.Value);
                     Utils.ClientChatMessage($"Added tag {tag}  to {lastSnapshot.Value.Title}", steamid);
@@ -1008,9 +1000,22 @@ namespace CSPracc
             {
                 if (lastSnapshot.Value != null)
                 {
-                    lastSnapshot.Value.Tags.Remove(tag);
-                    CurrentProjectileStorage.SetOrAdd(lastSnapshot.Key, lastSnapshot.Value);
-                    Utils.ClientChatMessage($"Removed tag {tag} from {lastSnapshot.Value.Title}", steamid);
+                    bool foundTag = false;
+                    foreach(string tagToDelete in lastSnapshot.Value.Tags)
+                    {
+                        if(tagToDelete.ToLower() == tag.ToLower())
+                        {
+                            foundTag = true;
+                            lastSnapshot.Value.Tags.Remove(tagToDelete);
+                            break;
+                        }
+                    }
+                   if(foundTag)
+                    {
+                        CurrentProjectileStorage.SetOrAdd(lastSnapshot.Key, lastSnapshot.Value);
+                        Utils.ClientChatMessage($"Removed tag {tag} from {lastSnapshot.Value.Title}", steamid);
+                    }
+                   
                 }
             }
         }

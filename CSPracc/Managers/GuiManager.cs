@@ -39,6 +39,11 @@ namespace CSPracc.Managers
             CSPraccPlugin.Instance.AddCommand("css_9", "sel 1", Selection);
         }
 
+        /// <summary>
+        /// Print HTML Message to player
+        /// </summary>
+        /// <param name="message">Html Message to print</param>
+        /// <param name="player">player to print the message for</param>
         public void ShowHtmlMessage(HtmlMessage message,CCSPlayerController player)
         {
             if (message == null) return;
@@ -58,6 +63,10 @@ namespace CSPracc.Managers
             });
         }
 
+        /// <summary>
+        /// Start / Stop Timer
+        /// </summary>
+        /// <param name="playerController">player who issued the command</param>
         public void StartTimer(CCSPlayerController playerController) 
         {
             if(Timers.ContainsKey(playerController.SteamID))
@@ -72,6 +81,11 @@ namespace CSPracc.Managers
             }
         }
 
+        /// <summary>
+        /// Print countdown to player
+        /// </summary>
+        /// <param name="playerController">player who issued the command</param>
+        /// <param name="time">time in seconds</param>
         public void StartCountdown(CCSPlayerController playerController, int time)
         {
             Utils.ClientChatMessage($"Countdown started", playerController);
@@ -82,14 +96,7 @@ namespace CSPracc.Managers
         {
             Server.NextFrame(() =>
             {
-                if (htmlMenus.ContainsKey(id))
-                {
-                    htmlMenus[id] = menu;
-                }
-                else
-                {
-                    htmlMenus.Add(id, menu);
-                }
+                htmlMenus.SetOrAdd(id, menu);
             });
 
         }
@@ -109,6 +116,10 @@ namespace CSPracc.Managers
             CSPraccPlugin.Instance!.RemoveCommand("css_9", Selection);
         }
 
+
+        /// <summary>
+        /// Draw menu and other stuff
+        /// </summary>
         public void OnTick() 
         {
             foreach(var key in htmlMenus.Keys) 
@@ -124,20 +135,36 @@ namespace CSPracc.Managers
                 string menuText = $"<font color=\"green\">{menu.Title}</font><br>";
                 if (menu.Options == null) continue;
 
-                for(int option = 0; option < menu.MenuPages[menu.Page].Count;option++)
+                if(menu.MenuPages.Count > menu.Page)
                 {
-                    menuText += $"<font color=\"green\">!{option + 1}</font>) {menu.MenuPages[menu.Page][option].Key}";
-                    if(option +1 < menu.MenuPages[menu.Page].Count)
+                    for (int option = 0; option < menu.MenuPages[menu.Page].Count; option++)
                     {
-                        menuText += "<br>";
+                        menuText += $"<font color=\"green\">!{option + 1}</font>) {menu.MenuPages[menu.Page][option].Key}";
+                        if (option + 1 < menu.MenuPages[menu.Page].Count)
+                        {
+                            menuText += "<br>";
+                        }
                     }
-                }
-
+                }              
+                
                 menuText += "<br>";
-               // menuText += "_____________<br>";
-                if(menu.Page > 0) menuText += $"<font color=\"green\">!7</font> - Prev";
-                if(menu.MenuPages.Count > menu.Page +1) menuText += $"<font color=\"green\">!8</font> - Next";
-                menuText += $"<font color=\"green\">!9</font> - Close";
+                if (menu.Page > 0)
+                {
+                    menuText += $"<font color=\"green\"> !7</font>) Prev&nbsp;&nbsp;&nbsp;";
+                }
+                else
+                {
+                    menuText += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                }
+                if (menu.MenuPages.Count > menu.Page + 1)
+                {
+                    menuText += $"<font color=\"green\">!8</font>) Next&nbsp;&nbsp;&nbsp;";
+                }
+                else
+                {
+                    menuText += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                }
+                menuText += $"<font color=\"green\">!9</font>) Close";
                 player.PrintToCenterHtml(menuText);
             }
 
@@ -184,6 +211,11 @@ namespace CSPracc.Managers
             }
         }
 
+        /// <summary>
+        /// Menu Selection
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="command"></param>
         public void Selection(CCSPlayerController? player, CommandInfo command)
         {
             if (player == null) return;
@@ -203,7 +235,11 @@ namespace CSPracc.Managers
             {
                 return;
             }
-            int maxItems = menu.MenuPages[menu.Page].Count;
+            int maxItems = 6;
+            if(menu.MenuPages.Count > menu.Page)
+            {
+                maxItems = menu.MenuPages[menu.Page].Count;
+            }
             if(index == 7)
             {
                 if(menu.Page > 0)

@@ -59,6 +59,6 @@ namespace CSPracc.DataModules
             }
         }
 
-        public List<List<KeyValuePair<string,Action>>> MenuPages { get; init; }
+        public List<List<KeyValuePair<string,Action>>> MenuPages { get; init; } = new List<List<KeyValuePair<string, Action>>> ();
     }
 }

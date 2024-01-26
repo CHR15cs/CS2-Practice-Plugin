@@ -98,6 +98,7 @@ namespace CSPracc.DataModules.Constants
         public const string NADES = ".nades";
         public const string find = ".find";
         public const string SAVE = ".save";
+        public const string delay = ".delay";
         public const string Description = ".desc";
         public const string Rename = ".rename";
         public const string AddTag = ".addtag";
@@ -143,6 +144,14 @@ namespace CSPracc.DataModules.Constants
 
         public const string breakstuff = ".break";
         public const string impacts = ".impacts";
+
+        public const string mimic_menu = ".mimic";
+        public const string create_replay = ".createreplay";
+        public const string record_role = ".record";
+        public const string stoprecord = ".stoprecord";
+        public const string store_replay = ".storereplay";
+        public const string rename_replayset = ".renameset";
+        public const string replay_menu = ".replays";
     }
 
     public class AdminFlags

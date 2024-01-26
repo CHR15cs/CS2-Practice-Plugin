@@ -107,9 +107,9 @@ namespace CSPracc.CommandHandler
         }
 
 
-        public override void PrintHelp(CCSPlayerController? player)
+        public override void PrintHelp(CCSPlayerController? player, string args = "")
         {
-            base.PrintHelp(player);
+            base.PrintHelp(player, args);
             List<string> message = new List<string>();
             message.Add($" {ChatColors.Green} {MATCH_COMMAND.WARMUP}{ChatColors.White} Switches to warmup.");
             message.Add($" {ChatColors.Green} {MATCH_COMMAND.PAUSE}{ChatColors.White} Pauses the match.");
@@ -126,7 +126,10 @@ namespace CSPracc.CommandHandler
             message.Add($" {ChatColors.Green} {MATCH_COMMAND.DEMO}{ChatColors.White} Demo menu.");
             foreach (string s in message)
             {
-                player?.PrintToChat(s);
+                if (args == "" || s.ToLower().Contains(args.ToLower()))
+                {
+                    player?.PrintToChat(s);
+                }
             }
         }
     }

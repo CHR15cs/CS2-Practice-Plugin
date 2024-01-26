@@ -18,7 +18,9 @@ namespace CSPracc
         [JsonPropertyName("RconPassword")] public string RconPassword { get; set; } = "secret";
         [JsonPropertyName("DemoSettings")] public DemoManagerSettings DemoManagerSettings { get; set; } = new DemoManagerSettings();
         [JsonPropertyName("StandardMode")] public PluginMode ModeToLoad { get; set; } = PluginMode.Base;
-        [JsonPropertyName("AdminRequirement")] public bool AdminRequirement { get; set; } = true;       
+        [JsonPropertyName("AdminRequirement")] public bool AdminRequirement { get; set; } = true;
+
+        [JsonPropertyName("MapChangeDelay")] public int DelayMapChange { get; set; } = 3;
 
     }
 }

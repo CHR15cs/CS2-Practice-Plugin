@@ -101,9 +101,9 @@ namespace CSPracc.CommandHandler
         }
 
 
-        public override void PrintHelp(CCSPlayerController? player)
+        public override void PrintHelp(CCSPlayerController? player, string args = "")
         {
-            base.PrintHelp(player);
+            base.PrintHelp(player, args);
             List<string> message = new List<string>();
             message.Add($" {ChatColors.Green}{DRYRUN_COMMAND.refill}{ChatColors.White} Refills your utility.");
             message.Add($" {ChatColors.Green}{DRYRUN_COMMAND.ak}{ChatColors.White} Drop yourself an ak.");
@@ -112,7 +112,10 @@ namespace CSPracc.CommandHandler
             message.Add($" {ChatColors.Green}{DRYRUN_COMMAND.m4}{ChatColors.White} Drop yourself an m4a4.");
             foreach (string s in message)
             {
-                player?.PrintToChat(s);
+                if (args == "" || s.ToLower().Contains(args.ToLower()))
+                {
+                    player?.PrintToChat(s);
+                }
             }
         }
     }

@@ -9,8 +9,9 @@ namespace CSPracc.DataModules
 {
     public class PlayerReplay
     {
-        string ReplayName {  get; set; }
+        public string ReplayName {  get; set; }
         public List<PlayerFrame> frames;
+        public int frameCount = 0;
         public PlayerReplay(string replayName) 
         { 
             frames = new List<PlayerFrame>();
@@ -29,12 +30,12 @@ namespace CSPracc.DataModules
 
         public PlayerFrame? GetNextFrame()
         {
-            if(frames.Count > 0)
+            if (frames.Count > frameCount)
             {
-                PlayerFrame? frame = frames.FirstOrDefault();
+                PlayerFrame? frame = frames[frameCount];
                 if(frame != null)
                 {
-                    frames.Remove(frame);
+                    frameCount++;
                 }
                 return frame;
             }

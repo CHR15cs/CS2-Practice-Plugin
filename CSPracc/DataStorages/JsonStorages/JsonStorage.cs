@@ -25,8 +25,9 @@ namespace CSPracc.DataStorages.JsonStorages
                 {
                     Storage = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(jsonString)!;
                 }
-                catch
+                catch(Exception ex) 
                 {
+                    CSPraccPlugin.Instance!.Logger.LogError(ex.Message, ex);
                     CSPraccPlugin.Instance!.Logger.LogWarning($"Could not read {JsonFile.Name}. Creating new dictonary.");
                     Storage = new Dictionary<TKey, TValue>();
                 }

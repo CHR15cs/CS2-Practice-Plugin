@@ -507,7 +507,7 @@ namespace CSPracc
             snapshotToAdd.Title = name;
             int newid = CurrentProjectileStorage.Add(snapshotToAdd);
             lastSavedNade.SetOrAdd(player.SteamID, newid);        
-            player.PrintToCenter($"Successfully added grenade \"{name}\" at id: {newid}");
+            player.ChatMessage($"Successfully added grenade {ChatColors.Blue}\"{name}\"{ChatColors.White} at id: {ChatColors.Green}{newid}");
         }
         
         /// <summary>

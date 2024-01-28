@@ -17,10 +17,10 @@ using Microsoft.Extensions.Logging;
 
 namespace CSPracc
 {
-    public static class SpawnManager
+    public  class SpawnManager
     {
-        private static SpawnPointStorage? _spawnPointStorage;
-        private static SpawnPointStorage? spawnPointStorage
+        private  SpawnPointStorage? _spawnPointStorage;
+        private  SpawnPointStorage? spawnPointStorage
         {
             get
             {
@@ -31,12 +31,12 @@ namespace CSPracc
                 return _spawnPointStorage;
             }
         }
-        private static string lastMap = String.Empty;
-        private static Dictionary<byte, List<Position>>? _spawns = null;
+        private  string lastMap = String.Empty;
+        private  Dictionary<byte, List<Position>>? _spawns = null;
         /// <summary>
         /// Dictionary to store the spawns of the current map in
         /// </summary>
-        public static Dictionary<byte,List<Position>> Spawns
+        public  Dictionary<byte,List<Position>> Spawns
         {
             get
             {
@@ -61,7 +61,7 @@ namespace CSPracc
         /// Read out the map based spawns and store them in a dictionary
         /// </summary>
         /// <param name="spawns">dictionary to store the spawns in</param>
-        private static void getSpawns(ref Dictionary<byte,List<Position>> spawns)
+        private void getSpawns(ref Dictionary<byte,List<Position>> spawns)
         {
             _spawns!.Clear();
             _spawns = new Dictionary<byte, List<Position>>();
@@ -102,12 +102,12 @@ namespace CSPracc
             }
         }
 
-        public static void TeleportToSpawn(CCSPlayerController? player, string args)
+        public void TeleportToSpawn(CCSPlayerController? player, string args)
         {         
             TeleportToTeamSpawn(player, args);
         }
 
-        public static void TeleportToTeamSpawn(CCSPlayerController? player,string args , CsTeam csTeam = CsTeam.None)
+        public void TeleportToTeamSpawn(CCSPlayerController? player,string args , CsTeam csTeam = CsTeam.None)
         {
             if (player == null) return;
             if (!player.PlayerPawn.IsValid) return;
@@ -126,28 +126,28 @@ namespace CSPracc
                 return;
             }
             CsTeam targetTeam = csTeam == CsTeam.None ? (CsTeam)player.TeamNum : csTeam;
-            if (SpawnManager.Spawns[(byte)targetTeam].Count <= number)
+            if (Spawns[(byte)targetTeam].Count <= number)
             {
-                player.PrintToCenter($"insufficient number of spawns found. spawns {SpawnManager.Spawns[(byte)targetTeam].Count} - {number}");
+                player.PrintToCenter($"insufficient number of spawns found. spawns {Spawns[(byte)targetTeam].Count} - {number}");
                 return;
             }
-            CSPraccPlugin.Instance.Logger.LogInformation($"teleport to: {SpawnManager.Spawns[(byte)targetTeam][number].PlayerPosition}");
+            CSPraccPlugin.Instance.Logger.LogInformation($"teleport to: {Spawns[(byte)targetTeam][number].PlayerPosition}");
             Utils.RemoveNoClip(player);
-            player.PlayerPawn.Value.Teleport(SpawnManager.Spawns[(byte)targetTeam][number].PlayerPosition, SpawnManager.Spawns[(byte)targetTeam][number].PlayerAngle, new Vector(0, 0, 0));
+            player.PlayerPawn.Value.Teleport(Spawns[(byte)targetTeam][number].PlayerPosition,Spawns[(byte)targetTeam][number].PlayerAngle, new Vector(0, 0, 0));
             
             player.PrintToCenter($"Teleporting to spawn {number + 1}");
         }
 
-        public static void ClearUsedSpawns()
+        public void ClearUsedSpawns()
         {
             spawnPointStorage.ResetUsedSpawns();
         }
 
-        public static void TeleportToBestSpawn(CCSPlayerController player)
+        public void TeleportToBestSpawn(CCSPlayerController player)
         {
             if (player == null || !player.IsValid || player.IsBot) return;
 
-            List<Position> points = SpawnManager.Spawns[player.TeamNum];
+            List<Position> points = Spawns[player.TeamNum];
             float closestDistance = absolutDistance(player,points.FirstOrDefault());
             int closestIndex = 0;
             for(int i = 0; i < points.Count; i++) 
@@ -163,11 +163,11 @@ namespace CSPracc
             player.TeleportToPosition(points[closestIndex]);
         }
 
-        public static void TeleportToWorstSpawn(CCSPlayerController player)
+        public void TeleportToWorstSpawn(CCSPlayerController player)
         {
             if (player == null || !player.IsValid || player.IsBot) return;
 
-            List<Position> points = SpawnManager.Spawns[player.TeamNum];
+            List<Position> points = Spawns[player.TeamNum];
             float maxDistance = absolutDistance(player, points.FirstOrDefault());
             int maxIndex = 0;
             for (int i = 0; i < points.Count; i++)
@@ -183,7 +183,7 @@ namespace CSPracc
             player.TeleportToPosition(points[maxIndex]);
         }
 
-        private static float absolutDistance(CCSPlayerController player, Position spawnPoint)
+        private float absolutDistance(CCSPlayerController player, Position spawnPoint)
         {
             float distanceX = 0;
             float distanceY = 0;
@@ -209,7 +209,7 @@ namespace CSPracc
             return distanceX + distanceY + distanceZ;
         }
 
-        public static bool TeleportToUnusedSpawn(CCSPlayerController player,string bombsite)
+        public bool TeleportToUnusedSpawn(CCSPlayerController player,string bombsite)
         {
             if (player == null || !player.IsValid || player.IsBot) return false;
 
@@ -222,14 +222,14 @@ namespace CSPracc
             return true;
         }
 
-        public static void AddCurrentPositionAsSpawnPoint(CCSPlayerController player, string Bombsite)
+        public void AddCurrentPositionAsSpawnPoint(CCSPlayerController player, string Bombsite)
         {
             if (player == null || !player.IsValid) return;
 
             spawnPointStorage!.AddSpawnPoint(new JsonSpawnPoint(player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.ToVector3(), player.PlayerPawn.Value!.EyeAngles.ToVector3(),Bombsite),player.GetCsTeam());
         }
 
-        public static void LoadSpawnsForBombsite(string Bombsite)
+        public void LoadSpawnsForBombsite(string Bombsite)
         {
             if(Bombsite == null) return;
             Server.PrintToConsole("Check if spawnpoints exist");
@@ -282,7 +282,7 @@ namespace CSPracc
             //CreateSpawnPointsFromJsonPoints(spawnPointStorage.GetSpawnPointsFromTeam(CsTeam.CounterTerrorist)!, "info_player_counterterrorist", Bombsite);
         }
 
-        private static void CreateSpawnPointsFromJsonPoints(List<JsonSpawnPoint> jsonSpawnPoints,string entityName,string Bombsite)
+        private void CreateSpawnPointsFromJsonPoints(List<JsonSpawnPoint> jsonSpawnPoints,string entityName,string Bombsite)
         {
             foreach (JsonSpawnPoint point in jsonSpawnPoints)
             {

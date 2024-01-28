@@ -35,7 +35,7 @@ namespace CSPracc.EventHandler
             plugin.RegisterEventHandler<EventPlayerSpawn>(mode.OnPlayerSpawn, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventRoundStart>(mode.OnRoundStart, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventPlayerHurt>(mode.OnPlayerHurt, hookMode: HookMode.Pre);
-            plugin.RegisterEventHandler<EventPlayerDeath>(mode.OnPlayerDeath, hookMode: HookMode.Pre);
+            plugin.RegisterEventHandler<EventPlayerDeath>(mode.OnPlayerDeath, hookMode: HookMode.Post);
             
             Plugin = plugin;
             BotManager = new PracticeBotManager();

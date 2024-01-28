@@ -105,6 +105,7 @@ namespace CSPracc.DataModules.Constants
         public const string RemoveTag = ".removetag";
         public const string ClearTags = ".cleartags";
         public const string DeleteTag = ".deletetag";
+        public const string UpdatePos = ".updatepos";
         public const string Last = ".last";
         public const string BACK = ".back";
         public const string forward = ".forward";

@@ -18,6 +18,7 @@ namespace CSPracc.Modes
     public class PracticeMode : BaseMode
     {
         BotReplayManager BotReplayManager { get; set; }
+  
         /// <summary>
         /// Get settings
         /// </summary>
@@ -29,12 +30,20 @@ namespace CSPracc.Modes
             List<KeyValuePair<string,Action>> menuOptions = new List<KeyValuePair<string,Action>>();
             if(!ccsplayerController.GetValueOfCookie("PersonalizedNadeMenu",out string? setting))
             {
-                setting = "yes";
-                ccsplayerController.SetOrAddValueOfCookie("PersonalizedNadeMenu", "yes");
+                if(CSPraccPlugin.Instance.Config.UsePersonalNadeMenu)
+                {
+                    setting = "yes";
+                    ccsplayerController.SetOrAddValueOfCookie("PersonalizedNadeMenu", "yes");
+                }
+                else
+                {
+                    setting = "no";
+                    ccsplayerController.SetOrAddValueOfCookie("PersonalizedNadeMenu", "no");
+                }                
             }
             if(setting == null)
             {
-                setting = "yes";
+                setting = CSPraccPlugin.Instance.Config.UsePersonalNadeMenu ? "yes": "no";
                 ccsplayerController.SetOrAddValueOfCookie("PersonalizedNadeMenu", "yes");
             }
             string MenuText = "";
@@ -197,10 +206,12 @@ namespace CSPracc.Modes
 
         ProjectileManager projectileManager;
         PracticeBotManager PracticeBotManager;
+        SpawnManager SpawnManager;
         public PracticeMode() : base() 
         {
             projectileManager = new ProjectileManager();
             PracticeBotManager = new PracticeBotManager();
+            SpawnManager = new SpawnManager();
             BotReplayManager = new BotReplayManager(ref PracticeBotManager, ref projectileManager);  
         }
 
@@ -238,7 +249,7 @@ namespace CSPracc.Modes
             DataModules.Constants.Methods.MsgToServer("Loading practice mode.");
             Server.ExecuteCommand("exec CSPRACC\\pracc.cfg");
             EventHandler?.Dispose();
-            EventHandler = new PracticeEventHandler(CSPraccPlugin.Instance!, new PracticeCommandHandler(this, ref projectileManager,ref PracticeBotManager),ref projectileManager, ref PracticeBotManager);
+            EventHandler = new PracticeEventHandler(CSPraccPlugin.Instance!, new PracticeCommandHandler(this, ref projectileManager,ref PracticeBotManager, ref SpawnManager),ref projectileManager, ref PracticeBotManager);
         }
 
         public void ShowPracticeMenu(CCSPlayerController player)
@@ -264,6 +275,7 @@ namespace CSPracc.Modes
         }
         public override void Dispose()
         {
+            Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
             projectileManager.Dispose();
             base.Dispose();
         }

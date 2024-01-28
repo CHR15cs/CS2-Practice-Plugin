@@ -16,7 +16,7 @@ using System.Xml.Linq;
 
 namespace CSPracc.Managers
 {
-    public class PrefireRouteManager
+    public class PrefireRouteManager : IDisposable
     {
         private bool editing = false;
         public PrefireRoute? CurrentPrefireRoute {  get; private set; }
@@ -25,10 +25,28 @@ namespace CSPracc.Managers
 
         Dictionary<int,List<JsonSpawnPoint>> SpawnPointsPerBot { get; set; }
 
+        CCSPlayerController? playerToShoot { get; set; } = null;
+
         public PrefireRouteManager() 
         {
             PrefireRouteStorage = new PrefireRouteStorage(new FileInfo(Path.Combine(CSPraccPlugin.Instance.ModuleDirectory, "Prefire", $"{Server.MapName}.json")));
             SpawnPointsPerBot = new Dictionary<int, List<JsonSpawnPoint>>();
+            CSPraccPlugin.Instance.RegisterListener<Listeners.OnTick>(OnTick);
+        }
+
+        public void OnTick()
+        {
+            //Make sure bot stays in place
+            var bots = Utilities.GetPlayers().Where(x => x.IsBot && x.IsValid && !x.IsHLTV);
+            foreach (var bot in bots)
+            {
+                bot.PlayerPawn.Value!.MoveType = MoveType_t.MOVETYPE_NONE;
+                if(playerToShoot != null)
+                {
+                    bot.PlayerPawn.Value.EyeAngles.Y = playerToShoot.PlayerPawn.Value!.EyeAngles.Y - 180.0f;
+                    bot.PlayerPawn.Value.EyeAngles.X = playerToShoot.PlayerPawn.Value.EyeAngles.X + 20;
+                }
+            }
         }
 
         public bool AddNewRoute(string name)
@@ -118,24 +136,31 @@ namespace CSPracc.Managers
         }
 
 
-        public HtmlMenu GetPrefireRouteMenu() 
+        public HtmlMenu GetPrefireRouteMenu(CCSPlayerController player) 
         {
             List<KeyValuePair<int,PrefireRoute>> PrefireRoutes = PrefireRouteStorage.GetAll();
             List<KeyValuePair<string,Action>> menuOptions = new List<KeyValuePair<string,Action>>();
             foreach(KeyValuePair<int,PrefireRoute> route in  PrefireRoutes)
             {
-                menuOptions.Add(new KeyValuePair<string, Action>($"{route.Value.Name}", () => { LoadRouteById(route.Key); }));
+                menuOptions.Add(new KeyValuePair<string, Action>($"{route.Value.Name}", () => { LoadRouteById(route.Key,player); }));
             }
             return new HtmlMenu("Prefire Menu", menuOptions);
         }
 
         private bool GenerateRoute(PrefireRoute route)
         {
+            Server.ExecuteCommand("bot_kick");
             Server.PrintToConsole($"Generating route {route.Name}");
             Server.PrintToConsole($"Adding bots.");
-            addBots();
+            addBots(route);
+            Server.ExecuteCommand("bot_freeze 0");
+            Server.ExecuteCommand("bot_stop 0");
+            Server.ExecuteCommand("bot_quota_mode normal");
             Server.PrintToConsole($"Assigning spawns to bots");
-            CSPraccPlugin.Instance!.AddTimer(1.0f, () => { assignSpawnpositionsToBot(route); spawnFirstBotWave(); teleportPlayerToStartingPoint(); });
+            Server.ExecuteCommand("mp_restartgame 1");
+            CSPraccPlugin.Instance!.AddTimer(2.0f, () => { assignSpawnpositionsToBot(route); spawnFirstBotWave(); teleportPlayerToStartingPoint();  });
+            
+
             Server.PrintToConsole($"Spawning firt wave");
             CurrentPrefireRoute = route;
             Utils.ServerMessage($"Starting prefire route {route.Name}");
@@ -155,9 +180,9 @@ namespace CSPracc.Managers
             }
         }
 
-        private void addBots()
+        private void addBots(PrefireRoute route)
         {
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < route.spawnPoints.Count; i++)
             {
                 Server.ExecuteCommand("bot_join_team CT");
                 Server.ExecuteCommand("bot_add_ct");
@@ -210,19 +235,15 @@ namespace CSPracc.Managers
             {
                 return;
             }
-   ;
-
-            Server.PrintToConsole($"Teleporting bot {botToSpawn.PlayerName}");
-            Server.PrintToConsole($"location: {spawnPoints.FirstOrDefault()!.Position}");
-            Server.PrintToConsole($"QAngle: {spawnPoints.FirstOrDefault()!.QAngle.ToCSQAngle()}");
-            Server.PrintToConsole($"Valid: {botToSpawn.PlayerPawn.IsValid}");
+   ;        
             botToSpawn.TeleportToJsonSpawnPoint(spawnPoints.FirstOrDefault());
             spawnPoints.RemoveAt(0);
         }
 
-        public bool LoadRouteById(int id)
+        public bool LoadRouteById(int id, CCSPlayerController playerToShoot)
         {
             editing = false;
+            this.playerToShoot = playerToShoot;
             if (!PrefireRouteStorage.Get(id, out PrefireRoute route))
             {
                 Utils.ServerMessage($"Could not load route with id: {id}");
@@ -236,18 +257,28 @@ namespace CSPracc.Managers
             return GenerateRoute(route);
         }
 
-        public bool LoadRouteByName(string name)
+        public bool LoadRouteByName(string name,CCSPlayerController player)
         {
             List<KeyValuePair<int, PrefireRoute>> PrefireRoutes = PrefireRouteStorage.GetAll();
             foreach (KeyValuePair<int, PrefireRoute> route in PrefireRoutes)
             {
                 if(route.Value.Name == name)
                 {
-                    return LoadRouteById(route.Key);
+                    return LoadRouteById(route.Key,player);
                 }
             }
             return false;
         }
 
+        public void SetPlayerToShoot(CCSPlayerController player)
+        {
+            playerToShoot  = player;
+        }
+
+        public void Dispose()
+        {
+            Listeners.OnTick ontick = new Listeners.OnTick(OnTick);
+            CSPraccPlugin.Instance!.RemoveListener("OnTick", ontick);
+        }
     }
 }

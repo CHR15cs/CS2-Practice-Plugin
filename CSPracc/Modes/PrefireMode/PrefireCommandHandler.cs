@@ -75,7 +75,7 @@ namespace CSPracc.CommandHandler
                     }
                 case PREFIRE_COMMAND.restart:
                     {
-                        PrefireMode.Restart();
+                        PrefireMode.Restart(player);
                         break;
                     }
                 default:

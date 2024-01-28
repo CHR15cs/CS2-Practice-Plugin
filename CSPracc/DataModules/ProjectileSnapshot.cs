@@ -18,7 +18,7 @@ namespace CSPracc.DataModules
         public List<string> Tags { get; set; } = new List<string>();
         public ulong initialThrower { get; set; } = 0;
         public GrenadeType_t GrenadeType_T { get; set; }
-        public System.Numerics.Vector3 PlayerPosition { get; init; } = new Vector3(0, 0, 0);
+        public System.Numerics.Vector3 PlayerPosition { get; set; } = new Vector3(0, 0, 0);
         public System.Numerics.Vector3 PlayerVelocity { get; init; } = new Vector3(0,0,0);
         public System.Numerics.Vector3 ProjectilePosition { get; init; } = new Vector3(0, 0, 0);
         public System.Numerics.Vector3 PlayerAngle { get; init; } = new Vector3(0, 0, 0);

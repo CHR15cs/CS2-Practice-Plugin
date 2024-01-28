@@ -24,11 +24,18 @@ namespace CSPracc.Modes
     {        
         PrefireRouteManager PrefireRouteManager { get; set; }
 
+        SpawnManager SpawnManager { get; set; } 
+
         private int KilledBots { get; set; }
 
         GunManager GunManager { get; set; }
+
+        private ulong _playerToShoot { get; set; } = 0;
+
+
         public PrefireMode() : base()
         {
+            this.SpawnManager = new SpawnManager();
             GunManager = new GunManager(GuiManager);
             PrefireRouteManager = new PrefireRouteManager();
             KilledBots = 0;
@@ -69,13 +76,13 @@ namespace CSPracc.Modes
         {
             if (player == null) return;
             if (!player.IsValid) return;
-            PrefireRouteManager.LoadRouteByName(route);
+            PrefireRouteManager.LoadRouteByName(route,player);
             KilledBots = 0;
         }
 
         public void ShowRouteMenu(CCSPlayerController player)
         {
-            GuiManager.AddMenu(player.SteamID, PrefireRouteManager.GetPrefireRouteMenu());
+            GuiManager.AddMenu(player.SteamID, PrefireRouteManager.GetPrefireRouteMenu(player));
         }
 
         public void AddRoute(CCSPlayerController player,string route) 
@@ -143,6 +150,24 @@ namespace CSPracc.Modes
             {
                 if(PrefireRouteManager.CurrentPrefireRoute == null) return HookResult.Continue;
                 PrefireRouteManager.SpawnNextPosition(@event.Userid.Slot);
+                bool akFound = false;   
+                foreach(var weapon in @event.Userid.PlayerPawn.Value.WeaponServices.MyWeapons)
+                {
+                    
+                    if(weapon.Value.DesignerName  == "weapon_ak47")
+                    {
+                        akFound = true;
+                        continue;
+                    }
+                    @event.Userid.PlayerPawn.Value.RemovePlayerItem(weapon.Value);
+                    //weapon.Value.Remove();
+                }
+                if(!akFound)
+                @event.Userid.GiveNamedItem("weapon_ak47");
+
+                @event.Userid.ExecuteClientCommand("slot 0");
+
+
             }
             return HookResult.Continue;
         }
@@ -150,7 +175,27 @@ namespace CSPracc.Modes
         public HookResult OnPlayerDeath(EventPlayerDeath @event, GameEventInfo info)
         {
             if (@event.Userid == null || !@event.Userid.IsValid || !@event.Userid.IsBot) return HookResult.Continue;
-            return HookResult.Continue;
+
+            if (@event.Userid.IsBot)
+            {
+                //CSPraccPlugin.Instance.AddTimer(0.5f, () => @event.Userid.Respawn());
+                if (PrefireRouteManager.CurrentPrefireRoute == null) return HookResult.Continue;
+                KilledBots++;
+                @event.Attacker.HtmlMessage($"{KilledBots}/{PrefireRouteManager.CurrentPrefireRoute!.spawnPoints.Count}");              
+                if (KilledBots == PrefireRouteManager.CurrentPrefireRoute!.spawnPoints.Count)
+                {
+                    @event.Attacker.HtmlMessage($"Finished {PrefireRouteManager.CurrentPrefireRoute.Name}!");
+                    PrefireRouteManager.LoadRouteByName(PrefireRouteManager.CurrentPrefireRoute.Name, @event.Attacker);
+                    KilledBots = 0;
+                }
+            }
+            else
+            {
+                @event.Userid.HtmlMessage($"You lost {PrefireRouteManager.CurrentPrefireRoute.Name}!");
+                PrefireRouteManager.LoadRouteByName(PrefireRouteManager.CurrentPrefireRoute.Name, @event.Userid);
+                KilledBots = 0;
+            }
+                return HookResult.Continue;
         }
 
         public HookResult OnPlayerHurt(EventPlayerHurt @event, GameEventInfo info)
@@ -158,30 +203,27 @@ namespace CSPracc.Modes
             if (@event.Userid == null || !@event.Userid.IsValid || !@event.Userid.IsBot) return HookResult.Continue;
            
 
-            if(PrefireRouteManager.CurrentPrefireRoute == null) return HookResult.Continue;
-            if(@event.Userid.IsBot)
-            {
-                Server.PrintToConsole("bot got attacked");
-
-                
-                if (@event.Health <= 0)
-                {
-                    CCSPlayerController? bot = Utilities.GetPlayerFromSlot(@event.Userid.Slot);
-                    if(bot == null) return HookResult.Continue;
-                    KilledBots++;
-                    @event.Userid.Respawn();
-                    @event.Attacker.HtmlMessage($"{KilledBots}/{PrefireRouteManager.CurrentPrefireRoute!.spawnPoints.Count}");
-                    if(KilledBots == PrefireRouteManager.CurrentPrefireRoute!.spawnPoints.Count)
-                    {
-                        @event.Attacker.HtmlMessage($"Finished {PrefireRouteManager.CurrentPrefireRoute.Name}!");
-                        PrefireRouteManager.LoadRouteByName(PrefireRouteManager.CurrentPrefireRoute.Name);
-                        KilledBots = 0;
-                    }
-                    return HookResult.Continue;
-                }
+            //if(PrefireRouteManager.CurrentPrefireRoute == null) return HookResult.Continue;
+            //if(@event.Userid.IsBot)
+            //{            
+            //    if (@event.Health <= 0)
+            //    {
+            //        CCSPlayerController? bot = Utilities.GetPlayerFromSlot(@event.Userid.Slot);
+            //        if(bot == null) return HookResult.Continue;
+            //        KilledBots++;
+            //        @event.Userid.Respawn();
+                    
+            //        if(KilledBots == PrefireRouteManager.CurrentPrefireRoute!.spawnPoints.Count)
+            //        {
+            //            @event.Attacker.HtmlMessage($"Finished {PrefireRouteManager.CurrentPrefireRoute.Name}!");
+            //            PrefireRouteManager.LoadRouteByName(PrefireRouteManager.CurrentPrefireRoute.Name);
+            //            KilledBots = 0;
+            //        }
+            //        return HookResult.Continue;
+            //    }
                
 
-            }
+            //}
             return HookResult.Continue;
         }
 
@@ -198,12 +240,12 @@ namespace CSPracc.Modes
             return HookResult.Continue;
         }
 
-        public void Restart()
+        public void Restart(CCSPlayerController player)
         {
             if(PrefireRouteManager.CurrentPrefireRoute != null)
             {
                 Utils.ServerMessage($"Restarting route {PrefireRouteManager.CurrentPrefireRoute.Name}");
-                PrefireRouteManager.LoadRouteByName(PrefireRouteManager.CurrentPrefireRoute.Name);
+                PrefireRouteManager.LoadRouteByName(PrefireRouteManager.CurrentPrefireRoute.Name,player);
             }
             else
             {
@@ -214,6 +256,7 @@ namespace CSPracc.Modes
         public override void ConfigureEnvironment()
         {
             DataModules.Constants.Methods.MsgToServer("Loading prefire mode.");
+            Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
             Server.ExecuteCommand("exec CSPRACC\\prefire.cfg");
             EventHandler?.Dispose();
             EventHandler = new PrefireEventHandler(CSPraccPlugin.Instance!, new PrefireCommandHandler(this),this);

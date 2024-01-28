@@ -164,7 +164,8 @@ namespace CSPracc
 
             player.GetValueOfCookie("PersonalizedNadeMenu", out string? value);
             string MenuTitle = string.Empty;
-            if (value == null || value == "yes")
+            bool usePersonalNadeMenu = (value == "yes") || (value == null && CSPraccPlugin.Instance!.Config!.UsePersonalNadeMenu) ? true : false;
+            if (usePersonalNadeMenu)
             {
                 MenuTitle = "Personal Nade Menu";
                 foreach (KeyValuePair<int, ProjectileSnapshot> entry in getAllNadesFromPlayer(player.SteamID))
@@ -246,8 +247,7 @@ namespace CSPracc
             if (pos >= snapshots.Count)
             {
                 pos--;
-                Utils.ClientChatMessage($"You did not throw that many grenades yet", player);
-                return;
+                Utils.ClientChatMessage($"Reached the end of your grenade history, teleporting to the last grenade.", player);               
             }
             ProjectileSnapshot? snapshot = snapshots[pos];
             if (snapshot != null)
@@ -287,7 +287,7 @@ namespace CSPracc
             if (pos < 0)
             {
                 pos = 0;
-                Utils.ClientChatMessage($"You are at your latest smoke.", player);
+                Utils.ClientChatMessage($"You are at your latest grenade.", player);
             }
             ProjectileSnapshot? snapshot = snapshots[pos];
             if (snapshot != null)
@@ -305,8 +305,24 @@ namespace CSPracc
             player.GetValueOfCookie("PersonalizedNadeMenu", out string? value);
             string MenuTitle = string.Empty;
             List<KeyValuePair<int, ProjectileSnapshot>> nadeList = new List<KeyValuePair<int, ProjectileSnapshot>>();
-            if (value == null || value == "yes")
+            if (value == null)
             {
+                Server.PrintToConsole("Could not get cookie");
+                if(CSPraccPlugin.Instance.Config.UsePersonalNadeMenu)
+                {
+                    Server.PrintToConsole("personal nade menu");
+                    nadeList = getAllNadesFromPlayer(player.SteamID);
+                }
+                else
+                {
+                    Server.PrintToConsole("global");
+                    nadeList = CurrentProjectileStorage.GetAll();
+                }
+                return nadeList;
+            }
+            if(value == "yes")
+            {
+                Server.PrintToConsole("Could get cookie");
                 nadeList = getAllNadesFromPlayer(player.SteamID);
             }
             else
@@ -489,10 +505,11 @@ namespace CSPracc
                 return;
             }
             snapshotToAdd.Title = name;
-            lastSavedNade.SetOrAdd(player.SteamID, CurrentProjectileStorage.Add(snapshotToAdd));        
-            player.PrintToCenter($"Successfully added grenade {name}");
+            int newid = CurrentProjectileStorage.Add(snapshotToAdd);
+            lastSavedNade.SetOrAdd(player.SteamID, newid);        
+            player.PrintToCenter($"Successfully added grenade \"{name}\" at id: {newid}");
         }
-
+        
         /// <summary>
         /// Add grenade to the list
         /// </summary>
@@ -610,7 +627,7 @@ namespace CSPracc
                     }                                   
                     if ( projectile.Globalname != "custom")
                     {                       
-                        ProjectileSnapshot tmpSnapshot = new ProjectileSnapshot(playerPosition.ToVector3(), projectile.InitialPosition.ToVector3(), playerAngle.ToVector3(), projectile.InitialVelocity.ToVector3(), name, description, type);
+                        ProjectileSnapshot tmpSnapshot = new ProjectileSnapshot(playerPosition.ToVector3(), projectile.InitialPosition.ToVector3(), playerAngle.ToVector3(), projectile.InitialVelocity.ToVector3(), name, description, type,player.SteamID);
                         List<ProjectileSnapshot>? projectileSnapshots = new List<ProjectileSnapshot>();                        
                         if (LastThrownGrenade.ContainsKey((player.SteamID)) && LastThrownGrenade.TryGetValue(player.SteamID, out projectileSnapshots))
                         {
@@ -969,6 +986,26 @@ player.TeamNum
                     lastSnapshot.Value.Title = title;                   
                     CurrentProjectileStorage.SetOrAdd(lastSnapshot.Key, lastSnapshot.Value); 
                     Utils.ClientChatMessage($"Updating grenade name to {title}", steamId);
+
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds description to your last saved nade
+        /// </summary>
+        /// <param name="steamId">player who issued the command</param>
+        /// <param name="title">description</param>
+        public void UpdatePosition(CCSPlayerController playerController)
+        {           
+            KeyValuePair<int, ProjectileSnapshot> lastSnapshot = getLastAddedProjectileSnapshot(playerController.SteamID);
+            if (lastSnapshot.Key != 0)
+            {
+                if (lastSnapshot.Value != null)
+                {
+                    lastSnapshot.Value.PlayerPosition = playerController.GetCurrentPosition()!.PlayerPosition.ToVector3();
+                    CurrentProjectileStorage.SetOrAdd(lastSnapshot.Key, lastSnapshot.Value);
+                    Utils.ClientChatMessage($"Updating player position for your current nade.", playerController);
 
                 }
             }

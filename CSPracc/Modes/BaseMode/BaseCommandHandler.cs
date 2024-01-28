@@ -49,43 +49,6 @@ namespace CSPracc.CommandHandler
             }
         }
 
-        ChatMenu? _modeMenu = null;
-        ChatMenu ModeMenu
-        {
-            get
-            {
-                if (_modeMenu == null)
-                {
-                    _modeMenu = new ChatMenu("Mode Menu");
-                    var handleGive = (CCSPlayerController player, ChatMenuOption option) => ModeMenuOption(player, option.Text);
-                    _modeMenu.AddMenuOption("Pracc", handleGive);
-                    _modeMenu.AddMenuOption("Match", handleGive);
-                    _modeMenu.AddMenuOption("Help", handleGive);
-                }
-                return _modeMenu;
-            }
-        }
-
-        private void ModeMenuOption(CCSPlayerController player, string optionText)
-        {
-            switch (optionText)
-            {
-                case "Pracc":
-                    CSPraccPlugin.SwitchMode(Enums.PluginMode.Pracc);
-                    break;
-                case "Match":
-                    RoundRestoreManager.CleanupOldFiles();
-                    CSPraccPlugin.SwitchMode(Enums.PluginMode.Match);
-                    break;
-                case "Retakes":
-                    CSPraccPlugin.SwitchMode(Enums.PluginMode.Retake);
-                    break;
-                case "Help":
-                    PrintHelp(player);
-                    break;
-            }
-        }
-
         protected string getCommand(string input)
         {
             string command = null;

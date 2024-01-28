@@ -26,13 +26,15 @@ namespace CSPracc.CommandHandler
         Dictionary<CCSPlayerController, Position> checkpoints = new Dictionary<CCSPlayerController, Position>();
         PracticeBotManager BotManager {  get; set; }
         PracticeMode PracticeMode { get; set; }
+        SpawnManager SpawnManager { get; set; }
 
         ProjectileManager ProjectileManager { get; set; }
-        public PracticeCommandHandler(PracticeMode mode,ref ProjectileManager projectileManager, ref PracticeBotManager botManager): base(mode)
+        public PracticeCommandHandler(PracticeMode mode,ref ProjectileManager projectileManager, ref PracticeBotManager botManager, ref SpawnManager spawnManager): base(mode)
         {
             PracticeMode = mode;
             BotManager = botManager;
             ProjectileManager =  projectileManager;
+            SpawnManager = spawnManager;
             CSPraccPlugin.Instance.AddCommand("css_pracc_smokecolor_enabled", "Enables / disabled smoke color", PraccSmokecolorEnabled);
         }
 
@@ -281,6 +283,9 @@ namespace CSPracc.CommandHandler
                         ProjectileManager.DeleteTagFromAllNades(player.SteamID,args);
                         break;
                     }
+                case PRACC_COMMAND.UpdatePos:
+                    ProjectileManager.UpdatePosition(player);
+                    break;
                 case PRACC_COMMAND.Last:
                     {
                         ProjectileManager.RestorePlayersLastThrownGrenade(player,-1); 
@@ -430,7 +435,6 @@ namespace CSPracc.CommandHandler
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.ClearTags}{ChatColors.White} Remove all tags from your last saved grenade.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.DeleteTag}{ChatColors.White}{ChatColors.Red} 'tag'{ChatColors.White} Delete a tag from all of your nades.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.showtags}{ChatColors.White} Show all available tags from your currently selected nade menu. To change the nade menu use .settings .");
-            message.Add($" {ChatColors.Green}{PRACC_COMMAND.SAVELAST}{ChatColors.White}{ChatColors.Red} 'name'{ChatColors.White}. Saves  lineup of last thrown nade.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.rethrow}{ChatColors.White} Rethrows your last grenade.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.BOT}{ChatColors.White} Spawns bot at your current location.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.BOOST}{ChatColors.White} Spawns bot at your current location and teleports you ontop.");

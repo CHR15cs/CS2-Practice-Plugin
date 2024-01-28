@@ -26,7 +26,7 @@ namespace CSPracc.Modes
         }
 
         
-
+        SpawnManager SpawnManager { get; set; }
         WeaponKitStorage WeaponKitStorage { get; set; }
         private string CurrentBombsite {  get; set; }
         private RetakeModeStatus status;
@@ -34,6 +34,7 @@ namespace CSPracc.Modes
         GunManager GunManager { get; set; }
         public RetakeMode() : base()
         {
+            this.SpawnManager = new SpawnManager();
             status = RetakeModeStatus.live;
             CurrentBombsite = "A";
             GunManager = new GunManager(GuiManager);

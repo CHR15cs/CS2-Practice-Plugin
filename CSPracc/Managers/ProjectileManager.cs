@@ -742,6 +742,30 @@ namespace CSPracc
                 }
                 Utils.ClientChatMessage("Rethrowing your last grenade.", player);
             }
+            else if (tag.ToLower().StartsWith("id:"))
+            {
+                tag = tag.Trim().ToLower().Substring(3);
+                if(!int.TryParse(tag, out int id))
+                {
+                    player.ChatMessage("Could not parse id");
+                    return;
+                }              
+                List<KeyValuePair<int, ProjectileSnapshot>> nades = getCurrentPlayerNades(player);
+                bool foundNade = false;
+                foreach (var kvp in nades)
+                {
+                    if (kvp.Key == id)
+                    {
+                        foundNade = true;
+                        CSPraccPlugin.Instance!.AddTimer(kvp.Value.Delay, () => ThrowGrenadePojectile(kvp.Value, player));
+                        player.ChatMessage($"Threw your grenade {ChatColors.Green}{kvp.Value.Title}");
+                    }
+                }
+                if(!foundNade)
+                {
+                    player.ChatMessage($"Could not find grenade with id {ChatColors.Red}{id}");
+                }
+            }
             else
             {
                 tag = tag.Trim().ToLower();

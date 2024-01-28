@@ -470,7 +470,7 @@ namespace CSPracc
         /// <summary>
         /// Add grenade to the list
         /// </summary>
-        /// <param name="player">palyer who issued the command</param>
+        /// <param name="player">player who issued the command</param>
         /// <param name="args">Arguments shall look like <Name> <Description></param>
         public void SaveSnapshot(CCSPlayerController player,string args)
         {
@@ -485,7 +485,7 @@ namespace CSPracc
             ProjectileSnapshot? snapshotToAdd = getLatestProjectileSnapshot(player.SteamID);
             if(snapshotToAdd == null)
             {
-                Utils.ClientChatMessage("Could not save lasth thrown projectile.",player);
+                Utils.ClientChatMessage("Could not save last thrown projectile.",player);
                 return;
             }
             snapshotToAdd.Title = name;
@@ -496,7 +496,7 @@ namespace CSPracc
         /// <summary>
         /// Add grenade to the list
         /// </summary>
-        /// <param name="player">palyer who issued the command</param>
+        /// <param name="player">player who issued the command</param>
         /// <param name="args">Arguments shall look like <Name> <Description></param>
         public void RemoveSnapshot(CCSPlayerController player, string args)
         {

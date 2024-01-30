@@ -811,27 +811,27 @@ namespace CSPracc
                         if(OperatingSystem.IsLinux())
                         {
                             CSmokeGrenadeProjectile_CreateFuncLinux.Invoke(
-    projectile.ProjectilePosition.ToCSVector().Handle,
-    projectile.ProjectilePosition.ToCSVector().Handle,
-    projectile.Velocity.ToCSVector().Handle,
-    projectile.Velocity.ToCSVector().Handle,
-    player.Pawn.Value.Handle,
-    45,
-    player.TeamNum
-);
+                                projectile.ProjectilePosition.ToCSVector().Handle,
+                                projectile.ProjectilePosition.ToCSVector().Handle,
+                                projectile.Velocity.ToCSVector().Handle,
+                                projectile.Velocity.ToCSVector().Handle,
+                                player.Pawn.Value.Handle,
+                                45,
+                                player.TeamNum
+                            );
 
                         }
                         else if(OperatingSystem.IsWindows())
                         {
                             CSmokeGrenadeProjectile_CreateFuncWindows.Invoke(
-projectile.ProjectilePosition.ToCSVector().Handle,
-projectile.ProjectilePosition.ToCSVector().Handle,
-projectile.Velocity.ToCSVector().Handle,
-projectile.Velocity.ToCSVector().Handle,
-player.Pawn.Value.Handle,
-45,
-player.TeamNum
-);
+                                projectile.ProjectilePosition.ToCSVector().Handle,
+                                projectile.ProjectilePosition.ToCSVector().Handle,
+                                projectile.Velocity.ToCSVector().Handle,
+                                projectile.Velocity.ToCSVector().Handle,
+                                player.Pawn.Value.Handle,
+                                45,
+                                player.TeamNum
+                            );
                         }
                         else
                         {

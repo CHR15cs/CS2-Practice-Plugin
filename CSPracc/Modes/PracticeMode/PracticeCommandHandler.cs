@@ -265,7 +265,7 @@ namespace CSPracc.CommandHandler
                     }
                 case PRACC_COMMAND.AddTag:
                     {
-                        ProjectileManager.AddTagToLastGrenade(player.SteamID, args);
+                        ProjectileManager.AddTagToLastGrenade(player, args);
                         break;
                     }
                 case PRACC_COMMAND.RemoveTag:

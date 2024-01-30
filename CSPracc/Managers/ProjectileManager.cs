@@ -1044,21 +1044,26 @@ namespace CSPracc
             }
         }
 
-        public void AddTagToLastGrenade(ulong steamid, string tag)
+        public void AddTagToLastGrenade(CCSPlayerController player, string tag)
         {
-            KeyValuePair<int, ProjectileSnapshot> lastSnapshot = getLastAddedProjectileSnapshot(steamid);
+            if (int.TryParse(tag, out int _)) 
+            {
+                player.ChatMessage("Cannot use a number as tag");
+                return;
+            }
+            KeyValuePair<int, ProjectileSnapshot> lastSnapshot = getLastAddedProjectileSnapshot(player.SteamID);
             if (lastSnapshot.Key != 0)
             {
                 if (lastSnapshot.Value != null)
                 {
                     if(snapshotContainTag(lastSnapshot.Value,tag))
                     {
-                        Utils.ClientChatMessage($"Grenade already contains tag {tag}", steamid);
+                        Utils.ClientChatMessage($"Grenade already contains tag {tag}", player.SteamID);
                         return;
                     }
                     lastSnapshot.Value.Tags.Add(tag);
                     CurrentProjectileStorage.SetOrAdd(lastSnapshot.Key, lastSnapshot.Value);
-                    Utils.ClientChatMessage($"Added tag {tag}  to {lastSnapshot.Value.Title}", steamid);
+                    Utils.ClientChatMessage($"Added tag {tag}  to {lastSnapshot.Value.Title}", player.SteamID);
                 }
             }
         }

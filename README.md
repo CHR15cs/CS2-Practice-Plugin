@@ -29,3 +29,7 @@ https://github.com/splewis/get5<br>
 https://github.com/splewis/csgo-practice-mode<br>
 Coach Slot: https://github.com/marqdevx/mm-cs2-coach <br>
 Throwing Smokes: https://github.com/zwolof <br>
+
+## Upgrade your practice
+<a href="https://leetify.com/invite/d9d17aae-d888-4380-b24e-649cee519710"><img src="https://leetify.com/assets/images/leetify-logo-primary-white.svg" alt="drawing" width="200"/></a><br>
+Refferal link, create a free account and support me.

@@ -722,7 +722,10 @@ namespace CSPracc
         /// <param name="player">player who issued the command</param>
         public void ReThrow(CCSPlayerController player, string tag = "")
         {
-            if(tag == "")
+            List<KeyValuePair<int, ProjectileSnapshot>> nades = getCurrentPlayerNades(player);
+
+            tag = tag.Trim().ToLower();
+            if (string.IsNullOrEmpty(tag))
             {
                 ProjectileSnapshot? grenade = getLatestProjectileSnapshot(player.SteamID);
                 if (grenade == null)
@@ -741,42 +744,48 @@ namespace CSPracc
                     return;
                 }
                 Utils.ClientChatMessage("Rethrowing your last grenade.", player);
+                return;
             }
-            else if (tag.ToLower().StartsWith("id:"))
+            else if (tag.StartsWith("id:"))
             {
-                tag = tag.Trim().ToLower().Substring(3);
-                if(!int.TryParse(tag, out int id))
+                tag = tag[3..];
+                if (!int.TryParse(tag, out int id))
                 {
                     player.ChatMessage("Could not parse id");
                     return;
-                }              
-                List<KeyValuePair<int, ProjectileSnapshot>> nades = getCurrentPlayerNades(player);
-                bool foundNade = false;
-                foreach (var kvp in nades)
-                {
-                    if (kvp.Key == id)
-                    {
-                        foundNade = true;
-                        CSPraccPlugin.Instance!.AddTimer(kvp.Value.Delay, () => ThrowGrenadePojectile(kvp.Value, player));
-                        player.ChatMessage($"Threw your grenade {ChatColors.Green}{kvp.Value.Title}");
-                    }
                 }
-                if(!foundNade)
+
+                var foundNade = nades.FirstOrDefault(x => x.Key == id).Value;
+                if (foundNade == null)
                 {
                     player.ChatMessage($"Could not find grenade with id {ChatColors.Red}{id}");
+                    return;
+                }
+
+                CSPraccPlugin.Instance!.AddTimer(foundNade.Delay, () => ThrowGrenadePojectile(foundNade, player));
+                player.ChatMessage($"Threw your grenade {ChatColors.Green}{foundNade.Title}");
+
+                return;
+            }
+            else if (int.TryParse(tag, out int id))
+            {
+                var foundNade = nades.FirstOrDefault(x => x.Key == id).Value;
+                if (foundNade != null)
+                {
+                    CSPraccPlugin.Instance!.AddTimer(foundNade.Delay, () => ThrowGrenadePojectile(foundNade, player));
+                    player.ChatMessage($"Threw your grenade {ChatColors.Green}{foundNade.Title}");
+
+                    return;
                 }
             }
-            else
+
+            Utils.ClientChatMessage($"Throwing all grenades containing tag: {ChatColors.Green}{tag}", player);
+
+            foreach (var kvp in nades)
             {
-                tag = tag.Trim().ToLower();
-                Utils.ClientChatMessage($"Throwing all grenades containing tag: {ChatColors.Green}{tag}", player);
-                List<KeyValuePair<int, ProjectileSnapshot>> nades = getCurrentPlayerNades(player);
-                foreach (var kvp in nades)
+                if (snapshotContainTag(kvp.Value, tag))
                 {
-                    if(snapshotContainTag(kvp.Value, tag))
-                    {
-                        CSPraccPlugin.Instance!.AddTimer(kvp.Value.Delay, ()=>ThrowGrenadePojectile(kvp.Value, player));
-                    }
+                    CSPraccPlugin.Instance!.AddTimer(kvp.Value.Delay, () => ThrowGrenadePojectile(kvp.Value, player));
                 }
             }
         }
@@ -802,27 +811,27 @@ namespace CSPracc
                         if(OperatingSystem.IsLinux())
                         {
                             CSmokeGrenadeProjectile_CreateFuncLinux.Invoke(
-    projectile.ProjectilePosition.ToCSVector().Handle,
-    projectile.ProjectilePosition.ToCSVector().Handle,
-    projectile.Velocity.ToCSVector().Handle,
-    projectile.Velocity.ToCSVector().Handle,
-    player.Pawn.Value.Handle,
-    45,
-    player.TeamNum
-);
+                                projectile.ProjectilePosition.ToCSVector().Handle,
+                                projectile.ProjectilePosition.ToCSVector().Handle,
+                                projectile.Velocity.ToCSVector().Handle,
+                                projectile.Velocity.ToCSVector().Handle,
+                                player.Pawn.Value.Handle,
+                                45,
+                                player.TeamNum
+                            );
 
                         }
                         else if(OperatingSystem.IsWindows())
                         {
                             CSmokeGrenadeProjectile_CreateFuncWindows.Invoke(
-projectile.ProjectilePosition.ToCSVector().Handle,
-projectile.ProjectilePosition.ToCSVector().Handle,
-projectile.Velocity.ToCSVector().Handle,
-projectile.Velocity.ToCSVector().Handle,
-player.Pawn.Value.Handle,
-45,
-player.TeamNum
-);
+                                projectile.ProjectilePosition.ToCSVector().Handle,
+                                projectile.ProjectilePosition.ToCSVector().Handle,
+                                projectile.Velocity.ToCSVector().Handle,
+                                projectile.Velocity.ToCSVector().Handle,
+                                player.Pawn.Value.Handle,
+                                45,
+                                player.TeamNum
+                            );
                         }
                         else
                         {

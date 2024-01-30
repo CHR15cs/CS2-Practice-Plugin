@@ -725,7 +725,7 @@ namespace CSPracc
             List<KeyValuePair<int, ProjectileSnapshot>> nades = getCurrentPlayerNades(player);
 
             tag = tag.Trim().ToLower();
-            if (tag == "")
+            if (string.IsNullOrEmpty(tag))
             {
                 ProjectileSnapshot? grenade = getLatestProjectileSnapshot(player.SteamID);
                 if (grenade == null)
@@ -744,6 +744,7 @@ namespace CSPracc
                     return;
                 }
                 Utils.ClientChatMessage("Rethrowing your last grenade.", player);
+                return;
             }
             else if (tag.StartsWith("id:"))
             {

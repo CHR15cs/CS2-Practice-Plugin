@@ -36,7 +36,7 @@ namespace CSPracc.Managers
         /// </summary>
         protected CommandAliasStorage GlobalCommandAliasStorage { get; init; } = new CommandAliasStorage(JsonBaseDirectory);
         protected Dictionary<CCSPlayerController, CommandAliasStorage> PlayerSpecificCommandAliasStorages { get; init; } = new Dictionary<CCSPlayerController, CommandAliasStorage>();
-        private CommandAliasManager() { }
+        private CommandAliasManager() {  }
         /// <summary>
         /// Gets or Adds Projectile Storage for given map
         /// </summary>

@@ -30,16 +30,16 @@ namespace CSPracc.EventHandler
         PrefireCommandHandler RetakeCommandHandler { get; set; }
         public PrefireEventHandler(CSPraccPlugin plugin, PrefireCommandHandler rch, PrefireMode mode) : base(plugin,rch)
         {
-            PrefireMode = mode;
-            //plugin.RegisterListener<Listeners.OnEntitySpawned>(entity => ProjectileManager.Instance.OnEntitySpawned(entity));          
-            plugin.RegisterEventHandler<EventPlayerSpawn>(mode.OnPlayerSpawn, hookMode: HookMode.Post);
-            plugin.RegisterEventHandler<EventRoundStart>(mode.OnRoundStart, hookMode: HookMode.Post);
-            plugin.RegisterEventHandler<EventPlayerHurt>(mode.OnPlayerHurt, hookMode: HookMode.Pre);
-            plugin.RegisterEventHandler<EventPlayerDeath>(mode.OnPlayerDeath, hookMode: HookMode.Post);
+            //PrefireMode = mode;
+            ////plugin.RegisterListener<Listeners.OnEntitySpawned>(entity => ProjectileManager.Instance.OnEntitySpawned(entity));          
+            //plugin.RegisterEventHandler<EventPlayerSpawn>(mode.OnPlayerSpawn, hookMode: HookMode.Post);
+            //plugin.RegisterEventHandler<EventRoundStart>(mode.OnRoundStart, hookMode: HookMode.Post);
+            //plugin.RegisterEventHandler<EventPlayerHurt>(mode.OnPlayerHurt, hookMode: HookMode.Pre);
+            //plugin.RegisterEventHandler<EventPlayerDeath>(mode.OnPlayerDeath, hookMode: HookMode.Post);
             
-            Plugin = plugin;
-            BotManager = new PracticeBotManager();
-            RetakeCommandHandler = rch;
+            //Plugin = plugin;
+            //BotManager = new PracticeBotManager();
+            //RetakeCommandHandler = rch;
         }
 
         public override void Dispose()

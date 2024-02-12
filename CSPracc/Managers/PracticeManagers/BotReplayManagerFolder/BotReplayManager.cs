@@ -21,14 +21,16 @@ namespace CSPracc.Managers
     {
         ProjectileManager ProjectileManager { get; set; }
         PracticeBotManager PracticeBotManager { get; set; }
+        GuiManager GuiManager { get; set; }
 
         BotReplayStorage BotReplayStorage { get; set; }
         Dictionary<ulong,int> ReplayToEdit {  get; set; } = new Dictionary<ulong,int>();
         Dictionary<ulong,PlayerReplay> replays = new Dictionary<ulong, PlayerReplay>();
         Dictionary<ulong,PlayerReplay> replaysToRecord = new Dictionary<ulong,PlayerReplay>();
         Dictionary<int, PlayerReplay> replaysToReplay = new Dictionary<int, PlayerReplay>();
-        public BotReplayManager(ref PracticeBotManager practiceBotManager,ref ProjectileManager projectileManager) 
+        public BotReplayManager(ref PracticeBotManager practiceBotManager,ref ProjectileManager projectileManager, ref CommandManager commandManager, ref GuiManager guiManager) 
         {
+            GuiManager = guiManager;
             ProjectileManager = projectileManager;
             PracticeBotManager = practiceBotManager;
             CSPraccPlugin.Instance.Logger.LogInformation("Creating Bot Replay storage");
@@ -39,10 +41,131 @@ namespace CSPracc.Managers
 
             CSPraccPlugin.Instance.RegisterListener<Listeners.OnEntitySpawned>(entity => OnEntitySpawned(entity));
             CSPraccPlugin.Instance.RegisterEventHandler<EventPlayerShoot>(OnPlayerShoot);
+            commandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.mimic_menu, "open bot mimic menu", ShowMimicMenu, null));
+            commandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.replay_menu, "open bot mimic menu", ShowMimcReplays, null));
+            commandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.store_replay, "store last recorded replay", SaveLastReplayCommandHandler, null));
+            commandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.create_replay, "create new replay", CreateReplayCommandHandler, null));
+            commandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.record_role, "record role", RecordPlayerCommandHandler, null));
+            commandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.rename_replayset, "rename replay set", RenameCurrentReplaySetCommandHandler, null));
+            commandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.stoprecord, "stop current recording", StopRecordingCommandHandler, null));
         }
+
+        /// <summary>
+        /// Return Mimic menu
+        /// </summary>
+        /// <param name="ccsplayerController">palyer who issued the command</param>
+        /// <returns></returns>
+        private HtmlMenu GetBotMimicMenu(CCSPlayerController ccsplayerController)
+        {
+            HtmlMenu mimic_menu;
+            List<KeyValuePair<string, Action>> menuOptions = new List<KeyValuePair<string, Action>>();
+            menuOptions.Add(new KeyValuePair<string, Action>("List existing replay", () => CSPraccPlugin.Instance!.AddTimer(0.5f, () => ShowMimcReplays(ccsplayerController, new List<string>()))));
+            menuOptions.Add(new KeyValuePair<string, Action>("Create new replay", new Action(() => CreateReplaySet(ccsplayerController, ""))));
+            menuOptions.Add(new KeyValuePair<string, Action>("Delete existing replay", () => CSPraccPlugin.Instance!.AddTimer(0.5f, () => DeleteMimicReplay(ccsplayerController))));
+            return mimic_menu = new HtmlMenu("Bot Mimic Menu", menuOptions);
+        }
+
+        /// <summary>
+        /// List all replays and play on selection
+        /// </summary>
+        /// <param name="player">player who issued the command</param>
+        public bool ShowMimcReplays(CCSPlayerController player,List<string> args)
+        {
+            HtmlMenu replay_menu;
+            List<KeyValuePair<string, Action>> menuOptions = new List<KeyValuePair<string, Action>>();
+            List<KeyValuePair<int, ReplaySet>> replays = GetAllCurrentReplays();
+            if (replays.Count == 0)
+            {
+                player.ChatMessage($"There are currently no replays existing. Create one using {BotReplayCommands.create_replay} 'name of the replay'");
+                return false;
+            }
+            for (int i = 0; i < replays.Count; i++)
+            {
+                ReplaySet set = replays[i].Value;
+                menuOptions.Add(new KeyValuePair<string, Action>($"{replays[i].Value.SetName}", () => PlayReplaySet(set)));
+            }
+            replay_menu = new HtmlMenu("Replays", menuOptions);
+            GuiManager.AddMenu(player.SteamID, replay_menu);
+            return true;
+        }
+
+
+        /// <summary>
+        /// Show mimic menu to the player
+        /// </summary>
+        /// <param name="player">player who issued the command</param>
+        public bool ShowMimicMenu(CCSPlayerController player, List<string> args)
+        {
+            HtmlMenu mimicMenu = GetBotMimicMenu(player);
+            GuiManager.AddMenu(player.SteamID, mimicMenu);
+            return true;
+        }
+
+        public bool ShowDeleteMenuCommandHandler(CCSPlayerController playerController, List<string> args)
+        {
+            DeleteMimicReplay(playerController);
+            return true;
+        }
+
+        /// <summary>
+        /// Show menu to delete replay
+        /// </summary>
+        /// <param name="ccsplayerController">player who issued the commands</param>
+        public void DeleteMimicReplay(CCSPlayerController player)
+        {
+            if (!player.IsAdmin())
+            {
+                player.ChatMessage("Only admins can delete replays!");
+                return;
+            }
+            HtmlMenu deletion_menu;
+            List<KeyValuePair<string, Action>> menuOptions = new List<KeyValuePair<string, Action>>();
+            List<KeyValuePair<int, ReplaySet>> replays = GetAllCurrentReplays();
+            if (replays.Count == 0)
+            {
+                player.ChatMessage($"There are currently no replays existing. Create one using {BotReplayCommands.create_replay} 'name of the replay'");
+                return;
+            }
+            for (int i = 0; i < replays.Count; i++)
+            {
+                Server.PrintToConsole($"Logging {replays[i].Value.SetName}");
+                int id = replays[i].Key;
+                menuOptions.Add(new KeyValuePair<string, Action>($"{replays[i].Value.SetName}", () => DeleteReplaySet(player, id)));
+            }
+            deletion_menu = new HtmlMenu("Delete Replay", menuOptions);
+            GuiManager.AddMenu(player.SteamID, deletion_menu);
+            return;
+        }
+
+
+        /// <summary>
+        /// Create new replay set
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="name"></param>
+        public bool CreateReplayCommandHandler(CCSPlayerController player,List<string> args)
+        {
+            string name = "new replayset";
+            if (args.Count > 0)
+            {
+                name = String.Join(" ", args);
+            }           
+            CreateReplaySet(player, name);
+            return true;
+        }
+
 
         public void CreateReplaySet(CCSPlayerController player, string name) 
         {
+            player.ChatMessage($"You are now in editing mode. For replay '{name}'");
+            player.ChatMessage($"Use {ChatColors.Green}{BotReplayCommands.record_role}{ChatColors.White} to record a new role.");
+            player.ChatMessage($"Use {ChatColors.Green}{BotReplayCommands.stoprecord}{ChatColors.White} to stop the recording.");
+            player.ChatMessage($"Use {ChatColors.Green}{BotReplayCommands.store_replay}{ChatColors.White} 'name' to save the record with the given name.");
+            player.ChatMessage($"Use {ChatColors.Green}{BotReplayCommands.rename_replayset}{ChatColors.White} to set a new name.");
+            if (String.IsNullOrWhiteSpace(name))
+            {
+                name = "new replayset";
+            }
             int id = BotReplayStorage.Add(new ReplaySet(new List<PlayerReplay>(), name));
             ReplayToEdit.SetOrAdd(player.SteamID, id);
         }
@@ -53,20 +176,24 @@ namespace CSPracc.Managers
         /// </summary>
         /// <param name="player">who issued the command</param>
         /// <param name="name">name of the replay, if not set, playername is used</param>
-        public void RecordPlayer(CCSPlayerController player,string name = "")
+        public bool RecordPlayerCommandHandler(CCSPlayerController playerController,List<string> args)
         {
-            if (replaysToRecord.ContainsKey(player.SteamID)) return;
-
-            if (name == "") name = player.PlayerName;
-            replaysToRecord.Add(player.SteamID, new PlayerReplay(name));
-            player.ChatMessage($"Recording role {name}");
+            if (replaysToRecord.ContainsKey(playerController.SteamID)) return false;
+            string name = playerController.PlayerName;
+            if(args.Count >= 0)
+            {
+                name = String.Join(" ", args);
+            }           
+            replaysToRecord.Add(playerController.SteamID, new PlayerReplay(name));
+            playerController.ChatMessage($"Recording role {name}");
+            return true;
         }
         /// <summary>
         /// Stop recording current replay
         /// </summary>
         /// <param name="player">player who issued the command</param>
         /// <returns>Return the replay</returns>
-        public PlayerReplay? StopRecording(CCSPlayerController player)
+        public bool StopRecordingCommandHandler(CCSPlayerController player,List<string> args)
         {
             if(replaysToRecord.ContainsKey(player.SteamID))
             {
@@ -74,53 +201,61 @@ namespace CSPracc.Managers
                 replaysToRecord.Remove(player.SteamID);
                 replays.SetOrAdd(player.SteamID, replay);
                 player.ChatMessage($"Stopped recording for role {replay.ReplayName}");
-                return replay;
+                return true;
 
             }
             else
             {
                 player.ChatMessage("You are currently not recording.");
             }
-            return null;
+            return false;
         }
         /// <summary>
         /// Rename last recorded replay
         /// </summary>
         /// <param name="player">who issued the command</param>
         /// <param name="name">name of the replay</param>
-        public void NameReplay(CCSPlayerController player,string name)
+        public bool NameReplayCommandHandler(CCSPlayerController playerController,List<string> args)
         {
-            if (replays.TryGetValue(player.SteamID, out PlayerReplay? replay))
+            if(args.Count == 0)
+            {
+                playerController.ChatMessage("Cannot set empty name");
+                return false;
+            }
+            string name = String.Join (" ", args);
+            if (replays.TryGetValue(playerController.SteamID, out PlayerReplay? replay))
             {
                 replay.ReplayName = name;
+                return true;
             }
             else
             {
-                player.ChatMessage("Could not get last replay recorded.");
+                playerController.ChatMessage("Could not get last replay recorded.");               
             }
+            return false;
         }
 
         /// <summary>
         /// Save last recorded replay and add it to the current replay set
         /// </summary>
         /// <param name="player"></param>
-        public void SaveLastReplay(CCSPlayerController player)
+        public bool SaveLastReplayCommandHandler(CCSPlayerController playerController, List<string> args)
         {
-            if(!replays.TryGetValue(player.SteamID, out PlayerReplay? replay))
+            if(!replays.TryGetValue(playerController.SteamID, out PlayerReplay? replay))
             {
-                Utils.ClientChatMessage("No Replay recorded.", player);
-                return;
+                playerController.ChatMessage("No Replay recorded.");
+                return false;
             }
             if (replay == null)
             {
-                Utils.ClientChatMessage("Error getting replays from storage.", player);
-                return;
+                playerController.ChatMessage("Error getting replays from storage.");
+                return false;
             }
 
-            if (!getPlayerEditReplay(player, out int replayid))
+            if (!getPlayerEditReplay(playerController, out int replayid))
             {
-                Utils.ClientChatMessage("You need to select a replay to edit.", player);
-                return;
+                playerController.ChatMessage("You need to select a replay to edit.");
+                return false;
             }
 
             if (BotReplayStorage.Get(replayid, out ReplaySet? replayList))
@@ -131,17 +266,34 @@ namespace CSPracc.Managers
                 }
                 replayList.Replays.Add(replay);
                 BotReplayStorage.SetOrAdd(replayid, replayList);
-                replays.Remove(player.SteamID);
-                Utils.ClientChatMessage("Added last recorded replay to storage", player);
+                replays.Remove(playerController.SteamID);
+                playerController.ChatMessage("Added last recorded replay to storage");
+                return true;
             }
             else
             {
-                Utils.ClientChatMessage("Error getting replays from storage.", player);
-                return;
+                playerController.ChatMessage("Error getting replays from storage.");
+                
             }
-            player.ChatMessage("Stored last replay");
+            return false;
         }
 
+        public bool DeleteReplaySetCommandHandler(CCSPlayerController playerController,List<string> args)
+        {
+            if(args.Count == 0)
+            {
+                playerController.ChatMessage("Cannot delete replayset without id");
+                return false;
+            }
+            int id = -1;
+            if(!int.TryParse(args[0], out id))
+            {
+                playerController.ChatMessage("Id needs to be a number");
+                return false;
+            }
+            DeleteReplaySet(playerController, id);
+            return true;
+        }
         public void DeleteReplaySet(CCSPlayerController player, int id) 
         {
             if(BotReplayStorage.ContainsKey(id))
@@ -153,36 +305,44 @@ namespace CSPracc.Managers
             player.ChatMessage($"Could not find replay with id {id}");
         }
 
+
         /// <summary>
         /// Rename current replay set
         /// </summary>
         /// <param name="player">player who issued the command</param>
         /// <param name="name">new name</param>
-        public void RenameCurrentReplaySet(CCSPlayerController player,string name)
+        public bool RenameCurrentReplaySetCommandHandler(CCSPlayerController player,List<string> args)
         {
+            if(args.Count == 0)
+            {
+                player.ChatMessage("Cannot set empty name");
+                return false;
+            }
+            string name = String.Join(" ", args);
             if(!getPlayerEditReplay(player, out int ReplayId))
             {
                 player.ChatMessage("Could not get current replay set.");
-                return;
+                return false;
             }
             if (!BotReplayStorage.ContainsKey(ReplayId))
             {
                 player.ChatMessage($"Could not get current replay with id {ReplayId}.");
-                return;
+                return false;
             }
             if (!BotReplayStorage.Get(ReplayId, out ReplaySet set))
             {
                 player.ChatMessage("Could not get current replay set.");
-                return;
+                return false;
             }
             if (set == null)
             {
                 player.ChatMessage("Could not get current replay set.");
-                return;
+                return false;
             }
             set.SetName = name;
             BotReplayStorage.SetOrAdd(ReplayId, set);
             player.ChatMessage($"Updated setname to {ChatColors.Green}{name}{ChatColors.White}.");
+            return true;
         }
 
         private bool getPlayerEditReplay(CCSPlayerController player, out int replayid)

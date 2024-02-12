@@ -23,7 +23,7 @@ namespace CSPracc
             {
                 return true;
             }
-            return AdminManager.PlayerHasPermissions(playerController, AdminFlags.Standard);
+            return AdminManager.PlayerHasPermissions(new SteamID(playerController.SteamID), AdminFlags.Standard);
         }
 
         public static CsTeam GetCsTeam(this CCSPlayerController playerController)

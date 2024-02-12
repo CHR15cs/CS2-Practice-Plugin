@@ -10,6 +10,8 @@ using System.Drawing;
 using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
 using System.Runtime.InteropServices;
+using CounterStrikeSharp.API.Modules.Utils;
+using System.Reflection.Metadata;
 
 namespace CSPracc
 {
@@ -154,6 +156,72 @@ namespace CSPracc
                     prop.AcceptInput("break");
                 }
             }
+        }
+
+        public static void DrawRectanlgeAroundPosition(Vector position, Color color)
+        {
+            var laserLeftSide = Utilities.CreateEntityByName<CBeam>("beam");
+            if (laserLeftSide == null)
+            {
+                Server.PrintToChatAll("laser null");
+                return;
+            }
+            laserLeftSide.Glow.GlowColor.X = 255;
+            laserLeftSide.Glow.GlowColor.Y = 255;
+            laserLeftSide.Glow.GlowColor.Z = 255;
+            laserLeftSide.Glow.GlowStartTime = 0;
+            laserLeftSide.Glow.GlowTime = 0xffffffff;
+            laserLeftSide.Glow.Glowing = true;
+            laserLeftSide.EndPos.X = position.X-20;
+            laserLeftSide.EndPos.Y = position.Y - 20;
+            laserLeftSide.EndPos.Z = position.Z;
+            Vector posStart = new Vector(position.X - 20, position.Y + 20, position.Z);
+            laserLeftSide.Width = 1.0f;
+            laserLeftSide.Render = color;
+            laserLeftSide.DispatchSpawn();
+            laserLeftSide.Teleport(posStart, new QAngle(0, 0, 0), new Vector(0, 0, 0));
+            var laserTopSide = Utilities.CreateEntityByName<CBeam>("beam");
+            if (laserTopSide == null)
+            {
+                Server.PrintToChatAll("laser null");
+                return;
+            }
+            laserTopSide.EndPos.X = position.X - 20;
+            laserTopSide.EndPos.Y = position.Y + 20;
+            laserTopSide.EndPos.Z = position.Z;
+            posStart = new Vector(position.X + 20, position.Y + 20, position.Z);
+            laserTopSide.Width = 1.0f;
+            laserTopSide.Render = color;
+            laserTopSide.DispatchSpawn();
+            laserTopSide.Teleport(posStart, new QAngle(0, 0, 0), new Vector(0, 0, 0));
+            var laserRightSide = Utilities.CreateEntityByName<CBeam>("beam");
+            if (laserRightSide == null)
+            {
+                Server.PrintToChatAll("laser null");
+                return;
+            }
+            laserRightSide.EndPos.X = position.X + 20;
+            laserRightSide.EndPos.Y = position.Y + 20;
+            laserRightSide.EndPos.Z = position.Z;
+            posStart = new Vector(position.X + 20, position.Y - 20, position.Z);
+            laserRightSide.Width = 1.0f;
+            laserRightSide.Render = color;
+            laserRightSide.DispatchSpawn();
+            laserRightSide.Teleport(posStart, new QAngle(0, 0, 0), new Vector(0, 0, 0));
+            var laserBottomSide = Utilities.CreateEntityByName<CBeam>("beam");
+            if (laserBottomSide == null)
+            {
+                Server.PrintToChatAll("laser null");
+                return;
+            }
+            laserBottomSide.EndPos.X = position.X + 20;
+            laserBottomSide.EndPos.Y = position.Y - 20;
+            laserBottomSide.EndPos.Z = position.Z;
+            posStart = new Vector(position.X - 20, position.Y - 20, position.Z);
+            laserBottomSide.Width = 1.0f;
+            laserBottomSide.Render = color;
+            laserBottomSide.DispatchSpawn();
+            laserBottomSide.Teleport(posStart, new QAngle(0, 0, 0), new Vector(0, 0, 0));
         }
     }
 

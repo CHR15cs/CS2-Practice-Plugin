@@ -24,7 +24,7 @@ namespace CSPracc.Modes
     {        
         PrefireRouteManager PrefireRouteManager { get; set; }
 
-        SpawnManager SpawnManager { get; set; } 
+        PracticeSpawnManager SpawnManager { get; set; } 
 
         private int KilledBots { get; set; }
 
@@ -33,9 +33,9 @@ namespace CSPracc.Modes
         private ulong _playerToShoot { get; set; } = 0;
 
 
-        public PrefireMode() : base()
+        public PrefireMode(CSPraccPlugin plugin) : base(plugin)
         {
-            this.SpawnManager = new SpawnManager();
+            //this.SpawnManager = new PracticeSpawnManager();
             GunManager = new GunManager(GuiManager);
             PrefireRouteManager = new PrefireRouteManager();
             KilledBots = 0;
@@ -135,7 +135,7 @@ namespace CSPracc.Modes
         public void AddSpawn(CCSPlayerController player, string bombsite)
         {
             if (!player.IsAdmin()) player.PrintToCenter("Only Admins can execute this command!");
-            SpawnManager.AddCurrentPositionAsSpawnPoint(player, bombsite);
+            //SpawnManager.AddCurrentPositionAsSpawnPoint(player, bombsite);
         }
 
         public HookResult OnPlayerSpawn(EventPlayerSpawn @event,GameEventInfo info)

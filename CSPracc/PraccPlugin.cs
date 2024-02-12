@@ -96,44 +96,39 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
         SwitchMode(Config!.ModeToLoad);
     }
 
-    public static void SwitchMode(PluginMode pluginMode)
+    public void SwitchMode(PluginMode pluginMode)
     {
         PluginMode?.Dispose();
         switch (pluginMode)
         {
             case Enums.PluginMode.Base:
                 {
-                    PluginMode = new BaseMode();
+                    PluginMode = new BaseMode(this);
                     break;
                 }
             case Enums.PluginMode.Pracc:
                 {
-                    PluginMode = new PracticeMode();
+                    PluginMode = new PracticeMode(this);
                     break;
-                }
-            case Enums.PluginMode.Match:
-                {
-                    PluginMode = new MatchMode();
-                    break;
-                }
+                }       
             case Enums.PluginMode.DryRun:
                 {
-                    PluginMode = new DryRunMode();
+                    PluginMode = new DryRunMode(this);
                     break;
                 }
             case Enums.PluginMode.Retake:
                 {
-                    PluginMode = new RetakeMode();
+                    PluginMode = new RetakeMode(this);
                     break;
                 }
             case Enums.PluginMode.Prefire:
                 {
-                    PluginMode = new PrefireMode();
+                    PluginMode = new PrefireMode(this);
                     break;
                 }
             default:
                 {
-                    PluginMode = new BaseMode();
+                    PluginMode = new BaseMode(this);
                     break;
                 }               
         }
@@ -146,7 +141,7 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
         {
             return;
         }
-        if(config.Version == null || config.Version == 1)
+        if(config.Version == 1)
         {
             config.AdminRequirement = true;
             config.ModeToLoad = Enums.PluginMode.Base;

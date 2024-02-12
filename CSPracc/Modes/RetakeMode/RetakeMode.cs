@@ -26,15 +26,15 @@ namespace CSPracc.Modes
         }
 
         
-        SpawnManager SpawnManager { get; set; }
-        WeaponKitStorage WeaponKitStorage { get; set; }
+        //SpawnManager SpawnManager { get; set; }
+        WeaponKitStorage? WeaponKitStorage { get; set; }
         private string CurrentBombsite {  get; set; }
         private RetakeModeStatus status;
 
         GunManager GunManager { get; set; }
-        public RetakeMode() : base()
+        public RetakeMode(CSPraccPlugin plugin) : base(plugin)
         {
-            this.SpawnManager = new SpawnManager();
+            //this.SpawnManager = new SpawnManager();
             status = RetakeModeStatus.live;
             CurrentBombsite = "A";
             GunManager = new GunManager(GuiManager);
@@ -70,20 +70,20 @@ namespace CSPracc.Modes
         public void AddSpawn(CCSPlayerController player, string bombsite)
         {
             if (!player.IsAdmin()) player.PrintToCenter("Only Admins can execute this command!");
-            SpawnManager.AddCurrentPositionAsSpawnPoint(player, bombsite);
+            //SpawnManager.AddCurrentPositionAsSpawnPoint(player, bombsite);
         }
 
         public HookResult OnPlayerSpawn(EventPlayerSpawn @event,GameEventInfo info)
         {
             if (@event.Userid == null || !@event.Userid.IsValid || @event.Userid.IsBot)return HookResult.Continue;
-            SpawnManager.TeleportToUnusedSpawn(@event.Userid,CurrentBombsite);
+           // SpawnManager.TeleportToUnusedSpawn(@event.Userid,CurrentBombsite);
             GunManager.EquipPlayer(@event.Userid);
             return HookResult.Continue;
         }
 
         public HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo info)
         {
-            SpawnManager.ClearUsedSpawns();
+            //SpawnManager.ClearUsedSpawns();
             Random rnd = new Random();
             if (rnd.Next(10) % 2 == 0)
             {

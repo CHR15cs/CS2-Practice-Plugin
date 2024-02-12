@@ -33,7 +33,7 @@ namespace CSPracc
         public  CCSPlayerController? CoachTeam2 { get; set; }
 
 
-        public MatchMode() : base()
+        public MatchMode(CSPraccPlugin plugin) : base(plugin)
         {
 
         }

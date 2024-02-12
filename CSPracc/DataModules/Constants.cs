@@ -90,69 +90,84 @@ namespace CSPracc.DataModules.Constants
         public const string m4a1 = ".m4a1";
     }
 
+    public class PROJECTILE_COMMAND
+    {
+        public const string NADES = "nades";
+        public const string find = "find";
+        public const string SAVE = "save";
+        public const string delay = "delay";
+        public const string Description = "desc";
+        public const string Rename = "rename";
+        public const string AddTag = "addtag";
+        public const string RemoveTag = "removetag";
+        public const string ClearTags = "cleartags";
+        public const string DeleteTag = "deletetag";
+        public const string UpdatePos = "updatepos";
+        public const string Last = "last";
+        public const string forward = "forward";
+        public const string BACK = "back";
+        public const string Delete = "delete";
+        public const string CLEAR = "clear";
+        public const string ClearAll = "clearall";
+        public const string rethrow = "throw";
+        public const string flash = "flash";
+        public const string noflash = "noflash";
+        public const string stop = "stop";
+        public const string showtags = "showtags";
+    }
+
+    public class BotReplayCommands
+    {
+        public const string mimic_menu = "mimic";
+        public const string create_replay = "createreplay";
+        public const string record_role = "record";
+        public const string stoprecord = "stoprecord";
+        public const string store_replay = "storereplay";
+        public const string rename_replayset = "renameset";
+        public const string replay_menu = "replays";
+    }
+
     public class PRACC_COMMAND
     {      
-        public const string SPAWN = ".spawn";
-        public const string TSPAWN = ".tspawn";
-        public const string CTSPAWN = ".ctspawn";           
-        public const string NADES = ".nades";
-        public const string find = ".find";
-        public const string SAVE = ".save";
-        public const string delay = ".delay";
-        public const string Description = ".desc";
-        public const string Rename = ".rename";
-        public const string AddTag = ".addtag";
-        public const string RemoveTag = ".removetag";
-        public const string ClearTags = ".cleartags";
-        public const string DeleteTag = ".deletetag";
-        public const string UpdatePos = ".updatepos";
-        public const string Last = ".last";
-        public const string BACK = ".back";
-        public const string forward = ".forward";
-        public const string bestspawn = ".bestspawn";
-        public const string worstspawn = ".worstspawn";
-
-        public const string Delete = ".delete";               
-        public const string BOT = ".bot";
-        public const string tBOT = ".tbot";
-        public const string ctBOT = ".ctbot";
-        public const string BOOST = ".boost";
-        public const string WATCHME = ".watchme";
-        public const string NOBOT = ".nobot";
-        public const string CLEARBOTS = ".clearbots";
-        public const string CROUCHBOT = ".crouchbot";
-        public const string CROUCHBOOST = ".crouchboost";
-        public const string SwapBot = ".swapbot";
-        public const string MoveBot = ".movebot";
-
-        public const string CLEAR = ".clear";
-        public const string ClearAll = ".clearall";       
-        public const string SAVELAST = ".savelast";
-        public const string CHECKPOINT = ".checkpoint";
-        public const string TELEPORT = ".tp";
+        public const string SPAWN = "spawn";
+        public const string TSPAWN = "tspawn";
+        public const string CTSPAWN = "ctspawn";           
        
-        public const string UserRole = ".userrole";        
-        public const string timer = ".timer";
-        public const string countdown = ".countdown";
-        public const string rethrow = ".throw";
-        public const string flash = ".flash";
-        public const string noflash = ".noflash";
-        public const string stop = ".stop";
+        
+        public const string bestspawn = "bestspawn";
+        public const string worstspawn = "worstspawn";
 
-        public const string settings = ".settings";
-        public const string editnade = ".editnade";
-        public const string showtags = ".showtags";
+                   
+        public const string BOT = "bot";
+        public const string tBOT = "tbot";
+        public const string ctBOT = "ctbot";
+        public const string BOOST = "boost";
+        public const string WATCHME = "watchme";
+        public const string NOBOT = "nobot";
+        public const string CLEARBOTS = "clearbots";
+        public const string CROUCHBOT = "crouchbot";
+        public const string CROUCHBOOST = "crouchboost";
+        public const string SwapBot = "swapbot";
+        public const string MoveBot = "movebot";
 
-        public const string breakstuff = ".break";
-        public const string impacts = ".impacts";
+              
+        public const string SAVELAST = "savelast";
+        public const string CHECKPOINT = "checkpoint";
+        public const string TELEPORT = "tp";
+       
+        public const string UserRole = "userrole";        
+        public const string timer = "timer";
+        public const string countdown = "countdown";
+      
 
-        public const string mimic_menu = ".mimic";
-        public const string create_replay = ".createreplay";
-        public const string record_role = ".record";
-        public const string stoprecord = ".stoprecord";
-        public const string store_replay = ".storereplay";
-        public const string rename_replayset = ".renameset";
-        public const string replay_menu = ".replays";
+        public const string settings = "settings";
+        public const string editnade = "editnade";
+       
+
+        public const string breakstuff = "break";
+        public const string impacts = "impacts";
+
+      
     }
 
     public class AdminFlags

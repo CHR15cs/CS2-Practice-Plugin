@@ -23,7 +23,7 @@ namespace CSPracc
 {
     public  class DryRunMode : MatchMode
     {
-
+        public DryRunMode(CSPraccPlugin plugin) : base(plugin) { }
         public override HookResult OnPlayerSpawnHandler(EventPlayerSpawn @event, GameEventInfo info)
         {
             foreach(CCSPlayerController player in Utilities.GetPlayers())

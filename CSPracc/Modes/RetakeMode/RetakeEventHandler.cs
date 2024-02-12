@@ -36,7 +36,7 @@ namespace CSPracc.EventHandler
             plugin.RegisterEventHandler<EventRoundStart>(mode.OnRoundStart, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventRoundEnd>(mode.OnRoundEnd, hookMode: HookMode.Post);
             Plugin = plugin;
-            BotManager = new PracticeBotManager();
+            //BotManager = new PracticeBotManager();
             RetakeCommandHandler = rch;
         }
 

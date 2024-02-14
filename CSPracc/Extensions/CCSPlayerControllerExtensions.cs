@@ -23,6 +23,16 @@ namespace CSPracc
             {
                 return true;
             }
+            AdminData? adminData = AdminManager.GetPlayerAdminData(new SteamID(playerController.SteamID));
+            string[] flags = new string[] { "admin" };
+            if(!adminData!.DomainHasFlags("CSPracc", flags, true))
+            {
+                Server.PrintToChatAll("did not find flag");
+            }
+            else
+            {
+                Server.PrintToChatAll("found flag");
+            }
             return AdminManager.PlayerHasPermissions(new SteamID(playerController.SteamID), AdminFlags.Standard);
         }
 

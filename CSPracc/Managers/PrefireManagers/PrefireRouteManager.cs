@@ -5,6 +5,7 @@ using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.DataModules;
 using CSPracc.DataStorages.JsonStorages;
 using CSPracc.Extensions;
+using CSPracc.Managers.PrefireManagers;
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
@@ -23,46 +24,40 @@ namespace CSPracc.Managers
 
         private PrefireRouteStorage PrefireRouteStorage { get; set; }
 
-        Dictionary<int,List<JsonSpawnPoint>> SpawnPointsPerBot { get; set; }
+        PrefireBotViewAngleManager _prefireBotViewAngleManager;
+        PrefireBotViewAngleManager PrefireBotViewAngleManager 
+        { 
+            get 
+            {
+                return _prefireBotViewAngleManager;
+            } 
+            set 
+            { 
+                _prefireBotViewAngleManager = value;
+            } 
+        }
 
-        CCSPlayerController? playerToShoot { get; set; } = null;
-
-        public PrefireRouteManager() 
+        PrefireRouteAdderManager _prefireRouteAdderManager;
+        PrefireRouteAdderManager PrefireRouteAdderManager
         {
+            get
+            {
+                return _prefireRouteAdderManager;
+            }
+            set
+            {
+                _prefireRouteAdderManager = value;
+            }
+        }
+        CCSPlayerController? playerToShoot { get; set; } = null;
+        CSPraccPlugin Plugin;
+        public PrefireRouteManager(ref CSPraccPlugin plugin) 
+        {
+            Plugin = plugin;
             PrefireRouteStorage = new PrefireRouteStorage(new FileInfo(Path.Combine(CSPraccPlugin.Instance.ModuleDirectory, "Prefire", $"{Server.MapName}.json")));
             SpawnPointsPerBot = new Dictionary<int, List<JsonSpawnPoint>>();
-            CSPraccPlugin.Instance.RegisterListener<Listeners.OnTick>(OnTick);
         }
 
-        public void OnTick()
-        {
-            //Make sure bot stays in place
-            var bots = Utilities.GetPlayers().Where(x => x.IsBot && x.IsValid && !x.IsHLTV);
-            foreach (var bot in bots)
-            {
-                bot.PlayerPawn.Value!.MoveType = MoveType_t.MOVETYPE_NONE;
-                if(playerToShoot != null)
-                {
-                    bot.PlayerPawn.Value.EyeAngles.Y = playerToShoot.PlayerPawn.Value!.EyeAngles.Y - 180.0f;
-                    bot.PlayerPawn.Value.EyeAngles.X = playerToShoot.PlayerPawn.Value.EyeAngles.X + 20;
-                }
-            }
-        }
-
-        public bool AddNewRoute(string name)
-        {
-            foreach(var item in PrefireRouteStorage.GetAll())
-            {
-                if(item.Value.Name == name)
-                {
-                    Utils.ServerMessage($" A route with name {name} already exists.");
-                    return false;
-                }
-            }
-            PrefireRouteStorage.Add(PrefireRouteStorage.GetAll().Count + 1, new PrefireRoute(name));
-            Utils.ServerMessage($"Added route {name}. Use .editroute {name} to edit the route.");
-            return true;
-        }
         public void SetStartingPoint(JsonSpawnPoint? startingPoint)
         {
             if(!editing)
@@ -159,8 +154,8 @@ namespace CSPracc.Managers
             Server.PrintToConsole($"Assigning spawns to bots");
             Server.ExecuteCommand("mp_restartgame 1");
             CSPraccPlugin.Instance!.AddTimer(2.0f, () => { assignSpawnpositionsToBot(route); spawnFirstBotWave(); teleportPlayerToStartingPoint();  });
-            
 
+            
             Server.PrintToConsole($"Spawning firt wave");
             CurrentPrefireRoute = route;
             Utils.ServerMessage($"Starting prefire route {route.Name}");
@@ -186,30 +181,6 @@ namespace CSPracc.Managers
             {
                 Server.ExecuteCommand("bot_join_team CT");
                 Server.ExecuteCommand("bot_add_ct");
-            }
-        }
-
-        private void assignSpawnpositionsToBot(PrefireRoute route)
-        {
-            List<CCSPlayerController> bots = Utilities.GetPlayers().Where(x => x.IsBot && x.IsValid && !x.IsHLTV).ToList();
-            int botNumber = 0;
-            foreach (JsonSpawnPoint? spawnPoint in route.spawnPoints)
-            {
-                if (spawnPoint == null) continue;
-
-                if (!SpawnPointsPerBot.ContainsKey(bots[botNumber].Slot))
-                {
-                    SpawnPointsPerBot.Add(bots[botNumber].Slot, new List<JsonSpawnPoint>());
-                }
-                SpawnPointsPerBot[bots[botNumber].Slot].Add(spawnPoint);
-                if (botNumber + 1 < bots.Count)
-                {
-                    botNumber++;
-                }
-                else
-                {
-                    botNumber = 0;
-                }
             }
         }
 
@@ -243,7 +214,7 @@ namespace CSPracc.Managers
         public bool LoadRouteById(int id, CCSPlayerController playerToShoot)
         {
             editing = false;
-            this.playerToShoot = playerToShoot;
+            PrefireBotViewAngleManager = new PrefireBotViewAngleManager(ref Plugin, playerToShoot);
             if (!PrefireRouteStorage.Get(id, out PrefireRoute route))
             {
                 Utils.ServerMessage($"Could not load route with id: {id}");
@@ -277,8 +248,7 @@ namespace CSPracc.Managers
 
         public void Dispose()
         {
-            Listeners.OnTick ontick = new Listeners.OnTick(OnTick);
-            CSPraccPlugin.Instance!.RemoveListener("OnTick", ontick);
+
         }
     }
 }

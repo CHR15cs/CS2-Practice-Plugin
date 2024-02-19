@@ -14,7 +14,7 @@ namespace CSPracc.Managers.PrefireManagers
         public PrefireBotSpawnpointManager()
         {
         }      
-        public Dictionary<CCSPlayerController, List<JsonSpawnPoint>> GenerateSpawnpositionsPerBot(PrefireRoute route)
+        public static Dictionary<CCSPlayerController, List<JsonSpawnPoint>> GenerateSpawnpositionsPerBot(PrefireRoute route)
         {
             var SpawnPointsPerBot = new Dictionary<CCSPlayerController, List<JsonSpawnPoint>>();
             List<CCSPlayerController> bots = Utilities.GetPlayers().Where(x => x.IsBot && x.IsValid && !x.IsHLTV).ToList();

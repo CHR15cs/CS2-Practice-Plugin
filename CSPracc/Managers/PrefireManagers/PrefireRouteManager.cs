@@ -54,34 +54,13 @@ namespace CSPracc.Managers
         public PrefireRouteManager(ref CSPraccPlugin plugin) 
         {
             Plugin = plugin;
-            PrefireRouteStorage = new PrefireRouteStorage(new FileInfo(Path.Combine(CSPraccPlugin.Instance.ModuleDirectory, "Prefire", $"{Server.MapName}.json")));
-            SpawnPointsPerBot = new Dictionary<int, List<JsonSpawnPoint>>();
-        }
-
-        public void SetStartingPoint(JsonSpawnPoint? startingPoint)
-        {
-            if(!editing)
-            {
-                Utils.ServerMessage("Need to be in editing mode.");
-                return;
-            }
-            if(CurrentPrefireRoute == null)
-            {
-                Utils.ServerMessage("No route is currently selected.");
-                return;
-            }
-            if (startingPoint == null)
-            {
-                Utils.ServerMessage("Could not set empty starting point.");
-                return;
-            }
-            CurrentPrefireRoute.StartingPoint = startingPoint;
+            PrefireRouteStorage = new PrefireRouteStorage();
         }
 
         public void EditRoute(string name) 
         {
             editing = true;
-            PrefireRoute? prefireRoute = GetPrefireRouteByName(name);
+            PrefireRoute? prefireRoute = PrefireRouteStorage.GetRouteByNameOrDefault(name);
             if(prefireRoute == null) 
             { 
                 Utils.ServerMessage($"Could not find prefire route {name}");
@@ -89,33 +68,6 @@ namespace CSPracc.Managers
             }
             CurrentPrefireRoute = prefireRoute;
             Utils.ServerMessage($"You are now editing {name}.");
-        }
-
-        public void AddSpawn(JsonSpawnPoint spawnPoint)
-        {
-            if(!editing)
-            {
-                Utils.ServerMessage($"You are not in editing mode.");
-            }
-            if(CurrentPrefireRoute == null)
-            {
-                Utils.ServerMessage($"No route is currently being edited.");
-                return;
-            }
-            CurrentPrefireRoute!.spawnPoints.Add(spawnPoint);
-            Utils.ServerMessage($"Added spawn. {spawnPoint.Position}");
-        }
-
-        public void SaveCurrentRoute()
-        {
-            if (CurrentPrefireRoute == null) return;
-            foreach( var item in PrefireRouteStorage.GetAll())
-            {
-                if(item.Value.Name == CurrentPrefireRoute.Name)
-                {
-                    PrefireRouteStorage.SetOrAdd(item.Key, CurrentPrefireRoute);
-                }
-            }
         }
 
         private PrefireRoute? GetPrefireRouteByName(string name) 
@@ -175,15 +127,6 @@ namespace CSPracc.Managers
             }
         }
 
-        private void addBots(PrefireRoute route)
-        {
-            for (int i = 0; i < route.spawnPoints.Count; i++)
-            {
-                Server.ExecuteCommand("bot_join_team CT");
-                Server.ExecuteCommand("bot_add_ct");
-            }
-        }
-
         private void spawnFirstBotWave()
         {           
             foreach (int key in SpawnPointsPerBot.Keys) 
@@ -191,24 +134,6 @@ namespace CSPracc.Managers
                 Server.PrintToConsole($"Spawn bot slot {key}");
                 SpawnNextPosition(key);
             }
-        }
-
-        public void SpawnNextPosition(int botIndex)
-        {
-            CCSPlayerController? botToSpawn = Utilities.GetPlayerFromSlot(botIndex);
-            if (botToSpawn == null) return;
-            if (editing) return;
-            if (!SpawnPointsPerBot.TryGetValue(botIndex, out List<JsonSpawnPoint>? spawnPoints))
-            {
-                return;
-            }
-            if (spawnPoints.Count == 0)
-            {
-                return;
-            }
-   ;        
-            botToSpawn.TeleportToJsonSpawnPoint(spawnPoints.FirstOrDefault());
-            spawnPoints.RemoveAt(0);
         }
 
         public bool LoadRouteById(int id, CCSPlayerController playerToShoot)

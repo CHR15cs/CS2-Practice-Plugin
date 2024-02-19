@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CounterStrikeSharp.API.Core;
+using CSPracc.Managers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -60,5 +62,10 @@ namespace CSPracc.DataModules
         }
 
         public List<List<KeyValuePair<string,Action>>> MenuPages { get; init; } = new List<List<KeyValuePair<string, Action>>> ();
+
+        public void Show(CCSPlayerController playerController)
+        {
+            GuiManager.Instance.AddMenu(playerController.SteamID, this);
+        }
     }
 }

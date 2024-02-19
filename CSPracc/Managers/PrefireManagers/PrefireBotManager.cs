@@ -25,14 +25,10 @@ namespace CSPracc.Managers.PrefireManagers
                 return _spawnPointStorage;
             }
         }
-
-
         public void ClearUsedSpawns()
         {
             spawnPointStorage.ResetUsedSpawns();
         }
-
-
         public bool TeleportToUnusedSpawn(CCSPlayerController player, string bombsite)
         {
             if (player == null || !player.IsValid || player.IsBot) return false;
@@ -52,6 +48,17 @@ namespace CSPracc.Managers.PrefireManagers
 
            // spawnPointStorage!.AddSpawnPoint(new JsonSpawnPoint(player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.ToVector3(), player.PlayerPawn.Value!.EyeAngles.ToVector3(), Bombsite), player.GetCsTeam());
         }
+
+
+        public void AddBots(PrefireRoute route)
+        {
+            for (int i = 0; i < route.spawnPoints.Count; i++)
+            {
+                Server.ExecuteCommand("bot_join_team CT");
+                Server.ExecuteCommand("bot_add_ct");
+            }
+        }
+
 
         public void LoadSpawnsForBombsite(string Bombsite)
         {
@@ -104,25 +111,6 @@ namespace CSPracc.Managers.PrefireManagers
             //CreateSpawnPointsFromJsonPoints(spawnPointStorage.GetSpawnPointsFromTeam(CsTeam.Terrorist)!, "info_player_terrorist", Bombsite);
             //Server.PrintToConsole("Calling Create Counter Terrorist SpawnPoints");
             //CreateSpawnPointsFromJsonPoints(spawnPointStorage.GetSpawnPointsFromTeam(CsTeam.CounterTerrorist)!, "info_player_counterterrorist", Bombsite);
-        }
-
-        private void CreateSpawnPointsFromJsonPoints(List<JsonSpawnPoint> jsonSpawnPoints, string entityName, string Bombsite)
-        {
-            foreach (JsonSpawnPoint point in jsonSpawnPoints)
-            {
-                if (point.Bombsite != Bombsite) continue;
-                Server.PrintToConsole("Found spawnpoint for bombsite");
-                SpawnPoint? sp = Utilities.CreateEntityByName<SpawnPoint>("spawnpoint");
-                if (sp == null) continue;
-                Server.PrintToConsole("SpawnPoint not null");
-                Vector absOrig = sp.AbsOrigin!;
-                //absOrig = point.Position.ToCSVector();
-                QAngle eyeAngle = sp.AbsRotation!;
-               // eyeAngle = point.QAngle.ToCSQAngle();
-                sp.TeamNum = (int)CsTeam.Terrorist;
-                sp.Priority = 0;
-                sp.DispatchSpawn();
-            }
         }
     }
 }

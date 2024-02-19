@@ -23,9 +23,9 @@ namespace CSPracc.Modes
         
         public BaseMode(CSPraccPlugin plugin) 
         {
+            GuiManager = new GuiManager();
             CommandManager = new CommandManager(ref plugin);
             Plugin = plugin;
-            GuiManager = new GuiManager(); 
             MapChangeManager = new MapChangeManager(ref CommandManager);
             ModeSwitchManager = new ModeSwitchManager(ref CommandManager, ref plugin, ref GuiManager);
         }
@@ -39,6 +39,7 @@ namespace CSPracc.Modes
 
         public virtual void Dispose()
         {
+            CommandManager.Dispose();
             GuiManager.Dispose();
         }
 

@@ -16,7 +16,6 @@ namespace CSPracc.Managers
 {
     public class GuiManager : IDisposable
     {
-
         public static GuiManager? Instance { get; private set; }
 
         Dictionary<ulong,DateTime> Timers = new Dictionary<ulong,DateTime>();
@@ -28,7 +27,7 @@ namespace CSPracc.Managers
         {
             Instance = this;
             CSPraccPlugin.Instance!.RegisterListener<Listeners.OnTick>(OnTick);
-            CSPraccPlugin.Instance.AddCommand("css_1", "sel 1", Selection);
+            CSPraccPlugin.Instance.AddCommand("css_1", "sel 1", Selection); 
             CSPraccPlugin.Instance.AddCommand("css_2", "sel 1", Selection);
             CSPraccPlugin.Instance.AddCommand("css_3", "sel 1", Selection);
             CSPraccPlugin.Instance.AddCommand("css_4", "sel 1", Selection);

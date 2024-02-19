@@ -1,4 +1,6 @@
-﻿using CSPracc.DataModules;
+﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Core;
+using CSPracc.DataModules;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +11,9 @@ namespace CSPracc.DataStorages.JsonStorages
 {
     public class PrefireRouteStorage : JsonStorage<int, PrefireRoute>
     {
-        public PrefireRouteStorage(FileInfo jsonFile) : base(jsonFile)
+        public PrefireRouteStorage() : base(new FileInfo(Path.Combine(CSPraccPlugin.Instance!.ModuleDirectory, "Prefire", $"{Server.MapName}.json")))
         {
+            
         }
 
         public override bool Get(int key, out PrefireRoute value)
@@ -21,6 +24,19 @@ namespace CSPracc.DataStorages.JsonStorages
                 return false;
             }
             return true;
+        }
+
+        public PrefireRoute? GetRouteByNameOrDefault(string name)
+        {
+            List<KeyValuePair<int, PrefireRoute>> routes = GetAll();
+            foreach(KeyValuePair<int, PrefireRoute> route in routes) 
+            { 
+                if(route.Value.Name == name)
+                {
+                    return route.Value;
+                }
+            }
+            return null;
         }
     }
 }

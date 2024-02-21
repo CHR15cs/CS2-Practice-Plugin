@@ -10,6 +10,7 @@ using CSPracc.DataStorages.JsonStorages;
 using CSPracc.EventHandler;
 using CSPracc.Extensions;
 using CSPracc.Managers;
+using CSPracc.Managers.PrefireManagers;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,7 @@ namespace CSPracc.Modes
         PrefireRouteManager PrefireRouteManager { get; set; }
 
         GunManager GunManager { get; set; }
+        PrefireRouteEditor PrefireRouteEditor { get; set; }
 
         public PrefireMode(CSPraccPlugin plugin) : base(plugin)
         {

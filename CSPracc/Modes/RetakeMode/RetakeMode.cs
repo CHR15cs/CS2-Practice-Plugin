@@ -121,8 +121,6 @@ namespace CSPracc.Modes
         {
             DataModules.Constants.Methods.MsgToServer("Loading retakes mode.");
             Server.ExecuteCommand("exec CSPRACC\\retake.cfg");
-            EventHandler?.Dispose();
-            EventHandler = new RetakeEventHandler(CSPraccPlugin.Instance!, new RetakeCommandHandler(this),this);
         }
     }
 }

@@ -27,6 +27,8 @@ namespace CSPracc.Managers
         Dictionary<ulong,PlayerReplay> replays = new Dictionary<ulong, PlayerReplay>();
         Dictionary<ulong,PlayerReplay> replaysToRecord = new Dictionary<ulong,PlayerReplay>();
         Dictionary<int, PlayerReplay> replaysToReplay = new Dictionary<int, PlayerReplay>();
+
+        Listeners.OnEntitySpawned onESpawn;
         public BotReplayManager(ref PracticeBotManager practiceBotManager,ref ProjectileManager projectileManager) 
         {
             ProjectileManager = projectileManager;
@@ -36,8 +38,8 @@ namespace CSPracc.Managers
             CSPraccPlugin.Instance.Logger.LogInformation($"Created Bot Replay storage Count: {BotReplayStorage.GetAll().Count}");
 
             CSPraccPlugin.Instance!.RegisterListener<Listeners.OnTick>(OnTick);
-
-            CSPraccPlugin.Instance.RegisterListener<Listeners.OnEntitySpawned>(entity => OnEntitySpawned(entity));
+            onESpawn = new Listeners.OnEntitySpawned(entity => OnEntitySpawned(entity));
+            CSPraccPlugin.Instance.RegisterListener<Listeners.OnEntitySpawned>(onESpawn);
             CSPraccPlugin.Instance.RegisterEventHandler<EventPlayerShoot>(OnPlayerShoot);
         }
 
@@ -413,9 +415,7 @@ namespace CSPracc.Managers
         {
             Listeners.OnTick onTick = new Listeners.OnTick(OnTick);
             CSPraccPlugin.Instance!.RemoveListener("OnTick", onTick);
-            Listeners.OnEntitySpawned onEntitySpawned = new Listeners.OnEntitySpawned(OnEntitySpawned);
-            CSPraccPlugin.Instance!.RemoveListener("OnEntitySpawned", onEntitySpawned);
-
+            CSPraccPlugin.Instance.DeregisterListener<Listeners.OnEntitySpawned>(onESpawn);
             GameEventHandler<EventPlayerShoot> playershoot = OnPlayerShoot;
             CSPraccPlugin.Instance!.DeregisterEventHandler("player_shoot", playershoot, true);
         }

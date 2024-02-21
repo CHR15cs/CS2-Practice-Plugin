@@ -8,6 +8,7 @@ using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.CommandHandler;
 using CSPracc.DataModules;
 using CSPracc.DataModules.Constants;
+using CSPracc.Extensions;
 using CSPracc.Managers;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,8 @@ namespace CSPracc.EventHandler
         PracticeBotManager BotManager { get; set; }
 
         ProjectileManager ProjectileManager { get; set; }
+
+        Listeners.OnEntitySpawned onESpawn;
         ~PracticeEventHandler()
         {
 
@@ -32,7 +35,9 @@ namespace CSPracc.EventHandler
         public PracticeEventHandler(CSPraccPlugin plugin, PracticeCommandHandler pch,ref ProjectileManager projectileManager,ref PracticeBotManager botManager) : base(plugin,pch)
         {
             ProjectileManager = projectileManager;
-            plugin.RegisterListener<Listeners.OnEntitySpawned>(entity => ProjectileManager.OnEntitySpawned(entity));          
+            onESpawn = new Listeners.OnEntitySpawned(entity => ProjectileManager.OnEntitySpawned(entity));
+            //plugin.RegisterListener<Listeners.OnEntitySpawned>(entity => ProjectileManager.OnEntitySpawned(entity));
+            plugin.RegisterListener<Listeners.OnEntitySpawned>(onESpawn);   
             plugin.RegisterEventHandler<EventPlayerBlind>(OnPlayerBlind, hookMode: HookMode.Pre);
             plugin.RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt, hookMode: HookMode.Post);
             plugin.RegisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn, hookMode: HookMode.Post);
@@ -79,9 +84,8 @@ namespace CSPracc.EventHandler
             GameEventHandler<EventSmokegrenadeDetonate> smokegrenadedetonate = ProjectileManager.OnSmokeDetonate;
             Plugin.DeregisterEventHandler("smokegrenade_detonate", smokegrenadedetonate, true);
 
-            Listeners.OnEntitySpawned onEntitySpawned = new Listeners.OnEntitySpawned(ProjectileManager.OnEntitySpawned);
-            Plugin.RemoveListener("OnEntitySpawned", onEntitySpawned);
-
+            
+            Plugin.DeregisterListener<Listeners.OnEntitySpawned>(onESpawn);
             base.Dispose();
         }
     }

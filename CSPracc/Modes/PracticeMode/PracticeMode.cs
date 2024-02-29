@@ -11,10 +11,12 @@ using CSPracc.EventHandler;
 using CSPracc.Extensions;
 using CSPracc.Managers;
 using CSPracc.Managers.PracticeManagers;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using static CounterStrikeSharp.API.Core.BasePlugin;
@@ -24,6 +26,7 @@ namespace CSPracc.Modes
 {
     public class PracticeMode : BaseMode
     {
+        List<IManager> _managers;
         BotReplayManager? BotReplayManager;    
         ProjectileManager? projectileManager;
         PracticeBotManager? PracticeBotManager;
@@ -32,37 +35,49 @@ namespace CSPracc.Modes
         PlayerHurtManager? PlayerHurtManager;
         ToggleImpactManager? ToggleImpactManager;
         BreakEntitiesManager? BreakEntitiesManager;
+        TimerManager? TimerManager;
+        CountdownManager? CountdownManager;
         public PracticeMode(CSPraccPlugin plugin) : base(plugin)
-        {     
+        {
+            _managers = new List<IManager>();
         }
         public override void ConfigureEnvironment()
         {
             SetupManagers();
+            _managers.ForEach(m => m.RegisterCommands());
             DataModules.Constants.Methods.MsgToServer("Loading practice mode.");
             Server.ExecuteCommand("exec CSPRACC\\pracc.cfg");         
         }
 
         private void SetupManagers()
         {
-            projectileManager = new ProjectileManager(ref CommandManager,ref GuiManager, ref Plugin);
+            projectileManager = new ProjectileManager(ref CommandManager, ref GuiManager, ref Plugin);            
             PracticeBotManager = new PracticeBotManager(ref CommandManager,ref Plugin);
             SpawnManager = new PracticeSpawnManager(ref base.CommandManager);
             BotReplayManager = new BotReplayManager(ref PracticeBotManager, ref projectileManager, ref CommandManager,ref GuiManager);
-            PlayerBlindManager = new PlayerBlindManager(ref Plugin, ref projectileManager);
-            PlayerHurtManager = new PlayerHurtManager(ref Plugin);
+            PlayerBlindManager = new PlayerBlindManager(ref Plugin, ref projectileManager, ref CommandManager);
+            PlayerHurtManager = new PlayerHurtManager(ref Plugin, ref CommandManager);
             ToggleImpactManager = new ToggleImpactManager(ref CommandManager);
             BreakEntitiesManager = new BreakEntitiesManager(ref CommandManager);
+            TimerManager = new TimerManager(ref CommandManager, ref GuiManager);
+            CountdownManager = new CountdownManager(ref CommandManager, ref GuiManager);
+
+            _managers.Add(projectileManager);
+            _managers.Add(PracticeBotManager);
+            _managers.Add(SpawnManager);
+            _managers.Add(BotReplayManager);
+            _managers.Add(PlayerBlindManager);
+            _managers.Add(PlayerHurtManager);
+            _managers.Add(ToggleImpactManager);
+            _managers.Add(BreakEntitiesManager);
+            _managers.Add(TimerManager);
+            _managers.Add(CountdownManager);
         }
+
         public override void Dispose()
         {
-            projectileManager!.Dispose();
-            PracticeBotManager!.Dispose();
-            SpawnManager!.Dispose();
-            BotReplayManager!.Dispose();
-            PlayerBlindManager!.Dispose();
-            PlayerHurtManager!.Dispose();
-            Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
-            projectileManager.Dispose();          
+            _managers.ForEach(m => m.Dispose());
+            Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");         
             base.Dispose();
         }
     }

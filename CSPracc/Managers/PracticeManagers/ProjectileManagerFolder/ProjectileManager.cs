@@ -29,10 +29,11 @@ using System.Reflection.Metadata;
 using CSPracc.Managers;
 using static CounterStrikeSharp.API.Core.BasePlugin;
 using CounterStrikeSharp.API.Modules.Commands;
+using CSPracc.Managers.BaseManagers;
 
 namespace CSPracc
 {
-    public class ProjectileManager : IDisposable
+    public class ProjectileManager : BaseManager
     {
         /// <summary>
         /// Save history of thrown grenades
@@ -102,35 +103,35 @@ namespace CSPracc
         }
         GuiManager GuiManager;
         CSPraccPlugin Plugin;
-        public ProjectileManager(ref CommandManager commandManager,ref GuiManager guiManager, ref CSPraccPlugin plugin)
+        public ProjectileManager(ref CommandManager commandManager,ref GuiManager guiManager, ref CSPraccPlugin plugin) : base(ref commandManager)
         {
             Plugin = plugin;
             GuiManager = guiManager;
             plugin.RegisterListener<Listeners.OnEntitySpawned>(OnEntitySpawned);
             plugin.RegisterEventHandler<EventSmokegrenadeDetonate>(OnSmokeDetonate, hookMode: HookMode.Post);
             plugin.AddCommand("css_pracc_smokecolor_enabled", "Enable smoke coloring", SmokeColoring);
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.NADES, "Show nade menu", NadesCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.SAVE, "Save last thrown nade", SaveSnapshotCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.Rename, "Rename last loaded grenade", RenameLastSnapshotCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.Delete, "Delete last nade", CommandHandlerRemoveSnapshot, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.rethrow, "Rethrow last grenade or with given id/tag", ReThrowCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.Last, "Go back to last thrown grenade spot", RestorePlayersLastThrownGrenadeCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.BACK, "Go back in grenade history", RestorePlayersLastThrownGrenadeCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.forward, "Go forward in grenade history", RestoreNextPlayersLastThrownGrenadeCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.AddTag, "Add tag to last loaded grenade", AddTagToLastGrenadeCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.RemoveTag, "Remove tag from last loaded grenade", RemoveTagFromLastGrenadeCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.showtags, "Show all tags", ShowAllAvailableTagsCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.DeleteTag, "Delete tag from all grenades", DeleteTagFromAllNadesCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.ClearTags, "Clear grenade from tags", ClearTagsFromLastGrenadeCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.Description, "Add description to last loaded grenade", AddDescriptionCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.delay, "Add delay to last loaded grenade", SetDelayCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.find, "Search grenade menu for string", FindCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.UpdatePos, "Update player starting position", UpdatePositionCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.flash, "Enable flash testing mode", FlashCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.stop, "Stop flash testing mode", StopCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.noflash, "Toggle noflash", NoFlashCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.CLEAR, "Clear player grenade projectiles", ClearPersonalNadesCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(PROJECTILE_COMMAND.ClearAll, "Clear all player grenade projectiles", ClearAllNadesCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.NADES,new PlayerCommand(PROJECTILE_COMMAND.NADES, "Show nade menu", NadesCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.SAVE, new PlayerCommand(PROJECTILE_COMMAND.SAVE, "Save last thrown nade", SaveSnapshotCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.Rename, new PlayerCommand(PROJECTILE_COMMAND.Rename, "Rename last loaded grenade", RenameLastSnapshotCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.Delete, new PlayerCommand(PROJECTILE_COMMAND.Delete, "Delete last nade", CommandHandlerRemoveSnapshot, null));
+            Commands.Add(PROJECTILE_COMMAND.rethrow, new PlayerCommand(PROJECTILE_COMMAND.rethrow, "Rethrow last grenade or with given id/tag", ReThrowCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.Last, new PlayerCommand(PROJECTILE_COMMAND.Last, "Go back to last thrown grenade spot", RestorePlayersLastThrownGrenadeCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.BACK, new PlayerCommand(PROJECTILE_COMMAND.BACK, "Go back in grenade history", RestorePlayersLastThrownGrenadeCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.forward, new PlayerCommand(PROJECTILE_COMMAND.forward, "Go forward in grenade history", RestoreNextPlayersLastThrownGrenadeCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.AddTag, new PlayerCommand(PROJECTILE_COMMAND.AddTag, "Add tag to last loaded grenade", AddTagToLastGrenadeCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.RemoveTag, new PlayerCommand(PROJECTILE_COMMAND.RemoveTag, "Remove tag from last loaded grenade", RemoveTagFromLastGrenadeCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.showtags, new PlayerCommand(PROJECTILE_COMMAND.showtags, "Show all tags", ShowAllAvailableTagsCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.DeleteTag, new PlayerCommand(PROJECTILE_COMMAND.DeleteTag, "Delete tag from all grenades", DeleteTagFromAllNadesCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.ClearTags, new PlayerCommand(PROJECTILE_COMMAND.ClearTags, "Clear grenade from tags", ClearTagsFromLastGrenadeCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.Description, new PlayerCommand(PROJECTILE_COMMAND.Description, "Add description to last loaded grenade", AddDescriptionCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.delay, new PlayerCommand(PROJECTILE_COMMAND.delay, "Add delay to last loaded grenade", SetDelayCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.find, new PlayerCommand(PROJECTILE_COMMAND.find, "Search grenade menu for string", FindCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.UpdatePos, new PlayerCommand(PROJECTILE_COMMAND.UpdatePos, "Update player starting position", UpdatePositionCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.flash, new PlayerCommand(PROJECTILE_COMMAND.flash, "Enable flash testing mode", FlashCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.stop, new PlayerCommand(PROJECTILE_COMMAND.stop, "Stop flash testing mode", StopCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.noflash, new PlayerCommand(PROJECTILE_COMMAND.noflash, "Toggle noflash", NoFlashCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.CLEAR, new PlayerCommand(PROJECTILE_COMMAND.CLEAR, "Clear player grenade projectiles", ClearPersonalNadesCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.ClearAll, new PlayerCommand(PROJECTILE_COMMAND.ClearAll, "Clear all player grenade projectiles", ClearAllNadesCommandHandler, null));
         }
 
         #region CommandHandlers
@@ -730,12 +731,13 @@ namespace CSPracc
         }
 
         #endregion
-        public void Dispose()
+        public new void Dispose()
         {
             Listeners.OnEntitySpawned onEntitySpawned = new Listeners.OnEntitySpawned(OnEntitySpawned);
             Plugin.RemoveListener("OnEntitySpawned", onEntitySpawned);
             GameEventHandler<EventSmokegrenadeDetonate> smokegrenadedetonate = OnSmokeDetonate;
             Plugin.DeregisterEventHandler("smokegrenade_detonate", smokegrenadedetonate, true);
+            base.Dispose();
         }
         /// <summary>
         /// Gets or Adds Projectile Storage for given map
@@ -1321,5 +1323,5 @@ namespace CSPracc
                 }
             return true;
             }
-        }
+    }
     }

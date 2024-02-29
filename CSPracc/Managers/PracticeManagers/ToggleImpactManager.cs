@@ -7,16 +7,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CSPracc.DataModules.Constants;
+using CSPracc.Managers.BaseManagers;
 
 namespace CSPracc.Managers.PracticeManagers
 {
-    public class ToggleImpactManager
+    public class ToggleImpactManager : BaseManager
     {
-        public ToggleImpactManager(ref CommandManager commandManager) 
+        public ToggleImpactManager(ref CommandManager commandManager) : base (ref commandManager)
         { 
-            commandManager.RegisterCommand(new DataModules.PlayerCommand(PRACC_COMMAND.impacts,"Toggle impacts",ImpactCommandHandler,null));
+            Commands.Add(PRACC_COMMAND.impacts, new DataModules.PlayerCommand(PRACC_COMMAND.impacts,"Toggle impacts",ImpactCommandHandler,null));
         }
-
         public bool ImpactCommandHandler(CCSPlayerController playerController, List<string> args)
         {
             ConVar? showimpacts = ConVar.Find("sv_showimpacts");
@@ -34,6 +34,5 @@ namespace CSPracc.Managers.PracticeManagers
             }
             return true;
         }
-
     }
 }

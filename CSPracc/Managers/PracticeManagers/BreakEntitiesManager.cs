@@ -7,14 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CSPracc.DataModules.Constants;
+using CSPracc.Managers.BaseManagers;
 
 namespace CSPracc.Managers.PracticeManagers
 {
-    public class BreakEntitiesManager
+    public class BreakEntitiesManager : BaseManager
     { 
-        public BreakEntitiesManager(ref CommandManager commandManager) 
-        { 
-            commandManager.RegisterCommand(new DataModules.PlayerCommand(PRACC_COMMAND.breakstuff,"Break all breakable entities", BreakStuffCommandHandler, null));
+        public BreakEntitiesManager(ref CommandManager commandManager)  : base(ref commandManager)
+        {
+            Commands.Add(PRACC_COMMAND.breakstuff, new DataModules.PlayerCommand(PRACC_COMMAND.breakstuff, "Break all breakable entities", BreakStuffCommandHandler, null));
         }
 
         private bool BreakStuffCommandHandler(CCSPlayerController playerController, List<string> args)
@@ -22,6 +23,5 @@ namespace CSPracc.Managers.PracticeManagers
             Utils.BreakAll();
             return true;
         }
-
     }
 }

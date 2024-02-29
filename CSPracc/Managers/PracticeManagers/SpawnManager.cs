@@ -16,18 +16,20 @@ using CSPracc.Extensions;
 using Microsoft.Extensions.Logging;
 using CSPracc.Managers;
 using CSPracc.DataModules.Constants;
+using CSPracc.Managers.BaseManagers;
 
 namespace CSPracc
 {
-    public  class PracticeSpawnManager : IDisposable
+    public  class PracticeSpawnManager : BaseManager
     {
-        public PracticeSpawnManager(ref CommandManager cmdManager)
+        public PracticeSpawnManager(ref CommandManager cmdManager) : base(ref cmdManager)
         {
-            cmdManager.RegisterCommand(new PlayerCommand(PRACC_COMMAND.SPAWN, "Teleport user to given spawn", CommandHandlerSpawn, null));
-            cmdManager.RegisterCommand(new PlayerCommand(PRACC_COMMAND.TSPAWN, "Teleport user to given tspawn", CommandHandlerTSpawn, null));
-            cmdManager.RegisterCommand(new PlayerCommand(PRACC_COMMAND.CTSPAWN, "Teleport user to given ctspawn", CommandHandlerCTSpawn, null));
-            cmdManager.RegisterCommand(new PlayerCommand(PRACC_COMMAND.bestspawn, "Teleport user to closest spawn of your current team", CommandHandlerCTSpawn, null));
-            cmdManager.RegisterCommand(new PlayerCommand(PRACC_COMMAND.worstspawn, "Teleport user to farest spawn of your current team", CommandHandlerCTSpawn, null));
+            CommandManager = cmdManager;
+            Commands.Add(PRACC_COMMAND.SPAWN, new PlayerCommand(PRACC_COMMAND.SPAWN, "Teleport user to given spawn", CommandHandlerSpawn, null));
+            Commands.Add(PRACC_COMMAND.TSPAWN, new PlayerCommand(PRACC_COMMAND.TSPAWN, "Teleport user to given tspawn", CommandHandlerTSpawn, null));
+            Commands.Add(PRACC_COMMAND.CTSPAWN, new PlayerCommand(PRACC_COMMAND.CTSPAWN, "Teleport user to given ctspawn", CommandHandlerCTSpawn, null));
+            Commands.Add(PRACC_COMMAND.bestspawn, new PlayerCommand(PRACC_COMMAND.bestspawn, "Teleport user to closest spawn of your current team", CommandHandlerCTSpawn, null));
+            Commands.Add(PRACC_COMMAND.worstspawn, new PlayerCommand(PRACC_COMMAND.worstspawn, "Teleport user to farest spawn of your current team", CommandHandlerCTSpawn, null));
         }
 
         private  string lastMap = String.Empty;
@@ -221,11 +223,6 @@ namespace CSPracc
             }
             CSPraccPlugin.Instance!.Logger.LogInformation($"calculating distance {distanceX + distanceY + distanceZ}");
             return distanceX + distanceY + distanceZ;
-        }
-
-        public void Dispose()
-        {
-           
         }
     }
 }

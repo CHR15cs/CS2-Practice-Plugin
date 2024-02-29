@@ -17,8 +17,9 @@ using static CounterStrikeSharp.API.Core.BasePlugin;
 
 namespace CSPracc.Managers
 {
-    public class BotReplayManager : IDisposable
+    public class BotReplayManager : IManager
     {
+        CommandManager CommandManager;
         ProjectileManager ProjectileManager { get; set; }
         PracticeBotManager PracticeBotManager { get; set; }
         GuiManager GuiManager { get; set; }
@@ -30,6 +31,7 @@ namespace CSPracc.Managers
         Dictionary<int, PlayerReplay> replaysToReplay = new Dictionary<int, PlayerReplay>();
         public BotReplayManager(ref PracticeBotManager practiceBotManager,ref ProjectileManager projectileManager, ref CommandManager commandManager, ref GuiManager guiManager) 
         {
+            CommandManager = commandManager;
             GuiManager = guiManager;
             ProjectileManager = projectileManager;
             PracticeBotManager = practiceBotManager;
@@ -41,13 +43,6 @@ namespace CSPracc.Managers
 
             CSPraccPlugin.Instance.RegisterListener<Listeners.OnEntitySpawned>(entity => OnEntitySpawned(entity));
             CSPraccPlugin.Instance.RegisterEventHandler<EventPlayerShoot>(OnPlayerShoot);
-            commandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.mimic_menu, "open bot mimic menu", ShowMimicMenu, null));
-            commandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.replay_menu, "open bot mimic menu", ShowMimcReplays, null));
-            commandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.store_replay, "store last recorded replay", SaveLastReplayCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.create_replay, "create new replay", CreateReplayCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.record_role, "record role", RecordPlayerCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.rename_replayset, "rename replay set", RenameCurrentReplaySetCommandHandler, null));
-            commandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.stoprecord, "stop current recording", StopRecordingCommandHandler, null));
         }
 
         /// <summary>
@@ -578,6 +573,29 @@ namespace CSPracc.Managers
 
             GameEventHandler<EventPlayerShoot> playershoot = OnPlayerShoot;
             CSPraccPlugin.Instance!.DeregisterEventHandler("player_shoot", playershoot, true);
+            DeregisterCommands();
+        }
+
+        public void RegisterCommands()
+        {
+            CommandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.mimic_menu, "open bot mimic menu", ShowMimicMenu, null));
+            CommandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.replay_menu, "open bot mimic menu", ShowMimcReplays, null));
+            CommandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.store_replay, "store last recorded replay", SaveLastReplayCommandHandler, null));
+            CommandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.create_replay, "create new replay", CreateReplayCommandHandler, null));
+            CommandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.record_role, "record role", RecordPlayerCommandHandler, null));
+            CommandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.rename_replayset, "rename replay set", RenameCurrentReplaySetCommandHandler, null));
+            CommandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.stoprecord, "stop current recording", StopRecordingCommandHandler, null));
+        }
+
+        public void DeregisterCommands()
+        {
+            CommandManager.DeregisterCommand(BotReplayCommands.mimic_menu);
+            CommandManager.DeregisterCommand(BotReplayCommands.replay_menu);
+            CommandManager.DeregisterCommand(BotReplayCommands.store_replay);
+            CommandManager.DeregisterCommand(BotReplayCommands.create_replay);
+            CommandManager.DeregisterCommand(BotReplayCommands.record_role);
+            CommandManager.DeregisterCommand(BotReplayCommands.rename_replayset);
+            CommandManager.DeregisterCommand(BotReplayCommands.stoprecord);
         }
     }
 }

@@ -8,16 +8,16 @@ using System.Text;
 using System.Threading.Tasks;
 using CSPracc.DataModules.Constants;
 using CounterStrikeSharp.API.Modules.Utils;
+using CSPracc.Managers.BaseManagers;
 
 namespace CSPracc.Managers.PracticeManagers
 {
-    public class WatchMeManager
+    public class WatchMeManager : BaseManager
     {
-        public WatchMeManager(ref CommandManager commandManager) 
+        public WatchMeManager(ref CommandManager commandManager) : base(ref commandManager)
         { 
-            commandManager.RegisterCommand(new DataModules.PlayerCommand(PRACC_COMMAND.WATCHME,"Break all breakable entities", WatchMeCommandHandler, null));
+            Commands.Add(PRACC_COMMAND.WATCHME,new DataModules.PlayerCommand(PRACC_COMMAND.WATCHME,"Break all breakable entities", WatchMeCommandHandler, null));
         }
-
 
         public bool WatchMeCommandHandler(CCSPlayerController playerController, List<string> args)
         {

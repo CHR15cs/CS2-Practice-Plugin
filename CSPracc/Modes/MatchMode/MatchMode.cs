@@ -191,60 +191,6 @@ namespace CSPracc
             }
         }
 
-        public  void StopCoach(CCSPlayerController playerController)
-        {
-            if (playerController == null) return;
-
-            if(ListCoaches == null ||  ListCoaches.Count == 0) return;
-
-            Server.PrintToChatAll($"Looking for coach now {playerController.SteamID} , count of coaches {ListCoaches.Count}");
-
-            if(ListCoaches.Remove(playerController.SteamID))
-            {
-                playerController.PrintToCenter("You`re no longer a coach.");
-            }
-            
-        }
-
-        public  void AddCoach(CCSPlayerController playerController)
-        {
-            if (playerController == null) return;
-            if (!playerController.PlayerPawn.IsValid) return;
-
-            if (ListCoaches == null)
-            {
-                ListCoaches = new List<ulong>();
-            }
-            if(ListCoaches.Contains(playerController.SteamID))
-            {
-                playerController.PrintToCenter("You already are a coach.");
-                return;
-            }
-            ListCoaches.Add(playerController.SteamID);
-            playerController.Clan = "COACH";
-            playerController.PrintToCenter("You`re a coach now.");
-        }
-
-        public  void RestoreBackup(CCSPlayerController player)
-        {
-            if(player == null) { return; }
-            if(!player.IsValid) { return; }
-            if(!player.IsAdmin()) { player.PrintToCenter("Only admins can execute this command!"); return; }
-            Pause();
-            Methods.MsgToServer("Admin is using round restore manager.");
-            RoundRestoreManager.OpenBackupMenu(player);
-        }
-
-        public void RestoreLastRound(CCSPlayerController player)
-        {
-            if (player == null) { return; }
-            if (!player.IsValid) { return; }
-            if (!player.IsAdmin()) { player.PrintToCenter("Only admins can execute this command!"); return; }
-            Pause();
-            Methods.MsgToServer("Admin is using round restore manager.");
-            RoundRestoreManager.LoadLastBackup(player);
-        }
-
         public  void ForceUnpause(CCSPlayerController player)
         {
             if (player == null) { return; }
@@ -254,56 +200,6 @@ namespace CSPracc
             ReadyTeamT = true;
             Methods.MsgToServer("Both Teams are now ready. Unpausing match!");
             Server.ExecuteCommand(DataModules.Constants.COMMANDS.UNPAUSE_MATCH);
-        }
-        public virtual HookResult OnPlayerSpawnHandler(EventPlayerSpawn @event,GameEventInfo info)
-        {
-            if (state == match_state.warmup) { return HookResult.Continue; }
-            if (ListCoaches != null && ListCoaches.Count > 0)
-            {
-                foreach (ulong id in ListCoaches)
-                {
-                    if (id == @event.Userid!.SteamID)
-                    {
-                        @event.Userid.InGameMoneyServices!.Account = 0;
-                        Server.ExecuteCommand("mp_suicide_penalty 0");
-                        CCSPlayerController player = Utilities.GetPlayerFromSteamId(id);
-                        if (player == null || !player.IsValid) { return HookResult.Continue; }
-                        CSPraccPlugin.Instance!.AddTimer(0.5f, () => player!.PlayerPawn!.Value!.CommitSuicide(false, true));
-                        Server.ExecuteCommand("mp_suicide_penalty 1");
-                    }
-                }
-               
-            }
-            return HookResult.Changed;
-        }
-
-        public HookResult OnFreezeTimeEnd(EventRoundFreezeEnd @event,GameEventInfo info) 
-        {
-
-            if (state == match_state.warmup) { return HookResult.Continue; }
-            if (ListCoaches != null && ListCoaches.Count > 0)
-            {
-                CSPraccPlugin.Instance!.AddTimer(2.0f, () => SwitchTeamsCoach(ListCoaches));
-            }                
-            return HookResult.Continue;
-        }
-
-        private static void SwitchTeamsCoach(List<ulong> playerList)
-        {
-            if (playerList == null || playerList.Count == 0) return;
-
-            
-            foreach (ulong id in playerList)
-            {
-                CCSPlayerController player = Utilities.GetPlayerFromSteamId(id);
-                if (player == null || !player.IsValid)
-                {
-                    return;
-                }
-                CsTeam oldTeam = (CsTeam)player.TeamNum;
-                player.ChangeTeam(CsTeam.Spectator);
-                player.ChangeTeam(oldTeam);
-            }
         }
 
         public override void ConfigureEnvironment()

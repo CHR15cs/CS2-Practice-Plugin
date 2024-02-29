@@ -18,26 +18,28 @@ using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 using Microsoft.Extensions.Logging;
 using CSPracc.Extensions;
 using static CounterStrikeSharp.API.Core.BasePlugin;
+using CSPracc.Managers.BaseManagers;
 
 namespace CSPracc.Managers
 {
-    public  class PracticeBotManager : IDisposable
+    public  class PracticeBotManager : BaseManager
     {
         CSPraccPlugin Plugin { get; init; }
-        public PracticeBotManager(ref CommandManager commandManager,ref CSPraccPlugin plugin) 
+        public PracticeBotManager(ref CommandManager commandManager,ref CSPraccPlugin plugin) : base (ref commandManager)
         {
             Plugin = plugin;
-            commandManager.RegisterCommand(new PlayerCommand(PRACC_COMMAND.BOT, "place bot at your current position",CommandHandlerBot, null));
-            commandManager.RegisterCommand(new PlayerCommand(PRACC_COMMAND.tBOT, "place tbot at your current position", CommandHandlerTBot, null));
-            commandManager.RegisterCommand(new PlayerCommand(PRACC_COMMAND.ctBOT, "place ctbot at your current position", CommandHandlerCTBot, null));
-            commandManager.RegisterCommand(new PlayerCommand(PRACC_COMMAND.CROUCHBOT, "place crouched bot at your current position", CommandHandlerCrouchBot, null));
-            commandManager.RegisterCommand(new PlayerCommand(PRACC_COMMAND.BOOST, "boost yourself ontop of a bot at your current position", CommandHandlerBoostBot, null));
-            commandManager.RegisterCommand(new PlayerCommand(PRACC_COMMAND.CROUCHBOOST, "boost yourself ontop of a crouched bot at your current position", CommandHandlerCrouchBoostBot, null));
-            commandManager.RegisterCommand(new PlayerCommand(PRACC_COMMAND.NOBOT, "remove closest bot", CommandHandlerNoBot, null));
-            commandManager.RegisterCommand(new PlayerCommand(PRACC_COMMAND.CLEARBOTS, "remove all of your bots", CommandHandlerClearBots, null));
-            commandManager.RegisterCommand(new PlayerCommand(PRACC_COMMAND.MoveBot, "move last placed bot to your current position", CommandHandlerMoveBot, null));
-            commandManager.RegisterCommand(new PlayerCommand(PRACC_COMMAND.SwapBot, "swap position with the closest bot", CommandHandlerSwapBot, null));
             Plugin.RegisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn, HookMode.Post);
+
+            Commands.Add(PRACC_COMMAND.BOT, new PlayerCommand(PRACC_COMMAND.BOT, "place bot at your current position", CommandHandlerBot, null));
+            Commands.Add(PRACC_COMMAND.tBOT,new PlayerCommand(PRACC_COMMAND.tBOT, "place tbot at your current position", CommandHandlerTBot, null));
+            Commands.Add(PRACC_COMMAND.ctBOT, new PlayerCommand(PRACC_COMMAND.ctBOT, "place ctbot at your current position", CommandHandlerCTBot, null));
+            Commands.Add(PRACC_COMMAND.CROUCHBOT, new PlayerCommand(PRACC_COMMAND.CROUCHBOT, "place crouched bot at your current position", CommandHandlerCrouchBot, null));
+            Commands.Add(PRACC_COMMAND.BOOST, new PlayerCommand(PRACC_COMMAND.BOOST, "boost yourself ontop of a bot at your current position", CommandHandlerBoostBot, null));
+            Commands.Add(PRACC_COMMAND.CROUCHBOOST, new PlayerCommand(PRACC_COMMAND.CROUCHBOOST, "boost yourself ontop of a crouched bot at your current position", CommandHandlerCrouchBoostBot, null));
+            Commands.Add(PRACC_COMMAND.NOBOT, new PlayerCommand(PRACC_COMMAND.NOBOT, "remove closest bot", CommandHandlerNoBot, null));
+            Commands.Add(PRACC_COMMAND.CLEARBOTS, new PlayerCommand(PRACC_COMMAND.CLEARBOTS, "remove all of your bots", CommandHandlerClearBots, null));
+            Commands.Add(PRACC_COMMAND.MoveBot, new PlayerCommand(PRACC_COMMAND.MoveBot, "move last placed bot to your current position", CommandHandlerMoveBot, null));
+            Commands.Add(PRACC_COMMAND.SwapBot, new PlayerCommand(PRACC_COMMAND.SwapBot, "swap position with the closest bot", CommandHandlerSwapBot, null));
         }
 
         private bool CommandHandlerBot(CCSPlayerController playerController,List<string> args)
@@ -390,10 +392,12 @@ namespace CSPracc.Managers
             return HookResult.Continue;
         }
 
-        public void Dispose()
+        public new void Dispose()
         {
             GameEventHandler<EventPlayerSpawn> onPlayerSpawned = new GameEventHandler<EventPlayerSpawn>(OnPlayerSpawn);
             Plugin.DeregisterEventHandler("player_spawned", onPlayerSpawned, true);
+            base.Dispose();
         }
+
     }
 }

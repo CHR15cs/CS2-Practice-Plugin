@@ -8,6 +8,7 @@ namespace CSPracc.Managers
 {
     public interface IManager : IDisposable
     {
-
+        public void RegisterCommands();
+        public void DeregisterCommands();
     }
 }

@@ -1,5 +1,7 @@
 ﻿using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
+using CSPracc.DataModules.Constants;
+using CSPracc.Managers.BaseManagers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,16 +10,14 @@ using System.Threading.Tasks;
 
 namespace CSPracc.Managers.PracticeManagers
 {
-    public class CountdownManager : IDisposable
+    public class CountdownManager : BaseManager
     {
         GuiManager GuiManager;
-        public CountdownManager(ref CommandManager commandManager, ref GuiManager guiManager) 
+        public CountdownManager(ref CommandManager commandManager, ref GuiManager guiManager) : base(ref commandManager)
         { 
             GuiManager = guiManager;
-            commandManager.RegisterCommand(new DataModules.PlayerCommand("","", CountdownCommandHandler,null));
+            Commands.Add(PRACC_COMMAND.countdown, new DataModules.PlayerCommand(PRACC_COMMAND.countdown, "", CountdownCommandHandler, null));
         }
-
-
         private bool CountdownCommandHandler(CCSPlayerController playerController, List<string> args)
         {
             if (args.Count != 1)
@@ -34,11 +34,6 @@ namespace CSPracc.Managers.PracticeManagers
         private void AddCountdown(CCSPlayerController player, int countdown)
         {
             GuiManager.StartCountdown(player, countdown);
-        }
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
         }
     }
 }

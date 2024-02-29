@@ -1,5 +1,7 @@
 ﻿using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
+using CSPracc.DataModules.Constants;
+using CSPracc.Managers.BaseManagers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,50 +10,23 @@ using System.Threading.Tasks;
 
 namespace CSPracc.Managers.PracticeManagers
 {
-    public class TimerManager : IDisposable
+    public class TimerManager : BaseManager
     {
         GuiManager GuiManager;
-        public TimerManager(ref CommandManager commandManager, ref GuiManager guiManager) 
+        public TimerManager(ref CommandManager commandManager, ref GuiManager guiManager) : base(ref commandManager)
         { 
             GuiManager = guiManager;
-            commandManager.RegisterCommand(new DataModules.PlayerCommand("","", CountdownCommandHandler,null));
+            Commands.Add(PRACC_COMMAND.timer,new DataModules.PlayerCommand(PRACC_COMMAND.timer,"Start timer", TimerCommandHandler, null));
         }
-
-
-        private bool CountdownCommandHandler(CCSPlayerController playerController, List<string> args)
-        {
-            if (args.Count != 1)
-            {
-                if (int.TryParse(args[0], out int time))
-                {
-                    AddCountdown(playerController, time);
-                    return true;
-                }
-            }
-            playerController.ChatMessage($"{ChatColors.Red}Could not parse parameter");
-            return false;
-        }
-        private void AddCountdown(CCSPlayerController player, int countdown)
-        {
-            GuiManager.StartCountdown(player, countdown);
-        }
-
         public bool TimerCommandHandler(CCSPlayerController playerController, List<string> args)
         {
             StartTimer(playerController);
             return true;
         }
-
         public void StartTimer(CCSPlayerController player)
         {
             if (player == null) return;
             GuiManager.StartTimer(player);
-        }
-
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
         }
     }
 }

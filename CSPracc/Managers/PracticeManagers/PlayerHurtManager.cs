@@ -1,6 +1,7 @@
 ﻿using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.DataModules.Constants;
+using CSPracc.Managers.BaseManagers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,16 +11,15 @@ using static CounterStrikeSharp.API.Core.BasePlugin;
 
 namespace CSPracc.Managers.PracticeManagers
 {
-    public class PlayerHurtManager : IDisposable
+    public class PlayerHurtManager : BaseManager
     {
         CSPraccPlugin Plugin;
-        public PlayerHurtManager(ref CSPraccPlugin plugin) 
+        public PlayerHurtManager(ref CSPraccPlugin plugin, ref CommandManager commandManager) : base(ref commandManager) 
         {
             Plugin = plugin;
             Plugin.RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt, HookMode.Post);
         }
-
-        public void Dispose()
+        public new void Dispose()
         {
             GameEventHandler<EventPlayerHurt> playerHurt = OnPlayerHurt;
             Plugin.DeregisterEventHandler("player_hurt", playerHurt, false);

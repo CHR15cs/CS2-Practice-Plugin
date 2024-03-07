@@ -33,29 +33,5 @@ namespace CSPracc.Managers.BaseManagers.CommandManagerFolder
             return command;
         }
 
-        public static List<string>? GetArgsFromPlayerCommandOrDefault(string argument)
-        {
-            List<string> arguments = new();
-            if (String.IsNullOrWhiteSpace(argument))
-            {
-                return null;
-            }
-            do
-            {
-                argument = argument.Trim();
-                int index = argument.IndexOf(' ');
-                if (index == -1)
-                {
-                    arguments.Add(argument);
-                    argument = string.Empty;
-                    break;
-                }
-                string foundArgument = argument.Substring(0, index);
-                arguments.Add(foundArgument);
-                argument = argument.Substring(index);
-            } while (argument.Length > 0 && argument != String.Empty);
-            arguments.RemoveAt(0);
-            return arguments;
-        }
     }
 }

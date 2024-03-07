@@ -25,24 +25,41 @@ namespace CSPracc
     public  class MatchMode : BaseMode
     {        protected  DataModules.Enums.match_state state = DataModules.Enums.match_state.warmup;
 
-        public static List<ulong>? ListCoaches { get; set; }
-        protected  bool ReadyTeamCT = false;
-        protected  bool ReadyTeamT = false;
-
-        public  CCSPlayerController? CoachTeam1 { get; set; }
-        public  CCSPlayerController? CoachTeam2 { get; set; }
-
+        private List<IManager> warmupManagers { get; set; } = new List<IManager>();
+        private List<IManager> matchManagers { get; set; } = new List<IManager>();
 
         public MatchMode(CSPraccPlugin plugin) : base(plugin)
         {
 
         }
 
+        private void SetupWarmupManagers()
+        {
+
+        }
+
+        private void SetupMatchManagers()
+        {
+
+        }
+
+
+        private void LoadWarmup()
+        {
+            warmupManagers.ForEach(m => m.RegisterCommands());
+            matchManagers.ForEach(m => m.DeregisterCommands());
+        }
+
+        private void LoadMatch()
+        {
+            warmupManagers.ForEach(m => m.DeregisterCommands());
+            matchManagers.ForEach(m => m.RegisterCommands());
+        }
+
         public override void Dispose()
         {
-            EventHandler?.Dispose();
+            
         }
-        private  BaseEventHandler EventHandler {  get; set; } = null;
 
         public  void Pause()
         {

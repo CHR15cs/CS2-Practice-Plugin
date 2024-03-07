@@ -43,12 +43,7 @@ namespace CSPracc.Managers.BaseManagers.CommandManagerFolder
                 return HookResult.Continue;
             }
             CommandAliasManager.Instance.ReplaceAlias(player, command, out command);
-            List<string>? arguments = PlayerCommandParser.GetArgsFromPlayerCommandOrDefault(textFromPlayer);
-            if (arguments is null)
-            {
-                CSPraccPlugin.Instance!.Logger.LogWarning($"Could not get args from player text");
-                arguments = new List<string>();
-            }
+            PlayerCommandArgument playerCommandArgument = new (textFromPlayer);
             if (!Commands.TryGetValue(command, out PlayerCommand? commandToExecute))
             {
                 CSPraccPlugin.Instance!.Logger.LogWarning($"Could not get command");

@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Admin;
+using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +14,8 @@ namespace CSPracc.DataModules
         public string Name { get; set; }
         public string Description { get; set; } 
         private string permissionRequirement = "";
-        private Func<CCSPlayerController,List<string>,bool> CommandToExecute;
-        public PlayerCommand(string name,string description,Func<CCSPlayerController,List<string>,bool> commandToExecute,string? requiredFlag) 
+        private Func<CCSPlayerController,PlayerCommandArgument, bool> CommandToExecute;
+        public PlayerCommand(string name,string description,Func<CCSPlayerController, PlayerCommandArgument, bool> commandToExecute,string? requiredFlag, int? expectedArgumentCount) 
         {
             Name = name;
             Description = description;
@@ -25,7 +26,7 @@ namespace CSPracc.DataModules
             CommandToExecute = commandToExecute;
         }
 
-        public bool ExecuteCommand(CCSPlayerController playerController, List<string> args) 
+        public bool ExecuteCommand(CCSPlayerController playerController, PlayerCommandArgument args) 
         {
             if (!playerController.IsAdmin() && !AdminManager.PlayerHasPermissions(playerController, permissionRequirement))
             {

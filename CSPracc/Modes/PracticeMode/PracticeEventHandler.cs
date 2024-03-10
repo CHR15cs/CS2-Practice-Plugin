@@ -1,22 +1,10 @@
-﻿using CounterStrikeSharp.API;
-using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Core.Attributes;
-using CounterStrikeSharp.API.Core.Attributes.Registration;
-using CounterStrikeSharp.API.Modules.Entities;
-using CounterStrikeSharp.API.Modules.Events;
+﻿using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
-using CSPracc.CommandHandler;
-using CSPracc.DataModules;
-using CSPracc.DataModules.Constants;
-using CSPracc.Extensions;
-using CSPracc.Managers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using static CounterStrikeSharp.API.Core.BasePlugin;
+using CSPracc.CommandHandler;
+using CSPracc.Extensions;
+using CSPracc.DataModules.Constants;
+using CSPracc.Managers;
 
 namespace CSPracc.EventHandler
 {

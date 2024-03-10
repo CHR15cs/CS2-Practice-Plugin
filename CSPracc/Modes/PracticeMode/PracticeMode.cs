@@ -1,17 +1,12 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.CommandHandler;
 using CSPracc.DataModules;
 using CSPracc.DataModules.Constants;
 using CSPracc.EventHandler;
 using CSPracc.Managers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static CSPracc.DataModules.Enums;
 
 namespace CSPracc.Modes
 {
@@ -212,7 +207,30 @@ namespace CSPracc.Modes
             projectileManager = new ProjectileManager();
             PracticeBotManager = new PracticeBotManager();
             SpawnManager = new SpawnManager();
-            BotReplayManager = new BotReplayManager(ref PracticeBotManager, ref projectileManager);  
+            BotReplayManager = new BotReplayManager(ref PracticeBotManager, ref projectileManager);
+        }
+
+        private static void UnprotectCommands()
+        {
+            // allow commands to be run on the server even if `sv_cheats false`
+            var unprotectCommands = new List<string>
+            {
+                "sv_grenade_trajectory_prac_pipreview",
+                "sv_infinite_ammo",
+                "sv_showimpacts",
+            };
+
+            foreach (var conVar in unprotectCommands)
+            {
+                var c = ConVar.Find(conVar);
+                if (c == null)
+                {
+                    continue;
+                }
+            
+                c.Flags &= ~ConVarFlags.FCVAR_CHEAT;
+                c.Flags &= ~ConVarFlags.FCVAR_PROTECTED;
+            }
         }
 
         public void StartTimer(CCSPlayerController player)
@@ -247,7 +265,11 @@ namespace CSPracc.Modes
         public override void ConfigureEnvironment()
         {
             DataModules.Constants.Methods.MsgToServer("Loading practice mode.");
+            
+            UnprotectCommands();
+            
             Server.ExecuteCommand("exec CSPRACC\\pracc.cfg");
+            
             EventHandler?.Dispose();
             EventHandler = new PracticeEventHandler(CSPraccPlugin.Instance!, new PracticeCommandHandler(this, ref projectileManager,ref PracticeBotManager, ref SpawnManager),ref projectileManager, ref PracticeBotManager);
         }

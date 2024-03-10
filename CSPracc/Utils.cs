@@ -1,20 +1,15 @@
-﻿using CounterStrikeSharp.API.Core;
+﻿using System.Drawing;
 using CounterStrikeSharp.API;
-using CSPracc.DataModules;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
-using CounterStrikeSharp.API.Modules.Entities;
-using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
-using System.Runtime.InteropServices;
+using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Memory;
 
 namespace CSPracc
 {
     public class Utils
     {
+        // https://github.com/alliedmodders/hl2sdk/blob/cs2/game/shared/shareddefs.h#L509
+        private const uint EFL_NOCLIP_ACTIVE = (((uint)1) << 2);
+        
         /// <summary>
         /// Deleting Grenades from server
         /// </summary>
@@ -92,15 +87,50 @@ namespace CSPracc
                 }
             }
         }
-
-        public static void RemoveNoClip(CCSPlayerController player)
+        
+        public static void ToggleNoClip(CCSPlayerController? player)
         {
-            if (player == null || !player.IsValid) return;
-
-            if (player.PlayerPawn.Value!.MoveType == MoveType_t.MOVETYPE_NOCLIP)
+            if (player == null || !player.IsValid || player.PlayerPawn.Value == null)
             {
-                player.PlayerPawn.Value.MoveType = MoveType_t.MOVETYPE_WALK;
+                return;
             }
+            if (player.PlayerPawn.Value.MoveType == MoveType_t.MOVETYPE_NOCLIP)
+            {
+                RemoveNoClip(player);
+                return;
+            }
+
+            player.PlayerPawn.Value.Flags |= EFL_NOCLIP_ACTIVE;
+            player.PlayerPawn.Value.MoveType = MoveType_t.MOVETYPE_NOCLIP;
+            
+            Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 8); // 7?
+            
+            Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
+        }
+
+        public static void RemoveNoClip(CCSPlayerController? player)
+        {
+            if (player == null || !player.IsValid || player.PlayerPawn.Value == null)
+            {
+                return;
+            }
+            if (player.PlayerPawn.Value.MoveType == MoveType_t.MOVETYPE_WALK)
+            {
+                return;
+            }
+            
+            player.PlayerPawn.Value.Flags &= ~EFL_NOCLIP_ACTIVE;
+            player.PlayerPawn.Value.MoveType = MoveType_t.MOVETYPE_WALK;
+            
+            Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 2);
+            
+            Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
+            
+            // maybe needs calling?:
+            // NoClipStateChanged
+            // https://github.com/alliedmodders/hl2sdk/blob/cs2/game/server/player.h#L406
+            // see:
+            // https://github.com/alliedmodders/hl2sdk/blob/cs2/game/server/client.cpp#L1207-L1286
         }
 
         public static void ServerMessage(string message)

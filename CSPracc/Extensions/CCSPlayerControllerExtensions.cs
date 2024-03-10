@@ -23,7 +23,10 @@ namespace CSPracc
             {
                 return true;
             }
-            return AdminManager.PlayerHasPermissions(playerController, AdminFlags.Standard);
+
+            // check if they have permission (starting with least privileged)
+            return AdminManager.PlayerHasPermissions(playerController, AdminFlags.Standard) 
+                   || AdminManager.PlayerHasPermissions(playerController, AdminFlags.Root);
         }
 
         public static CsTeam GetCsTeam(this CCSPlayerController playerController)

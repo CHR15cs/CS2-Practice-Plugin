@@ -1,22 +1,12 @@
-﻿using CounterStrikeSharp.API.Core.Attributes.Registration;
+﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CounterStrikeSharp.API.Modules.Menu;
+using CounterStrikeSharp.API.Modules.Commands;
+using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Utils;
-using CounterStrikeSharp.API;
+using CSPracc.DataModules;
 using CSPracc.DataModules.Constants;
 using CSPracc.Managers;
-using CSPracc.DataModules;
-using CounterStrikeSharp.API.Modules.Commands;
-using CounterStrikeSharp.API.Modules.Memory;
 using CSPracc.Modes;
-using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
-using System.Reflection.Metadata.Ecma335;
-using CounterStrikeSharp.API.Modules.Cvars;
 
 namespace CSPracc.CommandHandler
 {

@@ -1,18 +1,12 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.CommandHandler;
 using CSPracc.DataModules;
 using CSPracc.DataModules.Constants;
 using CSPracc.EventHandler;
 using CSPracc.Managers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CounterStrikeSharp.API.Modules.Cvars;
-using static CSPracc.DataModules.Enums;
 
 namespace CSPracc.Modes
 {

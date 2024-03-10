@@ -157,6 +157,7 @@ namespace CSPracc.DataModules.Constants
 
     public class AdminFlags
     {
+        public const string Root = "@css/root";
         public const string Standard = "@CSPracc/admin";
     }
     public class Methods

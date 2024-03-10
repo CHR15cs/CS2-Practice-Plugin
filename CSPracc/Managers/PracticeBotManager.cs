@@ -1,19 +1,10 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.DataModules;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CounterStrikeSharp.API.Modules.Timers;
 using CSPracc.DataModules.Constants;
-using CounterStrikeSharp.API.Modules.Entities;
-using System.Net.Http.Headers;
-using CounterStrikeSharp.API.Modules.Memory;
-using System.Numerics;
+using CounterStrikeSharp.API.Modules.Entities.Constants;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 using Microsoft.Extensions.Logging;
 using CSPracc.Extensions;
@@ -30,6 +21,8 @@ namespace CSPracc.Managers
         private  Dictionary<string, Dictionary<string, object>> spawnedBots { get; set; } =new Dictionary<string, Dictionary<string, object>>();
 
         private Dictionary<ulong,string> lastBotSpawned {  get; set; } = new Dictionary<ulong,string>();
+        
+        private CounterStrikeSharp.API.Modules.Timers.Timer? collisionGroupTimer;
 
         /// <summary>
         /// Following code is heavily inspired by https://github.com/shobhit-pathak/MatchZy/blob/main/PracticeMode.cs
@@ -65,7 +58,7 @@ namespace CSPracc.Managers
             CSPraccPlugin.Instance!.AddTimer(0.1f, () => SpawnBot(player,crouch));
             Server.ExecuteCommand("bot_stop 1");
             Server.ExecuteCommand("bot_freeze 1");
-            Server.ExecuteCommand("bot_zombie 1");            
+            Server.ExecuteCommand("bot_zombie 1");
         }
 
         /// <summary>
@@ -276,6 +269,7 @@ namespace CSPracc.Managers
                     spawnedBots[tempPlayer.PlayerName]["position"] = botOwnerPosition;
                     spawnedBots[tempPlayer.PlayerName]["owner"] = botOwner;
                     spawnedBots[tempPlayer.PlayerName]["crouchstate"] = crouch;
+                    
                     CCSPlayer_MovementServices movementService = new CCSPlayer_MovementServices(tempPlayer.PlayerPawn.Value.MovementServices!.Handle);
                     CCSBot bot = tempPlayer.PlayerPawn.Value.Bot!;                   
                     CSPraccPlugin.Instance!.AddTimer(0.1f, () => tempPlayer.PlayerPawn.Value.Teleport(botOwnerPosition.PlayerPosition, botOwnerPosition.PlayerAngle, new Vector(0, 0, 0)));
@@ -287,6 +281,7 @@ namespace CSPracc.Managers
 
                     }
                     lastBotSpawned.SetOrAdd(botOwner.SteamID, tempPlayer.PlayerName);
+                    TemporarilyDisableCollisions(botOwner, tempPlayer);
                     unusedBotFound = true;
                 }
             }
@@ -294,6 +289,56 @@ namespace CSPracc.Managers
             {
                 Methods.MsgToServer($"Cannot add bots, the team is full! Use .nobots to remove the current bots.");
             }
+        }
+        
+        public void TemporarilyDisableCollisions(CCSPlayerController p1, CCSPlayerController p2)
+        {
+            CSPraccPlugin.Instance.Logger.LogInformation($"[TemporarilyDisableCollisions] Disabling {p1.PlayerName} {p2.PlayerName}");
+            // Reference collision code: https://github.com/Source2ZE/CS2Fixes/blob/f009e399ff23a81915e5a2b2afda20da2ba93ada/src/events.cpp#L150
+            p1.PlayerPawn.Value!.Collision.CollisionAttribute.CollisionGroup = (byte)CollisionGroup.COLLISION_GROUP_DEBRIS;
+            p1.PlayerPawn.Value.Collision.CollisionGroup = (byte)CollisionGroup.COLLISION_GROUP_DEBRIS;
+            p2.PlayerPawn.Value!.Collision.CollisionAttribute.CollisionGroup = (byte)CollisionGroup.COLLISION_GROUP_DEBRIS;
+            p2.PlayerPawn.Value.Collision.CollisionGroup = (byte)CollisionGroup.COLLISION_GROUP_DEBRIS;
+            // TODO: call CollisionRulesChanged
+            var p1p = p1.PlayerPawn;
+            var p2p = p2.PlayerPawn;
+            collisionGroupTimer?.Kill();
+            collisionGroupTimer = CSPraccPlugin.Instance.AddTimer(0.1f, () =>
+            {
+                if (!p1p.IsValid || !p2p.IsValid || !p1p.Value.IsValid || !p2p.Value.IsValid)
+                {
+                    CSPraccPlugin.Instance.Logger.LogWarning($"player handle invalid p1p {p1p.Value.IsValid} p2p {p2p.Value.IsValid}");
+                    collisionGroupTimer?.Kill();
+                    return;
+                }
+
+                if (!DoPlayersCollide(p1p.Value, p2p.Value))
+                {
+                    // Once they no longer collide 
+                    p1p.Value.Collision.CollisionAttribute.CollisionGroup = (byte)CollisionGroup.COLLISION_GROUP_PLAYER_MOVEMENT;
+                    p1p.Value.Collision.CollisionGroup = (byte)CollisionGroup.COLLISION_GROUP_PLAYER_MOVEMENT;
+                    p2p.Value.Collision.CollisionAttribute.CollisionGroup = (byte)CollisionGroup.COLLISION_GROUP_PLAYER_MOVEMENT;
+                    p2p.Value.Collision.CollisionGroup = (byte)CollisionGroup.COLLISION_GROUP_PLAYER_MOVEMENT;
+                    // TODO: call CollisionRulesChanged
+                    collisionGroupTimer?.Kill();
+                }
+
+            }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
+        }
+
+        public bool DoPlayersCollide(CCSPlayerPawn p1, CCSPlayerPawn p2)
+        {
+            Vector p1min, p1max, p2min, p2max;
+            var p1pos = p1.AbsOrigin;
+            var p2pos = p2.AbsOrigin;
+            p1min = p1.Collision.Mins + p1pos!;
+            p1max = p1.Collision.Maxs + p1pos!;
+            p2min = p2.Collision.Mins + p2pos!;
+            p2max = p2.Collision.Maxs + p2pos!;
+
+            return p1min.X <= p2max.X && p1max.X >= p2min.X &&
+                    p1min.Y <= p2max.Y && p1max.Y >= p2min.Y &&
+                    p1min.Z <= p2max.Z && p1max.Z >= p2min.Z;
         }
 
         public HookResult OnPlayerSpawn(EventPlayerSpawn @event, GameEventInfo info)

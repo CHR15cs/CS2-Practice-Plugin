@@ -16,6 +16,9 @@ namespace CSPracc
 {
     public class Utils
     {
+        // https://github.com/alliedmodders/hl2sdk/blob/cs2/game/shared/shareddefs.h#L509
+        private const uint EFL_NOCLIP_ACTIVE = (((uint)1) << 2);
+        
         /// <summary>
         /// Deleting Grenades from server
         /// </summary>
@@ -105,8 +108,10 @@ namespace CSPracc
                 RemoveNoClip(player);
                 return;
             }
-            
+
+            player.PlayerPawn.Value.Flags |= EFL_NOCLIP_ACTIVE;
             player.PlayerPawn.Value.MoveType = MoveType_t.MOVETYPE_NOCLIP;
+            
             Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 8); // 7?
             
             Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
@@ -122,11 +127,19 @@ namespace CSPracc
             {
                 return;
             }
-        
+            
+            player.PlayerPawn.Value.Flags &= ~EFL_NOCLIP_ACTIVE;
             player.PlayerPawn.Value.MoveType = MoveType_t.MOVETYPE_WALK;
+            
             Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 2);
             
             Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
+            
+            // maybe needs calling?:
+            // NoClipStateChanged
+            // https://github.com/alliedmodders/hl2sdk/blob/cs2/game/server/player.h#L406
+            // see:
+            // https://github.com/alliedmodders/hl2sdk/blob/cs2/game/server/client.cpp#L1207-L1286
         }
 
         public static void ServerMessage(string message)

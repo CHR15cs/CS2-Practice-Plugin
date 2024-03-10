@@ -221,7 +221,9 @@ namespace CSPracc.Modes
             // allow commands to be run on the server even if `sv_cheats false`
             var unprotectCommands = new List<string>
             {
+                "sv_grenade_trajectory_prac_pipreview",
                 "sv_infinite_ammo",
+                "sv_showimpacts",
             };
 
             foreach (var conVar in unprotectCommands)

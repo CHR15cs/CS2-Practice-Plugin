@@ -46,6 +46,7 @@ namespace CSPracc.DataModules.Constants
     public class BASE_COMMAND
     {
         public const string MODE = ".menu";
+        public const string PRAC = ".prac";
         public const string PRACC = ".pracc";
         public const string MATCH = ".match";
         public const string DryRun = ".dryrun";
@@ -92,6 +93,7 @@ namespace CSPracc.DataModules.Constants
 
     public class PRACC_COMMAND
     {      
+        public const string NOCLIP = ".noclip";
         public const string SPAWN = ".spawn";
         public const string TSPAWN = ".tspawn";
         public const string CTSPAWN = ".ctspawn";           
@@ -145,6 +147,7 @@ namespace CSPracc.DataModules.Constants
 
         public const string breakstuff = ".break";
         public const string impacts = ".impacts";
+        public const string restart_round = ".rr";
 
         public const string mimic_menu = ".mimic";
         public const string create_replay = ".createreplay";

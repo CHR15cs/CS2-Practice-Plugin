@@ -68,6 +68,12 @@ namespace CSPracc.CommandHandler
             }
             switch (command)
             {
+                case PRACC_COMMAND.NOCLIP:
+                    Utils.ToggleNoClip(player);
+                    break;
+                case PRACC_COMMAND.restart_round:
+                    Server.ExecuteCommand("mp_restartgame 1");
+                    break;
                 case PRACC_COMMAND.SPAWN:
                     {
                         SpawnManager.TeleportToSpawn(player, args);

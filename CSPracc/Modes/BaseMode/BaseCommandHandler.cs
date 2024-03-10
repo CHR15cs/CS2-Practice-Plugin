@@ -175,6 +175,7 @@ namespace CSPracc.CommandHandler
                         CSPraccPlugin.SwitchMode(Enums.PluginMode.Base);
                         break;
                     }
+                case BASE_COMMAND.PRAC:
                 case BASE_COMMAND.PRACC:
                     {
                         if (!player.IsAdmin())

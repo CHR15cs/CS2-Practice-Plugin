@@ -93,6 +93,24 @@ namespace CSPracc
                 }
             }
         }
+        
+        public static void ToggleNoClip(CCSPlayerController? player)
+        {
+            if (player == null || !player.IsValid || player.PlayerPawn.Value == null)
+            {
+                return;
+            }
+            if (player.PlayerPawn.Value.MoveType == MoveType_t.MOVETYPE_NOCLIP)
+            {
+                RemoveNoClip(player);
+                return;
+            }
+            
+            player.PlayerPawn.Value.MoveType = MoveType_t.MOVETYPE_NOCLIP;
+            Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 8); // 7?
+            
+            Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
+        }
 
         public static void RemoveNoClip(CCSPlayerController? player)
         {

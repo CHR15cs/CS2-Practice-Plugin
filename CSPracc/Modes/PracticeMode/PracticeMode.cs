@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CounterStrikeSharp.API.Modules.Cvars;
 using static CSPracc.DataModules.Enums;
 
 namespace CSPracc.Modes
@@ -212,7 +213,28 @@ namespace CSPracc.Modes
             projectileManager = new ProjectileManager();
             PracticeBotManager = new PracticeBotManager();
             SpawnManager = new SpawnManager();
-            BotReplayManager = new BotReplayManager(ref PracticeBotManager, ref projectileManager);  
+            BotReplayManager = new BotReplayManager(ref PracticeBotManager, ref projectileManager);
+        }
+
+        private static void UnprotectCommands()
+        {
+            // allow commands to be run on the server even if `sv_cheats false`
+            var unprotectCommands = new List<string>
+            {
+                "sv_infinite_ammo",
+            };
+
+            foreach (var conVar in unprotectCommands)
+            {
+                var c = ConVar.Find(conVar);
+                if (c == null)
+                {
+                    continue;
+                }
+            
+                c.Flags &= ~ConVarFlags.FCVAR_CHEAT;
+                c.Flags &= ~ConVarFlags.FCVAR_PROTECTED;
+            }
         }
 
         public void StartTimer(CCSPlayerController player)
@@ -247,7 +269,11 @@ namespace CSPracc.Modes
         public override void ConfigureEnvironment()
         {
             DataModules.Constants.Methods.MsgToServer("Loading practice mode.");
+            
+            UnprotectCommands();
+            
             Server.ExecuteCommand("exec CSPRACC\\pracc.cfg");
+            
             EventHandler?.Dispose();
             EventHandler = new PracticeEventHandler(CSPraccPlugin.Instance!, new PracticeCommandHandler(this, ref projectileManager,ref PracticeBotManager, ref SpawnManager),ref projectileManager, ref PracticeBotManager);
         }

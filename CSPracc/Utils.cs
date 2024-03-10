@@ -10,6 +10,7 @@ using System.Drawing;
 using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
 using System.Runtime.InteropServices;
+using CounterStrikeSharp.API.Modules.Memory;
 
 namespace CSPracc
 {
@@ -93,14 +94,21 @@ namespace CSPracc
             }
         }
 
-        public static void RemoveNoClip(CCSPlayerController player)
+        public static void RemoveNoClip(CCSPlayerController? player)
         {
-            if (player == null || !player.IsValid) return;
-
-            if (player.PlayerPawn.Value!.MoveType == MoveType_t.MOVETYPE_NOCLIP)
+            if (player == null || !player.IsValid || player.PlayerPawn.Value == null)
             {
-                player.PlayerPawn.Value.MoveType = MoveType_t.MOVETYPE_WALK;
+                return;
             }
+            if (player.PlayerPawn.Value.MoveType == MoveType_t.MOVETYPE_WALK)
+            {
+                return;
+            }
+        
+            player.PlayerPawn.Value.MoveType = MoveType_t.MOVETYPE_WALK;
+            Schema.SetSchemaValue(player.PlayerPawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 2);
+            
+            Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_MoveType");
         }
 
         public static void ServerMessage(string message)

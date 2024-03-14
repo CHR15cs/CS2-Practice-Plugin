@@ -30,6 +30,7 @@ using CSPracc.Managers;
 using static CounterStrikeSharp.API.Core.BasePlugin;
 using CounterStrikeSharp.API.Modules.Commands;
 using CSPracc.Managers.BaseManagers;
+using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 
 namespace CSPracc
 {
@@ -110,8 +111,8 @@ namespace CSPracc
             plugin.RegisterListener<Listeners.OnEntitySpawned>(OnEntitySpawned);
             plugin.RegisterEventHandler<EventSmokegrenadeDetonate>(OnSmokeDetonate, hookMode: HookMode.Post);
             plugin.AddCommand("css_pracc_smokecolor_enabled", "Enable smoke coloring", SmokeColoring);
-            Commands.Add(PROJECTILE_COMMAND.NADES,new PlayerCommand(PROJECTILE_COMMAND.NADES, "Show nade menu", NadesCommandHandler, null));
-            Commands.Add(PROJECTILE_COMMAND.SAVE, new PlayerCommand(PROJECTILE_COMMAND.SAVE, "Save last thrown nade", SaveSnapshotCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.NADES,new PlayerCommand(PROJECTILE_COMMAND.NADES, "Show nade menu", NadesCommandHandler, null,null));
+            Commands.Add(PROJECTILE_COMMAND.SAVE, new PlayerCommand(PROJECTILE_COMMAND.SAVE, "Save last thrown nade", SaveSnapshotCommandHandler, null, null));
             Commands.Add(PROJECTILE_COMMAND.Rename, new PlayerCommand(PROJECTILE_COMMAND.Rename, "Rename last loaded grenade", RenameLastSnapshotCommandHandler, null));
             Commands.Add(PROJECTILE_COMMAND.Delete, new PlayerCommand(PROJECTILE_COMMAND.Delete, "Delete last nade", CommandHandlerRemoveSnapshot, null));
             Commands.Add(PROJECTILE_COMMAND.rethrow, new PlayerCommand(PROJECTILE_COMMAND.rethrow, "Rethrow last grenade or with given id/tag", ReThrowCommandHandler, null));
@@ -136,12 +137,12 @@ namespace CSPracc
 
         #region CommandHandlers
 
-        public bool ClearAllNadesCommandHandler(CCSPlayerController player, List<string> args)
+        public bool ClearAllNadesCommandHandler(CCSPlayerController player, PlayerCommandArgument args)
         {
             return ClearNades(player, true);
         }
 
-        public bool ClearPersonalNadesCommandHandler(CCSPlayerController player, List<string> args)
+        public bool ClearPersonalNadesCommandHandler(CCSPlayerController player, PlayerCommandArgument args)
         {
             return ClearNades(player, false);
         }
@@ -160,38 +161,33 @@ namespace CSPracc
             }
         }
 
-        public bool NadesCommandHandler(CCSPlayerController playerController,List<string> args)
+        public bool NadesCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
-            if(args.Count < 1)
-            {
-                args.Add("");
-            }
-            if (args[0].Trim().ToLower() == "all")
+            if (args.ArgumentString.Trim().ToLower() == "all")
             {
                 GuiManager.AddMenu(playerController.SteamID, GetNadeMenu(playerController));
 
             }
-            else if (int.TryParse(args[0], out int id))
+            else if (int.TryParse(args.ArgumentString.Trim(), out int id))
             {
                 RestoreSnapshot(playerController, id);
                 SetLastAddedProjectileSnapshot(playerController.SteamID, id);
             }
             else
             {
-                GuiManager.AddMenu(playerController.SteamID, GetPlayerBasedNadeMenu(playerController, args[0], ""));
+                GuiManager.AddMenu(playerController.SteamID, GetPlayerBasedNadeMenu(playerController, args.ArgumentString.ToLower(), ""));
             }
             return true;
         }
 
-        public bool FindCommandHandler(CCSPlayerController playerController, List<string> args)
+        public bool FindCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
-            if (args.Count < 1)
+            if (args.ArgumentCount < 1)
             {
                 playerController.ChatMessage($"No query passed.");
                 return false;
             }
-            string query = String.Join(" ", args);
-            GuiManager.AddMenu(playerController.SteamID, GetPlayerBasedNadeMenu(playerController, query, ""));
+            GuiManager.AddMenu(playerController.SteamID, GetPlayerBasedNadeMenu(playerController, args.ToString(), ""));
             return true;
         }
 
@@ -200,13 +196,13 @@ namespace CSPracc
         /// </summary>
         /// <param name="player">player who issued the command</param>
         /// <param name="args">Arguments shall look like <Name> <Description></param>
-        public bool SaveSnapshotCommandHandler(CCSPlayerController playerController, List<string> args)
+        public bool SaveSnapshotCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
-            if (args.Count < 2)
+            if (args.ArgumentCount < 1)
             {
                 playerController.ChatMessage("You need to pass a name for the grenade");
             }
-            string grenadeName = String.Join(" ", args);
+            string grenadeName = args.ArgumentString;
             ProjectileSnapshot? snapshotToAdd = getLatestProjectileSnapshot(playerController.SteamID);
             if (snapshotToAdd == null)
             {

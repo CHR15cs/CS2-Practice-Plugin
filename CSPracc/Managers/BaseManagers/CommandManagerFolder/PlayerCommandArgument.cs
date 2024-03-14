@@ -51,5 +51,10 @@ namespace CSPracc.Managers.BaseManagers.CommandManagerFolder
             ArgumentCount = arguments.Count;
             return;
         }
+
+        public override string ToString()
+        {
+            return ArgumentString;
+        }
     }
 }

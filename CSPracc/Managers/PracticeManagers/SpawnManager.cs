@@ -17,6 +17,7 @@ using Microsoft.Extensions.Logging;
 using CSPracc.Managers;
 using CSPracc.DataModules.Constants;
 using CSPracc.Managers.BaseManagers;
+using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 
 namespace CSPracc
 {
@@ -25,11 +26,11 @@ namespace CSPracc
         public PracticeSpawnManager(ref CommandManager cmdManager) : base(ref cmdManager)
         {
             CommandManager = cmdManager;
-            Commands.Add(PRACC_COMMAND.SPAWN, new PlayerCommand(PRACC_COMMAND.SPAWN, "Teleport user to given spawn", CommandHandlerSpawn, null));
-            Commands.Add(PRACC_COMMAND.TSPAWN, new PlayerCommand(PRACC_COMMAND.TSPAWN, "Teleport user to given tspawn", CommandHandlerTSpawn, null));
-            Commands.Add(PRACC_COMMAND.CTSPAWN, new PlayerCommand(PRACC_COMMAND.CTSPAWN, "Teleport user to given ctspawn", CommandHandlerCTSpawn, null));
-            Commands.Add(PRACC_COMMAND.bestspawn, new PlayerCommand(PRACC_COMMAND.bestspawn, "Teleport user to closest spawn of your current team", CommandHandlerCTSpawn, null));
-            Commands.Add(PRACC_COMMAND.worstspawn, new PlayerCommand(PRACC_COMMAND.worstspawn, "Teleport user to farest spawn of your current team", CommandHandlerCTSpawn, null));
+            Commands.Add(PRACC_COMMAND.SPAWN, new PlayerCommand(PRACC_COMMAND.SPAWN, "Teleport user to given spawn", CommandHandlerSpawn, null, null));
+            Commands.Add(PRACC_COMMAND.TSPAWN, new PlayerCommand(PRACC_COMMAND.TSPAWN, "Teleport user to given tspawn", CommandHandlerTSpawn, null, null));
+            Commands.Add(PRACC_COMMAND.CTSPAWN, new PlayerCommand(PRACC_COMMAND.CTSPAWN, "Teleport user to given ctspawn", CommandHandlerCTSpawn, null, null));
+            Commands.Add(PRACC_COMMAND.bestspawn, new PlayerCommand(PRACC_COMMAND.bestspawn, "Teleport user to closest spawn of your current team", CommandHandlerCTSpawn, null, null));
+            Commands.Add(PRACC_COMMAND.worstspawn, new PlayerCommand(PRACC_COMMAND.worstspawn, "Teleport user to farest spawn of your current team", CommandHandlerCTSpawn, null, null));
         }
 
         private  string lastMap = String.Empty;
@@ -103,40 +104,39 @@ namespace CSPracc
             }
         }
 
-        private bool CommandHandlerSpawn(CCSPlayerController player, List<string> args)
+        private bool CommandHandlerSpawn(CCSPlayerController player, PlayerCommandArgument args)
         {         
             return TeleportToTeamSpawn(player, args);
         }
 
-        private bool CommandHandlerTSpawn(CCSPlayerController player, List<string> args)
+        private bool CommandHandlerTSpawn(CCSPlayerController player, PlayerCommandArgument args)
         {
             return TeleportToTeamSpawn(player, args,CsTeam.Terrorist);
         }
 
-        private bool CommandHandlerCTSpawn(CCSPlayerController player, List<string> args)
+        private bool CommandHandlerCTSpawn(CCSPlayerController player, PlayerCommandArgument args)
         {
             return TeleportToTeamSpawn(player, args, CsTeam.CounterTerrorist);
         }
 
-        private bool CommandHandlerBestSpawn(CCSPlayerController player, List<string> args)
+        private bool CommandHandlerBestSpawn(CCSPlayerController player, PlayerCommandArgument args)
         {
             return TeleportToBestSpawn(player);
         }
 
-        private bool CommandHandlerWorstSpawn(CCSPlayerController player, List<string> args)
+        private bool CommandHandlerWorstSpawn(CCSPlayerController player, PlayerCommandArgument args)
         {
             return TeleportToWorstSpawn(player);
         }
 
-        private bool TeleportToTeamSpawn(CCSPlayerController? player,List<string> args , CsTeam csTeam = CsTeam.None)
+        private bool TeleportToTeamSpawn(CCSPlayerController? player, PlayerCommandArgument args , CsTeam csTeam = CsTeam.None)
         {
-            Server.PrintToChatAll($"{String.Join(" ", args)}");
 
             int number = -1;
 
             try
             {
-                number = Convert.ToInt32(args[0]);
+                number = Convert.ToInt32(args.ArgumentString);
                 number--;
             }
             catch (Exception ex)

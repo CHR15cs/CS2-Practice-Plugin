@@ -19,6 +19,7 @@ using Microsoft.Extensions.Logging;
 using CSPracc.Extensions;
 using static CounterStrikeSharp.API.Core.BasePlugin;
 using CSPracc.Managers.BaseManagers;
+using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 
 namespace CSPracc.Managers
 {
@@ -30,65 +31,65 @@ namespace CSPracc.Managers
             Plugin = plugin;
             Plugin.RegisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn, HookMode.Post);
 
-            Commands.Add(PRACC_COMMAND.BOT, new PlayerCommand(PRACC_COMMAND.BOT, "place bot at your current position", CommandHandlerBot, null));
-            Commands.Add(PRACC_COMMAND.tBOT,new PlayerCommand(PRACC_COMMAND.tBOT, "place tbot at your current position", CommandHandlerTBot, null));
-            Commands.Add(PRACC_COMMAND.ctBOT, new PlayerCommand(PRACC_COMMAND.ctBOT, "place ctbot at your current position", CommandHandlerCTBot, null));
-            Commands.Add(PRACC_COMMAND.CROUCHBOT, new PlayerCommand(PRACC_COMMAND.CROUCHBOT, "place crouched bot at your current position", CommandHandlerCrouchBot, null));
-            Commands.Add(PRACC_COMMAND.BOOST, new PlayerCommand(PRACC_COMMAND.BOOST, "boost yourself ontop of a bot at your current position", CommandHandlerBoostBot, null));
-            Commands.Add(PRACC_COMMAND.CROUCHBOOST, new PlayerCommand(PRACC_COMMAND.CROUCHBOOST, "boost yourself ontop of a crouched bot at your current position", CommandHandlerCrouchBoostBot, null));
-            Commands.Add(PRACC_COMMAND.NOBOT, new PlayerCommand(PRACC_COMMAND.NOBOT, "remove closest bot", CommandHandlerNoBot, null));
-            Commands.Add(PRACC_COMMAND.CLEARBOTS, new PlayerCommand(PRACC_COMMAND.CLEARBOTS, "remove all of your bots", CommandHandlerClearBots, null));
-            Commands.Add(PRACC_COMMAND.MoveBot, new PlayerCommand(PRACC_COMMAND.MoveBot, "move last placed bot to your current position", CommandHandlerMoveBot, null));
-            Commands.Add(PRACC_COMMAND.SwapBot, new PlayerCommand(PRACC_COMMAND.SwapBot, "swap position with the closest bot", CommandHandlerSwapBot, null));
+            Commands.Add(PRACC_COMMAND.BOT, new PlayerCommand(PRACC_COMMAND.BOT, "place bot at your current position", CommandHandlerBot, null, null));
+            Commands.Add(PRACC_COMMAND.tBOT,new PlayerCommand(PRACC_COMMAND.tBOT, "place tbot at your current position", CommandHandlerTBot, null, null));
+            Commands.Add(PRACC_COMMAND.ctBOT, new PlayerCommand(PRACC_COMMAND.ctBOT, "place ctbot at your current position", CommandHandlerCTBot, null, null));
+            Commands.Add(PRACC_COMMAND.CROUCHBOT, new PlayerCommand(PRACC_COMMAND.CROUCHBOT, "place crouched bot at your current position", CommandHandlerCrouchBot, null, null));
+            Commands.Add(PRACC_COMMAND.BOOST, new PlayerCommand(PRACC_COMMAND.BOOST, "boost yourself ontop of a bot at your current position", CommandHandlerBoostBot, null, null));
+            Commands.Add(PRACC_COMMAND.CROUCHBOOST, new PlayerCommand(PRACC_COMMAND.CROUCHBOOST, "boost yourself ontop of a crouched bot at your current position", CommandHandlerCrouchBoostBot, null, null));
+            Commands.Add(PRACC_COMMAND.NOBOT, new PlayerCommand(PRACC_COMMAND.NOBOT, "remove closest bot", CommandHandlerNoBot, null, null));
+            Commands.Add(PRACC_COMMAND.CLEARBOTS, new PlayerCommand(PRACC_COMMAND.CLEARBOTS, "remove all of your bots", CommandHandlerClearBots, null, null));
+            Commands.Add(PRACC_COMMAND.MoveBot, new PlayerCommand(PRACC_COMMAND.MoveBot, "move last placed bot to your current position", CommandHandlerMoveBot, null, null));
+            Commands.Add(PRACC_COMMAND.SwapBot, new PlayerCommand(PRACC_COMMAND.SwapBot, "swap position with the closest bot", CommandHandlerSwapBot, null, null));
         }
 
-        private bool CommandHandlerBot(CCSPlayerController playerController,List<string> args)
+        private bool CommandHandlerBot(CCSPlayerController playerController,PlayerCommandArgument args)
         {
             AddBot(playerController);
             return true;
         }
-        private bool CommandHandlerTBot(CCSPlayerController playerController, List<string> args)
+        private bool CommandHandlerTBot(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             AddBot(playerController, team: CsTeam.Terrorist);
             return true;
         }
-        private bool CommandHandlerCTBot(CCSPlayerController playerController, List<string> args)
+        private bool CommandHandlerCTBot(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             AddBot(playerController,team:CsTeam.CounterTerrorist);
             return true;
         }
-        private bool CommandHandlerCrouchBot(CCSPlayerController playerController, List<string> args)
+        private bool CommandHandlerCrouchBot(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             AddBot(playerController, crouch:true);
             return true;
         }
-        private bool CommandHandlerBoostBot(CCSPlayerController playerController, List<string> args)
+        private bool CommandHandlerBoostBot(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             Boost(playerController);
             return true;
         }
-        private bool CommandHandlerCrouchBoostBot(CCSPlayerController playerController, List<string> args)
+        private bool CommandHandlerCrouchBoostBot(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             CrouchingBoostBot(playerController);
             return true;
         }
 
-        private bool CommandHandlerNoBot(CCSPlayerController playerController, List<string> args)
+        private bool CommandHandlerNoBot(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             NoBot(playerController);
             return true;
         }
-        private bool CommandHandlerClearBots(CCSPlayerController playerController, List<string> args)
+        private bool CommandHandlerClearBots(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             ClearBots(playerController);
             return true;
         }
-        private bool CommandHandlerMoveBot(CCSPlayerController playerController, List<string> args)
+        private bool CommandHandlerMoveBot(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             MoveBot(playerController);
             return true;
         }
-        private bool CommandHandlerSwapBot(CCSPlayerController playerController, List<string> args)
+        private bool CommandHandlerSwapBot(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             MoveBot(playerController);
             return true;

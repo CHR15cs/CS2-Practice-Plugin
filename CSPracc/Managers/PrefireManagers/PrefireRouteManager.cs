@@ -99,13 +99,13 @@ namespace CSPracc.Managers
             Server.ExecuteCommand("bot_kick");
             Server.PrintToConsole($"Generating route {route.Name}");
             Server.PrintToConsole($"Adding bots.");
-            addBots(route);
+            //addBots(route);
             Server.ExecuteCommand("bot_freeze 0");
             Server.ExecuteCommand("bot_stop 0");
             Server.ExecuteCommand("bot_quota_mode normal");
             Server.PrintToConsole($"Assigning spawns to bots");
             Server.ExecuteCommand("mp_restartgame 1");
-            CSPraccPlugin.Instance!.AddTimer(2.0f, () => { assignSpawnpositionsToBot(route); spawnFirstBotWave(); teleportPlayerToStartingPoint();  });
+            //CSPraccPlugin.Instance!.AddTimer(2.0f, () => { assignSpawnpositionsToBot(route); spawnFirstBotWave(); teleportPlayerToStartingPoint();  });
 
             
             Server.PrintToConsole($"Spawning firt wave");
@@ -129,11 +129,11 @@ namespace CSPracc.Managers
 
         private void spawnFirstBotWave()
         {           
-            foreach (int key in SpawnPointsPerBot.Keys) 
-            {
-                Server.PrintToConsole($"Spawn bot slot {key}");
-                SpawnNextPosition(key);
-            }
+            //foreach (int key in SpawnPointsPerBot.Keys) 
+            //{
+            //    Server.PrintToConsole($"Spawn bot slot {key}");
+            //    SpawnNextPosition(key);
+            //}
         }
 
         public bool LoadRouteById(int id, CCSPlayerController playerToShoot)

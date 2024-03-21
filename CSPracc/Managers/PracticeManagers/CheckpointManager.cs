@@ -4,6 +4,7 @@ using CSPracc.DataModules;
 using CSPracc.DataModules.Constants;
 using CSPracc.Extensions;
 using CSPracc.Managers.BaseManagers;
+using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,18 +21,18 @@ namespace CSPracc.Managers.PracticeManagers
         { 
             GuiManager = guiManager;
             checkpoints = new Dictionary<CCSPlayerController, Position>();
-            Commands.Add(PRACC_COMMAND.CHECKPOINT, new PlayerCommand(PRACC_COMMAND.CHECKPOINT, "Save current position as checkpoint", CheckpointCommandHandler, null));
-            Commands.Add(PRACC_COMMAND.TELEPORT, new PlayerCommand(PRACC_COMMAND.TELEPORT, "Teleport to last saved Checkpoint", TeleportCommandHandler, null));
+            Commands.Add(PRACC_COMMAND.CHECKPOINT, new PlayerCommand(PRACC_COMMAND.CHECKPOINT, "Save current position as checkpoint", CheckpointCommandHandler, null, null));
+            Commands.Add(PRACC_COMMAND.TELEPORT, new PlayerCommand(PRACC_COMMAND.TELEPORT, "Teleport to last saved Checkpoint", TeleportCommandHandler, null, null));
         }
 
-        public bool CheckpointCommandHandler(CCSPlayerController playerController, List<string> args)
+        public bool CheckpointCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             checkpoints!.SetOrAdd(playerController, playerController.GetCurrentPosition());
             playerController.ChatMessage("Saved current position as checkpoint");
             return true;
         }
 
-        public bool TeleportCommandHandler(CCSPlayerController playerController, List<string> args)
+        public bool TeleportCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             if (!checkpoints.ContainsKey(playerController))
             {

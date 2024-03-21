@@ -2,6 +2,7 @@
 using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.DataModules;
 using CSPracc.DataStorages.JsonStorages;
+using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,12 +25,12 @@ namespace CSPracc.Managers.PrefireManagers
             Storage = prefireRouteStorage;
         }
 
-        public void SetStartingPointCommandHandler(CCSPlayerController playerController,List<string> args)
+        public void SetStartingPointCommandHandler(CCSPlayerController playerController,PlayerCommandArgument args)
         {
             CurrentPrefireRoute.StartingPoint = playerController.GetCurrentPositionAsJsonSpawnPoint();
             playerController.ChatMessage($"Set current position as starting point for {ChatColors.Blue}{CurrentPrefireRoute.Name}{ChatColors.White}.");
         }
-        public bool AddSpawnCommandHandler(CCSPlayerController playerController, List<string> args)
+        public bool AddSpawnCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             JsonSpawnPoint? spawnPointToAdd = playerController.GetCurrentPositionAsJsonSpawnPoint();
             if(spawnPointToAdd is null )
@@ -41,7 +42,7 @@ namespace CSPracc.Managers.PrefireManagers
             playerController.ChatMessage($"Added current position as bot position for {ChatColors.Blue}{CurrentPrefireRoute.Name}{ChatColors.White}.");
             return true;
         }
-        public void SaveCurrentRouteCommandHandler(CCSPlayerController player, List<string> args)
+        public void SaveCurrentRouteCommandHandler(CCSPlayerController player, PlayerCommandArgument args)
         {
             foreach (var item in Storage.GetAll())
             {

@@ -2,6 +2,7 @@
 using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.DataModules.Constants;
 using CSPracc.Managers.BaseManagers;
+using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,9 +17,9 @@ namespace CSPracc.Managers.PracticeManagers
         public TimerManager(ref CommandManager commandManager, ref GuiManager guiManager) : base(ref commandManager)
         { 
             GuiManager = guiManager;
-            Commands.Add(PRACC_COMMAND.timer,new DataModules.PlayerCommand(PRACC_COMMAND.timer,"Start timer", TimerCommandHandler, null));
+            Commands.Add(PRACC_COMMAND.timer,new DataModules.PlayerCommand(PRACC_COMMAND.timer,"Start timer", TimerCommandHandler, null,null));
         }
-        public bool TimerCommandHandler(CCSPlayerController playerController, List<string> args)
+        public bool TimerCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             StartTimer(playerController);
             return true;

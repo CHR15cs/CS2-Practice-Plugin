@@ -113,26 +113,26 @@ namespace CSPracc
             plugin.AddCommand("css_pracc_smokecolor_enabled", "Enable smoke coloring", SmokeColoring);
             Commands.Add(PROJECTILE_COMMAND.NADES,new PlayerCommand(PROJECTILE_COMMAND.NADES, "Show nade menu", NadesCommandHandler, null,null));
             Commands.Add(PROJECTILE_COMMAND.SAVE, new PlayerCommand(PROJECTILE_COMMAND.SAVE, "Save last thrown nade", SaveSnapshotCommandHandler, null, null));
-            Commands.Add(PROJECTILE_COMMAND.Rename, new PlayerCommand(PROJECTILE_COMMAND.Rename, "Rename last loaded grenade", RenameLastSnapshotCommandHandler, null));
-            Commands.Add(PROJECTILE_COMMAND.Delete, new PlayerCommand(PROJECTILE_COMMAND.Delete, "Delete last nade", CommandHandlerRemoveSnapshot, null));
-            Commands.Add(PROJECTILE_COMMAND.rethrow, new PlayerCommand(PROJECTILE_COMMAND.rethrow, "Rethrow last grenade or with given id/tag", ReThrowCommandHandler, null));
-            Commands.Add(PROJECTILE_COMMAND.Last, new PlayerCommand(PROJECTILE_COMMAND.Last, "Go back to last thrown grenade spot", RestorePlayersLastThrownGrenadeCommandHandler, null));
-            Commands.Add(PROJECTILE_COMMAND.BACK, new PlayerCommand(PROJECTILE_COMMAND.BACK, "Go back in grenade history", RestorePlayersLastThrownGrenadeCommandHandler, null));
-            Commands.Add(PROJECTILE_COMMAND.forward, new PlayerCommand(PROJECTILE_COMMAND.forward, "Go forward in grenade history", RestoreNextPlayersLastThrownGrenadeCommandHandler, null));
-            Commands.Add(PROJECTILE_COMMAND.AddTag, new PlayerCommand(PROJECTILE_COMMAND.AddTag, "Add tag to last loaded grenade", AddTagToLastGrenadeCommandHandler, null));
-            Commands.Add(PROJECTILE_COMMAND.RemoveTag, new PlayerCommand(PROJECTILE_COMMAND.RemoveTag, "Remove tag from last loaded grenade", RemoveTagFromLastGrenadeCommandHandler, null));
-            Commands.Add(PROJECTILE_COMMAND.showtags, new PlayerCommand(PROJECTILE_COMMAND.showtags, "Show all tags", ShowAllAvailableTagsCommandHandler, null));
-            Commands.Add(PROJECTILE_COMMAND.DeleteTag, new PlayerCommand(PROJECTILE_COMMAND.DeleteTag, "Delete tag from all grenades", DeleteTagFromAllNadesCommandHandler, null));
-            Commands.Add(PROJECTILE_COMMAND.ClearTags, new PlayerCommand(PROJECTILE_COMMAND.ClearTags, "Clear grenade from tags", ClearTagsFromLastGrenadeCommandHandler, null));
-            Commands.Add(PROJECTILE_COMMAND.Description, new PlayerCommand(PROJECTILE_COMMAND.Description, "Add description to last loaded grenade", AddDescriptionCommandHandler, null));
-            Commands.Add(PROJECTILE_COMMAND.delay, new PlayerCommand(PROJECTILE_COMMAND.delay, "Add delay to last loaded grenade", SetDelayCommandHandler, null));
-            Commands.Add(PROJECTILE_COMMAND.find, new PlayerCommand(PROJECTILE_COMMAND.find, "Search grenade menu for string", FindCommandHandler, null));
-            Commands.Add(PROJECTILE_COMMAND.UpdatePos, new PlayerCommand(PROJECTILE_COMMAND.UpdatePos, "Update player starting position", UpdatePositionCommandHandler, null));
-            Commands.Add(PROJECTILE_COMMAND.flash, new PlayerCommand(PROJECTILE_COMMAND.flash, "Enable flash testing mode", FlashCommandHandler, null));
-            Commands.Add(PROJECTILE_COMMAND.stop, new PlayerCommand(PROJECTILE_COMMAND.stop, "Stop flash testing mode", StopCommandHandler, null));
-            Commands.Add(PROJECTILE_COMMAND.noflash, new PlayerCommand(PROJECTILE_COMMAND.noflash, "Toggle noflash", NoFlashCommandHandler, null));
-            Commands.Add(PROJECTILE_COMMAND.CLEAR, new PlayerCommand(PROJECTILE_COMMAND.CLEAR, "Clear player grenade projectiles", ClearPersonalNadesCommandHandler, null));
-            Commands.Add(PROJECTILE_COMMAND.ClearAll, new PlayerCommand(PROJECTILE_COMMAND.ClearAll, "Clear all player grenade projectiles", ClearAllNadesCommandHandler, null));
+            Commands.Add(PROJECTILE_COMMAND.Rename, new PlayerCommand(PROJECTILE_COMMAND.Rename, "Rename last loaded grenade", RenameLastSnapshotCommandHandler, null,null));
+            Commands.Add(PROJECTILE_COMMAND.Delete, new PlayerCommand(PROJECTILE_COMMAND.Delete, "Delete last nade", CommandHandlerRemoveSnapshot, null, null));
+            Commands.Add(PROJECTILE_COMMAND.rethrow, new PlayerCommand(PROJECTILE_COMMAND.rethrow, "Rethrow last grenade or with given id/tag", ReThrowCommandHandler, null, null));
+            Commands.Add(PROJECTILE_COMMAND.Last, new PlayerCommand(PROJECTILE_COMMAND.Last, "Go back to last thrown grenade spot", RestorePlayersLastThrownGrenadeCommandHandler, null, null));
+            Commands.Add(PROJECTILE_COMMAND.BACK, new PlayerCommand(PROJECTILE_COMMAND.BACK, "Go back in grenade history", RestorePlayersLastThrownGrenadeCommandHandler, null,null));
+            Commands.Add(PROJECTILE_COMMAND.forward, new PlayerCommand(PROJECTILE_COMMAND.forward, "Go forward in grenade history", RestoreNextPlayersLastThrownGrenadeCommandHandler, null, null));
+            Commands.Add(PROJECTILE_COMMAND.AddTag, new PlayerCommand(PROJECTILE_COMMAND.AddTag, "Add tag to last loaded grenade", AddTagToLastGrenadeCommandHandler, null, null));
+            Commands.Add(PROJECTILE_COMMAND.RemoveTag, new PlayerCommand(PROJECTILE_COMMAND.RemoveTag, "Remove tag from last loaded grenade", RemoveTagFromLastGrenadeCommandHandler, null, null));
+            Commands.Add(PROJECTILE_COMMAND.showtags, new PlayerCommand(PROJECTILE_COMMAND.showtags, "Show all tags", ShowAllAvailableTagsCommandHandler, null, null));
+            Commands.Add(PROJECTILE_COMMAND.DeleteTag, new PlayerCommand(PROJECTILE_COMMAND.DeleteTag, "Delete tag from all grenades", DeleteTagFromAllNadesCommandHandler, null, null));
+            Commands.Add(PROJECTILE_COMMAND.ClearTags, new PlayerCommand(PROJECTILE_COMMAND.ClearTags, "Clear grenade from tags", ClearTagsFromLastGrenadeCommandHandler, null, null));
+            Commands.Add(PROJECTILE_COMMAND.Description, new PlayerCommand(PROJECTILE_COMMAND.Description, "Add description to last loaded grenade", AddDescriptionCommandHandler, null, null));
+            Commands.Add(PROJECTILE_COMMAND.delay, new PlayerCommand(PROJECTILE_COMMAND.delay, "Add delay to last loaded grenade", SetDelayCommandHandler, null, null));
+            Commands.Add(PROJECTILE_COMMAND.find, new PlayerCommand(PROJECTILE_COMMAND.find, "Search grenade menu for string", FindCommandHandler, null, null));
+            Commands.Add(PROJECTILE_COMMAND.UpdatePos, new PlayerCommand(PROJECTILE_COMMAND.UpdatePos, "Update player starting position", UpdatePositionCommandHandler, null, null));
+            Commands.Add(PROJECTILE_COMMAND.flash, new PlayerCommand(PROJECTILE_COMMAND.flash, "Enable flash testing mode", FlashCommandHandler, null, null));
+            Commands.Add(PROJECTILE_COMMAND.stop, new PlayerCommand(PROJECTILE_COMMAND.stop, "Stop flash testing mode", StopCommandHandler, null, null));
+            Commands.Add(PROJECTILE_COMMAND.noflash, new PlayerCommand(PROJECTILE_COMMAND.noflash, "Toggle noflash", NoFlashCommandHandler, null, null));
+            Commands.Add(PROJECTILE_COMMAND.CLEAR, new PlayerCommand(PROJECTILE_COMMAND.CLEAR, "Clear player grenade projectiles", ClearPersonalNadesCommandHandler, null, null));
+            Commands.Add(PROJECTILE_COMMAND.ClearAll, new PlayerCommand(PROJECTILE_COMMAND.ClearAll, "Clear all player grenade projectiles", ClearAllNadesCommandHandler, null, null));
         }
 
         #region CommandHandlers
@@ -222,9 +222,9 @@ namespace CSPracc
         /// </summary>
         /// <param name="player">player who issued the command</param>
         /// <param name="args">Arguments shall look like <Name> <Description></param>
-        public bool CommandHandlerRemoveSnapshot(CCSPlayerController player, List<string> args)
+        public bool CommandHandlerRemoveSnapshot(CCSPlayerController player, PlayerCommandArgument args)
         {
-            if(args.Count == 0)
+            if(args.ArgumentCount == 0)
             {
                 KeyValuePair<int, ProjectileSnapshot> snapshot = getLastAddedProjectileSnapshot(player.SteamID);
                 CurrentProjectileStorage.RemoveKey(snapshot.Key);
@@ -234,7 +234,7 @@ namespace CSPracc
             int id = -1;
             try
             {
-                id = Convert.ToInt32(args[1]);
+                id = Convert.ToInt32(args.ArgumentString);
             }
             catch
             {
@@ -264,11 +264,11 @@ namespace CSPracc
         /// Smokes are currently not detonating, that why they are disabled for now.
         /// </summary>
         /// <param name="player">player who issued the command</param>
-        public bool ReThrowCommandHandler(CCSPlayerController playerController,List<string> args)
+        public bool ReThrowCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             List<KeyValuePair<int, ProjectileSnapshot>> nades = getCurrentPlayerNades(playerController);
 
-            if(args.Count == 0)
+            if(args.ArgumentCount == 0)
             {
                 ProjectileSnapshot? grenade = getLatestProjectileSnapshot(playerController.SteamID);
                 if (grenade == null)
@@ -338,7 +338,7 @@ namespace CSPracc
         /// Save current pos, restore it when flash thrown.
         /// </summary>
         /// <param name="player">player who issued the command</param>
-        public bool FlashCommandHandler(CCSPlayerController player, List<string> args)
+        public bool FlashCommandHandler(CCSPlayerController player, PlayerCommandArgument args)
         {
             if (!FlashPosition.ContainsKey(player.SteamID))
             {
@@ -353,7 +353,7 @@ namespace CSPracc
         }
 
 
-        public bool StopCommandHandler(CCSPlayerController player, List<string> args)
+        public bool StopCommandHandler(CCSPlayerController player, PlayerCommandArgument args)
         {
             if (FlashPosition.ContainsKey(player.SteamID))
             {
@@ -367,7 +367,7 @@ namespace CSPracc
         /// Disabling flash effect
         /// </summary>
         /// <param name="player">player who issued the command</param>
-        public bool NoFlashCommandHandler(CCSPlayerController player, List<string> args)
+        public bool NoFlashCommandHandler(CCSPlayerController player, PlayerCommandArgument args)
         {
 
             if (!NoFlashList.Contains(player.SteamID))
@@ -391,9 +391,9 @@ namespace CSPracc
         /// </summary>
         /// <param name="steamId">player who issued the command</param>
         /// <param name="description">description</param>
-        public bool AddDescriptionCommandHandler(CCSPlayerController playerController, List<string> args)
+        public bool AddDescriptionCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
-            if(args.Count == 0)
+            if(args.ArgumentCount == 0)
             {
                 playerController.ChatMessage("Cannot add empty description");
                 return false;
@@ -418,9 +418,9 @@ namespace CSPracc
         /// </summary>
         /// <param name="steamId">player who issued the command</param>
         /// <param name="description">description</param>
-        public bool SetDelayCommandHandler(CCSPlayerController playerController, List<string> args)
+        public bool SetDelayCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
-            if (args.Count == 0)
+            if (args.ArgumentCount == 0)
             {
                 playerController.ChatMessage("Cannot add empty delay");
                 return false;
@@ -430,7 +430,7 @@ namespace CSPracc
             {
                 if (lastSnapshot.Value != null)
                 {
-                    if (!float.TryParse(args[0], out float delayInSeconds))
+                    if (!float.TryParse(args.ArgumentString, out float delayInSeconds))
                     {
                         playerController.ChatMessage("Could not parse delay");
                         return false;
@@ -449,14 +449,14 @@ namespace CSPracc
         /// </summary>
         /// <param name="steamId">player who issued the command</param>
         /// <param name="title">description</param>
-        public bool RenameLastSnapshotCommandHandler(CCSPlayerController playerController, List<string> args)
+        public bool RenameLastSnapshotCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
-            if (args.Count == 0)
+            if (args.ArgumentCount == 0)
             {
                 playerController.ChatMessage("Cannot set empty name");
                 return false;
             }
-            string title = String.Join(" ", args);
+            string title = args.ArgumentString;
             KeyValuePair<int, ProjectileSnapshot> lastSnapshot = getLastAddedProjectileSnapshot(playerController.SteamID);
             if (lastSnapshot.Key != 0)
             {
@@ -476,7 +476,7 @@ namespace CSPracc
         /// </summary>
         /// <param name="steamId">player who issued the command</param>
         /// <param name="title">description</param>
-        public bool UpdatePositionCommandHandler(CCSPlayerController playerController, List<string> args)
+        public bool UpdatePositionCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             KeyValuePair<int, ProjectileSnapshot> lastSnapshot = getLastAddedProjectileSnapshot(playerController.SteamID);
             if (lastSnapshot.Key != 0)
@@ -492,14 +492,14 @@ namespace CSPracc
             return false;
         }
 
-        public bool AddTagToLastGrenadeCommandHandler(CCSPlayerController playerController, List<string> args)
+        public bool AddTagToLastGrenadeCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
-            if(args.Count == 0)
+            if(args.ArgumentCount == 0)
             {
                 playerController.ChatMessage("Cannot add empty tag to grenade");
                 return false;
             }
-            string tag = String.Join(" ", args);
+            string tag = args.ArgumentString;
             if (int.TryParse(tag, out int _))
             {
                 playerController.ChatMessage("Cannot use a number as tag");
@@ -524,14 +524,14 @@ namespace CSPracc
             return false;
         }
 
-        public bool RemoveTagFromLastGrenadeCommandHandler(CCSPlayerController playerController, List<string> args)
+        public bool RemoveTagFromLastGrenadeCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
-            if (args.Count == 0)
+            if (args.ArgumentCount == 0)
             {
                 playerController.ChatMessage("Cannot add empty tag to grenade");
                 return false;
             }
-            string tag = String.Join(" ", args);
+            string tag = args.ArgumentString;
             KeyValuePair<int, ProjectileSnapshot> lastSnapshot = getLastAddedProjectileSnapshot(playerController.SteamID);
             if (lastSnapshot.Key != 0)
             {
@@ -559,9 +559,9 @@ namespace CSPracc
             return false;
         }
 
-        public bool ClearTagsFromLastGrenadeCommandHandler(CCSPlayerController playerController, List<string> args)
+        public bool ClearTagsFromLastGrenadeCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
-            if (args.Count == 0)
+            if (args.ArgumentCount == 0)
             {
                 playerController.ChatMessage("Cannot add empty tag to grenade");
                 return false;
@@ -580,14 +580,14 @@ namespace CSPracc
             return false;
         }
 
-        public bool DeleteTagFromAllNadesCommandHandler(CCSPlayerController playerController, List<string> args)
+        public bool DeleteTagFromAllNadesCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
-            if (args.Count == 0)
+            if (args.ArgumentCount == 0)
             {
                 playerController.ChatMessage("Cannot add empty tag to grenade");
                 return false;
             }
-            string tag = String.Join(" ", args);
+            string tag = args.ArgumentString;
             List<KeyValuePair<int, ProjectileSnapshot>> playerSnapshots = getAllNadesFromPlayer(playerController.SteamID);
             foreach (KeyValuePair<int, ProjectileSnapshot> kvp in playerSnapshots)
             {
@@ -603,12 +603,12 @@ namespace CSPracc
         /// Restoring the last thrown smoke
         /// </summary>
         /// <param name="player"></param>
-        public bool RestorePlayersLastThrownGrenadeCommandHandler(CCSPlayerController player,List<string> args)
+        public bool RestorePlayersLastThrownGrenadeCommandHandler(CCSPlayerController player, PlayerCommandArgument args)
         {
             int count = -1;
-            if(args.Count > 0)
+            if(args.ArgumentCount > 0)
             {
-                int.TryParse(args[0], out count);
+                int.TryParse(args.ArgumentString, out count);
             }
             if (!LastThrownGrenade.TryGetValue(player.SteamID, out List<ProjectileSnapshot>? snapshots))
             {
@@ -652,12 +652,12 @@ namespace CSPracc
         /// Restoring the last thrown smoke
         /// </summary>
         /// <param name="player"></param>
-        public bool RestoreNextPlayersLastThrownGrenadeCommandHandler(CCSPlayerController player,List<string> args)
+        public bool RestoreNextPlayersLastThrownGrenadeCommandHandler(CCSPlayerController player, PlayerCommandArgument args)
         {
             int count = 1;
-            if (args.Count > 0)
+            if (args.ArgumentCount > 0)
             {
-                int.TryParse(args[0], out count);
+                int.TryParse(args.ArgumentString, out count);
             }
             if (!LastThrownGrenade.TryGetValue(player.SteamID, out List<ProjectileSnapshot>? snapshots))
             {
@@ -697,7 +697,7 @@ namespace CSPracc
         /// </summary>
         /// <param name="steamId">player</param>
         /// <returns>snapshot</returns>
-        public bool ShowAllAvailableTagsCommandHandler(CCSPlayerController playerController, List<string> args)
+        public bool ShowAllAvailableTagsCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             List<string> tags = new List<string>();
             playerController.GetValueOfCookie("PersonalizedNadeMenu", out string? value);
@@ -761,7 +761,7 @@ namespace CSPracc
             ProjectileSnapshot? latestSnapshot = getLatestProjectileSnapshot(player.SteamID);
             if (latestSnapshot != null)
             {
-                nadeOptions.Add(new KeyValuePair<string, Action>($"Your last thrown projectile", new Action(() => RestorePlayersLastThrownGrenadeCommandHandler(player, new List<string>()))));
+                nadeOptions.Add(new KeyValuePair<string, Action>($"Your last thrown projectile", new Action(() => RestorePlayersLastThrownGrenadeCommandHandler(player,new PlayerCommandArgument("")))));
             }
             foreach (KeyValuePair<int, ProjectileSnapshot> entry in CurrentProjectileStorage.GetAll())
             {

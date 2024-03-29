@@ -2,9 +2,9 @@ name: Bug Report
 description: File a bug report
 title: "[Bug]: "
 labels: ["bug", "triage"]
-projects: [CS2-Practice-Plugin"]
+projects: ["CS2-Practice-Plugin"]
 assignees:
-  - octocat
+  - CHR15cs
 body:
   - type: markdown
     attributes:

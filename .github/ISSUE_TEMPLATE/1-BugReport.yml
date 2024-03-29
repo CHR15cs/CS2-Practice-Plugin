@@ -34,14 +34,14 @@ body:
     id: metamodversion
     attributes:
       label: Which metamod version are you using?
-      value: "Can be checked with "meta version""
+      value: "Can be checked with 'meta version'"
     validations:
       required: true
     - type: textarea
     id: cssversion
     attributes:
       label: Which css version are you using?
-      value: "Can be checked with "css version""
+      value: "Can be checked with 'css version'"
     validations:
       required: true
   - type: dropdown

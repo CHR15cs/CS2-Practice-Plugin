@@ -1,8 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: GitHub Community Support
-    url: https://github.com/orgs/community/discussions
+  - name: Pracitce Plugin Community Support
+    url: https://discord.gg/HHzqY8Uvma
     about: Please ask and answer questions here.
-  - name: GitHub Security Bug Bounty
-    url: https://bounty.github.com/
-    about: Please report security vulnerabilities here.

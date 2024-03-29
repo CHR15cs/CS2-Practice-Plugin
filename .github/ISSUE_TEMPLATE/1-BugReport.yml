@@ -37,8 +37,8 @@ body:
       value: "Can be checked with 'meta version'"
     validations:
       required: true
-    - type: textarea
-    id: cssversion
+  - type: textarea  # Corrected indentation here
+    id: cssversion   # Corrected indentation here
     attributes:
       label: Which css version are you using?
       value: "Can be checked with 'css version'"

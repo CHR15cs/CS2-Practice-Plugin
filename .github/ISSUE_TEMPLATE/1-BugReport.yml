@@ -1,7 +1,7 @@
 name: Bug Report
 description: File a bug report
 title: "[Bug]: "
-labels: ["bug", "triage"]
+labels: ["bug"]
 projects: ["CHR15cs/CS2-Practice-Plugin"]
 assignees:
   - CHR15cs
@@ -14,20 +14,16 @@ body:
     id: what-happened
     attributes:
       label: What happened?
-      description: Also tell us, what did you expect to happen?
-      placeholder: Tell us what you see!
-      value: "A bug happened!"
+      description: Also tell us, what did you expect to happen? Add a step by step instruction to reproduce the error
+      value: "..."
     validations:
       required: true
-  - type: dropdown
-    id: version
+  - type: textarea
+    id: pluginversion
     attributes:
       label: Plugin Version
-      description: What version of our software are you running?
-      options:
-        - 1.0.0.2 (Default)
-        - Older (define)
-      default: 0
+      description: Which version are you running?
+      value: "v1.X.X.X"
     validations:
       required: true
   - type: textarea
@@ -37,8 +33,8 @@ body:
       value: "Can be checked with 'meta version'"
     validations:
       required: true
-  - type: textarea  # Corrected indentation here
-    id: cssversion   # Corrected indentation here
+  - type: textarea  
+    id: cssversion   
     attributes:
       label: Which css version are you using?
       value: "Can be checked with 'css version'"
@@ -52,6 +48,8 @@ body:
       options:
         - Windows
         - Linux
+    validations:
+      required: true
   - type: textarea
     id: logs
     attributes:

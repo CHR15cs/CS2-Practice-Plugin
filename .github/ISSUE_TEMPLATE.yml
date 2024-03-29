@@ -2,7 +2,7 @@ name: Bug Report
 description: File a bug report
 title: "[Bug]: "
 labels: ["bug", "triage"]
-projects: ["CS2-Practice-Plugin"]
+projects: ["CHR15cs/CS2-Practice-Plugin"]
 assignees:
   - CHR15cs
 body:

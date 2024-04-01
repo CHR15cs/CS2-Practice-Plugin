@@ -15,7 +15,7 @@ namespace CSPracc.Modes
 {
     public class BaseMode : IDisposable
     {
-        protected GuiManager GuiManager;
+        protected GuiManager GuiManager { get; private set; } = GuiManager.Instance;
         protected CommandManager CommandManager;
         public CSPraccPlugin Plugin;
         MapChangeManager MapChangeManager;
@@ -23,11 +23,10 @@ namespace CSPracc.Modes
         
         public BaseMode(CSPraccPlugin plugin) 
         {
-            GuiManager = new GuiManager();
             CommandManager = new CommandManager(ref plugin);
             Plugin = plugin;
             MapChangeManager = new MapChangeManager(ref CommandManager);
-            ModeSwitchManager = new ModeSwitchManager(ref CommandManager, ref plugin, ref GuiManager);
+            ModeSwitchManager = new ModeSwitchManager(ref CommandManager, ref plugin);
         }
       
         public  virtual void ConfigureEnvironment()

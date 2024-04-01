@@ -23,9 +23,8 @@ namespace CSPracc
 {
     public  class PracticeSpawnManager : BaseManager
     {
-        public PracticeSpawnManager(ref CommandManager cmdManager) : base(ref cmdManager)
+        public PracticeSpawnManager() : base()
         {
-            CommandManager = cmdManager;
             Commands.Add(PRACC_COMMAND.SPAWN, new PlayerCommand(PRACC_COMMAND.SPAWN, "Teleport user to given spawn", CommandHandlerSpawn, null, null));
             Commands.Add(PRACC_COMMAND.TSPAWN, new PlayerCommand(PRACC_COMMAND.TSPAWN, "Teleport user to given tspawn", CommandHandlerTSpawn, null, null));
             Commands.Add(PRACC_COMMAND.CTSPAWN, new PlayerCommand(PRACC_COMMAND.CTSPAWN, "Teleport user to given ctspawn", CommandHandlerCTSpawn, null, null));

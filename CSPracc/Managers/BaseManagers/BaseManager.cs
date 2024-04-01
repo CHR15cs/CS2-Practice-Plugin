@@ -11,9 +11,9 @@ namespace CSPracc.Managers.BaseManagers
     {
         protected CommandManager CommandManager;
         protected Dictionary<string, PlayerCommand> Commands { get; set; } = new Dictionary<string, PlayerCommand>();
-        public BaseManager(ref CommandManager commandManager) 
+        public BaseManager() 
         {
-            CommandManager = commandManager;
+            CommandManager = CommandManager.Instance;
         }
         public void DeregisterCommands()
         {

@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API.Core;
 using CSPracc.Managers.BaseManagers;
+using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,13 +11,13 @@ namespace CSPracc.Managers.MatchManagers.ReadyUpManagerFolder
 {
     public class ReadyUpManager : BaseManager
     {
-        public ReadyUpManager(ref CommandManager commandManager) : base(ref commandManager)
+        public ReadyUpManager() : base()
         {
         }
 
-        private bool ReadyCommandHandler(CCSPlayerController player, List<string> commands)
+        private bool ReadyCommandHandler(CCSPlayerController player,PlayerCommandArgument commands)
         {
-
+            return true;
         }
     }
 }

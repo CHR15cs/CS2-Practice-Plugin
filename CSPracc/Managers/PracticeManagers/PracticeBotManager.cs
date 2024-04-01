@@ -25,12 +25,9 @@ namespace CSPracc.Managers
 {
     public  class PracticeBotManager : BaseManager
     {
-        CSPraccPlugin Plugin { get; init; }
-        public PracticeBotManager(ref CommandManager commandManager,ref CSPraccPlugin plugin) : base (ref commandManager)
+        public PracticeBotManager() : base ()
         {
-            Plugin = plugin;
-            Plugin.RegisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn, HookMode.Post);
-
+            CSPraccPlugin.Instance.RegisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn, HookMode.Post);
             Commands.Add(PRACC_COMMAND.BOT, new PlayerCommand(PRACC_COMMAND.BOT, "place bot at your current position", CommandHandlerBot, null, null));
             Commands.Add(PRACC_COMMAND.tBOT,new PlayerCommand(PRACC_COMMAND.tBOT, "place tbot at your current position", CommandHandlerTBot, null, null));
             Commands.Add(PRACC_COMMAND.ctBOT, new PlayerCommand(PRACC_COMMAND.ctBOT, "place ctbot at your current position", CommandHandlerCTBot, null, null));
@@ -396,7 +393,7 @@ namespace CSPracc.Managers
         public new void Dispose()
         {
             GameEventHandler<EventPlayerSpawn> onPlayerSpawned = new GameEventHandler<EventPlayerSpawn>(OnPlayerSpawn);
-            Plugin.DeregisterEventHandler("player_spawned", onPlayerSpawned, true);
+            CSPraccPlugin.Instance.DeregisterEventHandler("player_spawned", onPlayerSpawned, true);
             base.Dispose();
         }
 

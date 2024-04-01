@@ -15,11 +15,9 @@ namespace CSPracc.Managers.PracticeManagers
 {
     public class CheckpointManager : BaseManager
     {
-        GuiManager GuiManager;
         Dictionary<CCSPlayerController, Position> checkpoints { get; set; }
-        public CheckpointManager(ref CommandManager commandManager, ref GuiManager guiManager) : base(ref commandManager)
+        public CheckpointManager() : base()
         { 
-            GuiManager = guiManager;
             checkpoints = new Dictionary<CCSPlayerController, Position>();
             Commands.Add(PRACC_COMMAND.CHECKPOINT, new PlayerCommand(PRACC_COMMAND.CHECKPOINT, "Save current position as checkpoint", CheckpointCommandHandler, null, null));
             Commands.Add(PRACC_COMMAND.TELEPORT, new PlayerCommand(PRACC_COMMAND.TELEPORT, "Teleport to last saved Checkpoint", TeleportCommandHandler, null, null));

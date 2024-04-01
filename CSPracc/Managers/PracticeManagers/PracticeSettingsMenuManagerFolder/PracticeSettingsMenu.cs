@@ -10,13 +10,13 @@ namespace CSPracc.Managers.PracticeManagers.PracticeSettingsMenuManagerFolder
 {
     public class PracticeSettingsMenu
     {
-        public static HtmlMenu GetPracticeSettingsMenu(CCSPlayerController ccsplayerController, CSPraccPlugin Plugin)
+        public static HtmlMenu GetPracticeSettingsMenu(CCSPlayerController ccsplayerController)
         {
             HtmlMenu practiceMenu;
             List<KeyValuePair<string, Action>> menuOptions = new List<KeyValuePair<string, Action>>();
             if (!ccsplayerController.GetValueOfCookie("PersonalizedNadeMenu", out string? setting))
             {
-                if (Plugin.Config!.UsePersonalNadeMenu)
+                if (CSPraccPlugin.Instance.Config!.UsePersonalNadeMenu)
                 {
                     setting = "yes";
                     ccsplayerController.SetOrAddValueOfCookie("PersonalizedNadeMenu", "yes");
@@ -29,7 +29,7 @@ namespace CSPracc.Managers.PracticeManagers.PracticeSettingsMenuManagerFolder
             }
             if (setting == null)
             {
-                setting = Plugin.Config!.UsePersonalNadeMenu ? "yes" : "no";
+                setting = CSPraccPlugin.Instance.Config!.UsePersonalNadeMenu ? "yes" : "no";
                 ccsplayerController.SetOrAddValueOfCookie("PersonalizedNadeMenu", "yes");
             }
             string MenuText = "";

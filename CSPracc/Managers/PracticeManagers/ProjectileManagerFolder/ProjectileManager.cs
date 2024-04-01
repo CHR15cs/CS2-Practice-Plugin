@@ -102,15 +102,12 @@ namespace CSPracc
                 return GetOrAddProjectileStorage(Server.MapName);
             }
         }
-        GuiManager GuiManager;
-        CSPraccPlugin Plugin;
-        public ProjectileManager(ref CommandManager commandManager,ref GuiManager guiManager, ref CSPraccPlugin plugin) : base(ref commandManager)
+
+        public ProjectileManager() : base()
         {
-            Plugin = plugin;
-            GuiManager = guiManager;
-            plugin.RegisterListener<Listeners.OnEntitySpawned>(OnEntitySpawned);
-            plugin.RegisterEventHandler<EventSmokegrenadeDetonate>(OnSmokeDetonate, hookMode: HookMode.Post);
-            plugin.AddCommand("css_pracc_smokecolor_enabled", "Enable smoke coloring", SmokeColoring);
+            CSPraccPlugin.Instance.RegisterListener<Listeners.OnEntitySpawned>(OnEntitySpawned);
+            CSPraccPlugin.Instance.RegisterEventHandler<EventSmokegrenadeDetonate>(OnSmokeDetonate, hookMode: HookMode.Post);
+            CSPraccPlugin.Instance.AddCommand("css_pracc_smokecolor_enabled", "Enable smoke coloring", SmokeColoring);
             Commands.Add(PROJECTILE_COMMAND.NADES,new PlayerCommand(PROJECTILE_COMMAND.NADES, "Show nade menu", NadesCommandHandler, null,null));
             Commands.Add(PROJECTILE_COMMAND.SAVE, new PlayerCommand(PROJECTILE_COMMAND.SAVE, "Save last thrown nade", SaveSnapshotCommandHandler, null, null));
             Commands.Add(PROJECTILE_COMMAND.Rename, new PlayerCommand(PROJECTILE_COMMAND.Rename, "Rename last loaded grenade", RenameLastSnapshotCommandHandler, null,null));
@@ -165,7 +162,7 @@ namespace CSPracc
         {
             if (args.ArgumentString.Trim().ToLower() == "all")
             {
-                GuiManager.AddMenu(playerController.SteamID, GetNadeMenu(playerController));
+                GuiManager.Instance.AddMenu(playerController.SteamID, GetNadeMenu(playerController));
 
             }
             else if (int.TryParse(args.ArgumentString.Trim(), out int id))
@@ -175,7 +172,7 @@ namespace CSPracc
             }
             else
             {
-                GuiManager.AddMenu(playerController.SteamID, GetPlayerBasedNadeMenu(playerController, args.ArgumentString.ToLower(), ""));
+                GuiManager.Instance.AddMenu(playerController.SteamID, GetPlayerBasedNadeMenu(playerController, args.ArgumentString.ToLower(), ""));
             }
             return true;
         }
@@ -187,7 +184,7 @@ namespace CSPracc
                 playerController.ChatMessage($"No query passed.");
                 return false;
             }
-            GuiManager.AddMenu(playerController.SteamID, GetPlayerBasedNadeMenu(playerController, args.ToString(), ""));
+            GuiManager.Instance.AddMenu(playerController.SteamID, GetPlayerBasedNadeMenu(playerController, args.ToString(), ""));
             return true;
         }
 
@@ -730,9 +727,9 @@ namespace CSPracc
         public new void Dispose()
         {
             Listeners.OnEntitySpawned onEntitySpawned = new Listeners.OnEntitySpawned(OnEntitySpawned);
-            Plugin.RemoveListener("OnEntitySpawned", onEntitySpawned);
+            CSPraccPlugin.Instance.RemoveListener("OnEntitySpawned", onEntitySpawned);
             GameEventHandler<EventSmokegrenadeDetonate> smokegrenadedetonate = OnSmokeDetonate;
-            Plugin.DeregisterEventHandler("smokegrenade_detonate", smokegrenadedetonate, true);
+            CSPraccPlugin.Instance.DeregisterEventHandler("smokegrenade_detonate", smokegrenadedetonate, true);
             base.Dispose();
         }
         /// <summary>

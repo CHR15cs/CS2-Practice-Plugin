@@ -13,10 +13,8 @@ namespace CSPracc.Managers.PracticeManagers
 {
     public class CountdownManager : BaseManager
     {
-        GuiManager GuiManager;
-        public CountdownManager(ref CommandManager commandManager, ref GuiManager guiManager) : base(ref commandManager)
+        public CountdownManager() : base()
         { 
-            GuiManager = guiManager;
             Commands.Add(PRACC_COMMAND.countdown, new DataModules.PlayerCommand(PRACC_COMMAND.countdown, "", CountdownCommandHandler, null, null));
         }
         private bool CountdownCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
@@ -34,7 +32,7 @@ namespace CSPracc.Managers.PracticeManagers
         }
         private void AddCountdown(CCSPlayerController player, int countdown)
         {
-            GuiManager.StartCountdown(player, countdown);
+            GuiManager.Instance.StartCountdown(player, countdown);
         }
     }
 }

@@ -13,16 +13,14 @@ namespace CSPracc.Managers.PracticeManagers
 {
     public class PlayerHurtManager : BaseManager
     {
-        CSPraccPlugin Plugin;
-        public PlayerHurtManager(ref CSPraccPlugin plugin, ref CommandManager commandManager) : base(ref commandManager) 
+        public PlayerHurtManager() : base() 
         {
-            Plugin = plugin;
-            Plugin.RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt, HookMode.Post);
+            CSPraccPlugin.Instance.RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt, HookMode.Post);
         }
         public new void Dispose()
         {
             GameEventHandler<EventPlayerHurt> playerHurt = OnPlayerHurt;
-            Plugin.DeregisterEventHandler("player_hurt", playerHurt, false);
+            CSPraccPlugin.Instance.DeregisterEventHandler("player_hurt", playerHurt, false);
         }
 
         private HookResult OnPlayerHurt(EventPlayerHurt @event, GameEventInfo info)

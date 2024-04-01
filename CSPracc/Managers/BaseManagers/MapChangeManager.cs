@@ -2,6 +2,7 @@
 using CounterStrikeSharp.API.Core;
 using CSPracc.DataModules;
 using CSPracc.DataModules.Constants;
+using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,21 +11,21 @@ using System.Threading.Tasks;
 
 namespace CSPracc.Managers.BaseManagers
 {
-    public class MapChangeManager
+    public class MapChangeManager : BaseManager
     {       
-        public MapChangeManager(ref CommandManager commandHandler) 
+        public MapChangeManager() : base()
         {
-            commandHandler.RegisterCommand(new PlayerCommand(BASE_COMMAND.MAP, "Change map to given name", ChangeMapCommandHandler, null));
+            CommandManager.RegisterCommand(new PlayerCommand(BASE_COMMAND.MAP, "Change map to given name", ChangeMapCommandHandler, null,null));
         }
 
-        private bool ChangeMapCommandHandler(CCSPlayerController playerController, List<string> args) 
+        private bool ChangeMapCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args) 
         { 
-            if(args.Count != 1)
+            if(args.ArgumentCount != 1)
             {
                 playerController.ChatMessage("Unexpectec amount of arguments");
                 return false;
             }
-            string mapName = args[0];
+            string mapName = args.ArgumentString;
             if (!mapName.StartsWith("de_"))
             {
                 mapName = "de_" + mapName;

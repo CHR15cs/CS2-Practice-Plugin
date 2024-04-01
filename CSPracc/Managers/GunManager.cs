@@ -14,13 +14,11 @@ namespace CSPracc.Managers
     public class GunManager
     {
         WeaponKitStorage WeaponKitStorage { get; set; }
-        HtmlMenu GunMenu { get; set; }
-        GuiManager GuiManager { get; set; }
+        HtmlMenu? GunMenu { get; set; }
 
         private UserPlayerEquipStorage playerEquipment;
-        public GunManager(GuiManager gm) 
+        public GunManager() 
         { 
-            GuiManager = gm;
             WeaponKitStorage = new WeaponKitStorage(new FileInfo(Path.Combine(CSPraccPlugin.Instance!.ModuleDirectory, "Retake", "WeaponKits.json")));
             WeaponKitStorage.SetOrAdd((int)CsTeam.Terrorist, new DataModules.WeaponKit(new List<string>() { "weapon_ak47", "weapon_awp", "weapon_galilar" }, new List<string>() { "weapon_p250", "weapon_p250", "weapon_deagle" }, true, true));
             WeaponKitStorage.SetOrAdd((int)CsTeam.CounterTerrorist, new DataModules.WeaponKit(new List<string>() { "weapon_m4a1", "weapon_m4a1_silencer", "weapon_awp", "weapon_famas" }, new List<string>() { "weapon_p250", "weapon_p250", "weapon_deagle" }, true, true));
@@ -33,7 +31,7 @@ namespace CSPracc.Managers
             GunMenuOptions.Add(new KeyValuePair<string, Action>($"Rifle Menu", new Action(() => ShowRifleMenu(player))));
             GunMenuOptions.Add(new KeyValuePair<string, Action>($"Pistol Menu", new Action(() => ShowPistolMenu(player))));
             GunMenu = new HtmlMenu("Gun Menu", GunMenuOptions);
-            GuiManager.AddMenu(player.SteamID, GunMenu);
+            GuiManager.Instance.AddMenu(player.SteamID, GunMenu);
         }
 
         private void InitWeaponEquip(CCSPlayerController player)
@@ -179,7 +177,7 @@ namespace CSPracc.Managers
             }
             rifleOptions.Add(new KeyValuePair<string, Action>("None", new Action(() => SelectPrimaryWeapon(player, ""))));
             HtmlMenu RifleMenu = new HtmlMenu("Rifle Menu", rifleOptions);
-            GuiManager.AddMenu(player.SteamID, RifleMenu);
+            GuiManager.Instance.AddMenu(player.SteamID, RifleMenu);
         }
 
 
@@ -198,8 +196,7 @@ namespace CSPracc.Managers
                 pistolOptions.Add(new KeyValuePair<string, Action>(secondary.Substring(7), new Action(() => SelectSecondaryWeapon(player, secondary))));
             }
             HtmlMenu pistolMenu = new HtmlMenu("Pistol Menu", pistolOptions);
-            GuiManager.AddMenu(player.SteamID, pistolMenu);
-
+            GuiManager.Instance.AddMenu(player.SteamID, pistolMenu);
         }
 
     }

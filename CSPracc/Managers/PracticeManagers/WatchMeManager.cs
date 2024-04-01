@@ -15,7 +15,7 @@ namespace CSPracc.Managers.PracticeManagers
 {
     public class WatchMeManager : BaseManager
     {
-        public WatchMeManager(ref CommandManager commandManager) : base(ref commandManager)
+        public WatchMeManager() : base()
         { 
             Commands.Add(PRACC_COMMAND.WATCHME,new DataModules.PlayerCommand(PRACC_COMMAND.WATCHME,"Break all breakable entities", WatchMeCommandHandler, null, null));
         }

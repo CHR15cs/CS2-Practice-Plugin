@@ -30,7 +30,18 @@ using Microsoft.Extensions.Logging;
 [MinimumApiVersion(80)]
 public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
 {
-    public static CSPraccPlugin? Instance { get; private set; }
+    private static CSPraccPlugin? _instance = null;
+    public static CSPraccPlugin Instance 
+    {
+        get
+        {
+            if(_instance == null)
+            {
+                throw new Exception("Plugin instance is null.");
+            }
+            return _instance;
+        }
+    }
 
     #region properties
     public override string ModuleName
@@ -83,7 +94,7 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
         {
             Reset();
         });
-        Instance = this;
+        _instance = this;
         SwitchMode(Config!.ModeToLoad);
         Logger.LogInformation("Pracitce Plugin loaded.");
     }

@@ -13,10 +13,8 @@ namespace CSPracc.Managers.PracticeManagers
 {
     public class TimerManager : BaseManager
     {
-        GuiManager GuiManager;
-        public TimerManager(ref CommandManager commandManager, ref GuiManager guiManager) : base(ref commandManager)
+        public TimerManager() : base()
         { 
-            GuiManager = guiManager;
             Commands.Add(PRACC_COMMAND.timer,new DataModules.PlayerCommand(PRACC_COMMAND.timer,"Start timer", TimerCommandHandler, null,null));
         }
         public bool TimerCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
@@ -27,7 +25,7 @@ namespace CSPracc.Managers.PracticeManagers
         public void StartTimer(CCSPlayerController player)
         {
             if (player == null) return;
-            GuiManager.StartTimer(player);
+            GuiManager.Instance.StartTimer(player);
         }
     }
 }

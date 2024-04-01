@@ -14,7 +14,7 @@ namespace CSPracc.Managers.PracticeManagers
 {
     public class ToggleImpactManager : BaseManager
     {
-        public ToggleImpactManager(ref CommandManager commandManager) : base (ref commandManager)
+        public ToggleImpactManager() : base ()
         { 
             Commands.Add(PRACC_COMMAND.impacts, new DataModules.PlayerCommand(PRACC_COMMAND.impacts,"Toggle impacts",ImpactCommandHandler,null, null));
         }

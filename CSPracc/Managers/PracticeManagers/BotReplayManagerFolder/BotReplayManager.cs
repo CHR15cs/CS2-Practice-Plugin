@@ -6,6 +6,7 @@ using CSPracc.DataModules;
 using CSPracc.DataModules.Constants;
 using CSPracc.DataStorages.JsonStorages;
 using CSPracc.Extensions;
+using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -19,11 +20,8 @@ namespace CSPracc.Managers
 {
     public class BotReplayManager : IManager
     {
-        CommandManager CommandManager;
         ProjectileManager ProjectileManager { get; set; }
         PracticeBotManager PracticeBotManager { get; set; }
-        GuiManager GuiManager { get; set; }
-
         BotReplayStorage BotReplayStorage { get; set; }
         Dictionary<ulong,int> ReplayToEdit {  get; set; } = new Dictionary<ulong,int>();
         Dictionary<ulong,PlayerReplay> replays = new Dictionary<ulong, PlayerReplay>();
@@ -31,16 +29,12 @@ namespace CSPracc.Managers
         Dictionary<int, PlayerReplay> replaysToReplay = new Dictionary<int, PlayerReplay>();
         public BotReplayManager(ref PracticeBotManager practiceBotManager,ref ProjectileManager projectileManager, ref CommandManager commandManager, ref GuiManager guiManager) 
         {
-            CommandManager = commandManager;
-            GuiManager = guiManager;
             ProjectileManager = projectileManager;
             PracticeBotManager = practiceBotManager;
             CSPraccPlugin.Instance.Logger.LogInformation("Creating Bot Replay storage");
             BotReplayStorage = new BotReplayStorage(new FileInfo(Path.Combine(CSPraccPlugin.ModuleDir.FullName, "BotReplays", "BotReplay_" + Server.MapName + ".json")));
             CSPraccPlugin.Instance.Logger.LogInformation($"Created Bot Replay storage Count: {BotReplayStorage.GetAll().Count}");
-
             CSPraccPlugin.Instance!.RegisterListener<Listeners.OnTick>(OnTick);
-
             CSPraccPlugin.Instance.RegisterListener<Listeners.OnEntitySpawned>(entity => OnEntitySpawned(entity));
             CSPraccPlugin.Instance.RegisterEventHandler<EventPlayerShoot>(OnPlayerShoot);
         }
@@ -64,7 +58,7 @@ namespace CSPracc.Managers
         /// List all replays and play on selection
         /// </summary>
         /// <param name="player">player who issued the command</param>
-        public bool ShowMimcReplays(CCSPlayerController player,List<string> args)
+        public bool ShowMimcReplays(CCSPlayerController player,PlayerCommandArgument args)
         {
             HtmlMenu replay_menu;
             List<KeyValuePair<string, Action>> menuOptions = new List<KeyValuePair<string, Action>>();
@@ -80,7 +74,7 @@ namespace CSPracc.Managers
                 menuOptions.Add(new KeyValuePair<string, Action>($"{replays[i].Value.SetName}", () => PlayReplaySet(set)));
             }
             replay_menu = new HtmlMenu("Replays", menuOptions);
-            GuiManager.AddMenu(player.SteamID, replay_menu);
+            GuiManager.Instance.AddMenu(player.SteamID, replay_menu);
             return true;
         }
 
@@ -89,14 +83,14 @@ namespace CSPracc.Managers
         /// Show mimic menu to the player
         /// </summary>
         /// <param name="player">player who issued the command</param>
-        public bool ShowMimicMenu(CCSPlayerController player, List<string> args)
+        public bool ShowMimicMenu(CCSPlayerController player,PlayerCommandArgument args)
         {
             HtmlMenu mimicMenu = GetBotMimicMenu(player);
-            GuiManager.AddMenu(player.SteamID, mimicMenu);
+            GuiManager.Instance.AddMenu(player.SteamID, mimicMenu);
             return true;
         }
 
-        public bool ShowDeleteMenuCommandHandler(CCSPlayerController playerController, List<string> args)
+        public bool ShowDeleteMenuCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             DeleteMimicReplay(playerController);
             return true;
@@ -128,7 +122,7 @@ namespace CSPracc.Managers
                 menuOptions.Add(new KeyValuePair<string, Action>($"{replays[i].Value.SetName}", () => DeleteReplaySet(player, id)));
             }
             deletion_menu = new HtmlMenu("Delete Replay", menuOptions);
-            GuiManager.AddMenu(player.SteamID, deletion_menu);
+            GuiManager.Instance.AddMenu(player.SteamID, deletion_menu);
             return;
         }
 
@@ -138,12 +132,12 @@ namespace CSPracc.Managers
         /// </summary>
         /// <param name="player"></param>
         /// <param name="name"></param>
-        public bool CreateReplayCommandHandler(CCSPlayerController player,List<string> args)
+        public bool CreateReplayCommandHandler(CCSPlayerController player, PlayerCommandArgument args)
         {
             string name = "new replayset";
-            if (args.Count > 0)
+            if (args.ArgumentCount > 0)
             {
-                name = String.Join(" ", args);
+                name = args.ArgumentString;
             }           
             CreateReplaySet(player, name);
             return true;
@@ -171,13 +165,13 @@ namespace CSPracc.Managers
         /// </summary>
         /// <param name="player">who issued the command</param>
         /// <param name="name">name of the replay, if not set, playername is used</param>
-        public bool RecordPlayerCommandHandler(CCSPlayerController playerController,List<string> args)
+        public bool RecordPlayerCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             if (replaysToRecord.ContainsKey(playerController.SteamID)) return false;
             string name = playerController.PlayerName;
-            if(args.Count >= 0)
+            if(args.ArgumentCount >= 0)
             {
-                name = String.Join(" ", args);
+                name = args.ArgumentString;
             }           
             replaysToRecord.Add(playerController.SteamID, new PlayerReplay(name));
             playerController.ChatMessage($"Recording role {name}");
@@ -188,7 +182,7 @@ namespace CSPracc.Managers
         /// </summary>
         /// <param name="player">player who issued the command</param>
         /// <returns>Return the replay</returns>
-        public bool StopRecordingCommandHandler(CCSPlayerController player,List<string> args)
+        public bool StopRecordingCommandHandler(CCSPlayerController player, PlayerCommandArgument args)
         {
             if(replaysToRecord.ContainsKey(player.SteamID))
             {
@@ -210,14 +204,14 @@ namespace CSPracc.Managers
         /// </summary>
         /// <param name="player">who issued the command</param>
         /// <param name="name">name of the replay</param>
-        public bool NameReplayCommandHandler(CCSPlayerController playerController,List<string> args)
+        public bool NameReplayCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
-            if(args.Count == 0)
+            if(args.ArgumentCount == 0)
             {
                 playerController.ChatMessage("Cannot set empty name");
                 return false;
             }
-            string name = String.Join (" ", args);
+            string name = args.ArgumentString;
             if (replays.TryGetValue(playerController.SteamID, out PlayerReplay? replay))
             {
                 replay.ReplayName = name;
@@ -234,7 +228,7 @@ namespace CSPracc.Managers
         /// Save last recorded replay and add it to the current replay set
         /// </summary>
         /// <param name="player"></param>
-        public bool SaveLastReplayCommandHandler(CCSPlayerController playerController, List<string> args)
+        public bool SaveLastReplayCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             if(!replays.TryGetValue(playerController.SteamID, out PlayerReplay? replay))
             {
@@ -273,15 +267,15 @@ namespace CSPracc.Managers
             return false;
         }
 
-        public bool DeleteReplaySetCommandHandler(CCSPlayerController playerController,List<string> args)
+        public bool DeleteReplaySetCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
-            if(args.Count == 0)
+            if(args.ArgumentCount == 0)
             {
                 playerController.ChatMessage("Cannot delete replayset without id");
                 return false;
             }
             int id = -1;
-            if(!int.TryParse(args[0], out id))
+            if(!int.TryParse(args.ArgumentString, out id))
             {
                 playerController.ChatMessage("Id needs to be a number");
                 return false;
@@ -306,14 +300,14 @@ namespace CSPracc.Managers
         /// </summary>
         /// <param name="player">player who issued the command</param>
         /// <param name="name">new name</param>
-        public bool RenameCurrentReplaySetCommandHandler(CCSPlayerController player,List<string> args)
+        public bool RenameCurrentReplaySetCommandHandler(CCSPlayerController player, PlayerCommandArgument args)
         {
-            if(args.Count == 0)
+            if(args.ArgumentCount == 0)
             {
                 player.ChatMessage("Cannot set empty name");
                 return false;
             }
-            string name = String.Join(" ", args);
+            string name = args.ArgumentString;
             if(!getPlayerEditReplay(player, out int ReplayId))
             {
                 player.ChatMessage("Could not get current replay set.");
@@ -578,24 +572,24 @@ namespace CSPracc.Managers
 
         public void RegisterCommands()
         {
-            CommandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.mimic_menu, "open bot mimic menu", ShowMimicMenu, null));
-            CommandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.replay_menu, "open bot mimic menu", ShowMimcReplays, null));
-            CommandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.store_replay, "store last recorded replay", SaveLastReplayCommandHandler, null));
-            CommandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.create_replay, "create new replay", CreateReplayCommandHandler, null));
-            CommandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.record_role, "record role", RecordPlayerCommandHandler, null));
-            CommandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.rename_replayset, "rename replay set", RenameCurrentReplaySetCommandHandler, null));
-            CommandManager.RegisterCommand(new PlayerCommand(BotReplayCommands.stoprecord, "stop current recording", StopRecordingCommandHandler, null));
+            CommandManager.Instance.RegisterCommand(new PlayerCommand(BotReplayCommands.mimic_menu, "open bot mimic menu", ShowMimicMenu, null, null));
+            CommandManager.Instance.RegisterCommand(new PlayerCommand(BotReplayCommands.replay_menu, "open bot mimic menu", ShowMimcReplays, null, null));
+            CommandManager.Instance.RegisterCommand(new PlayerCommand(BotReplayCommands.store_replay, "store last recorded replay", SaveLastReplayCommandHandler, null, null));
+            CommandManager.Instance.RegisterCommand(new PlayerCommand(BotReplayCommands.create_replay, "create new replay", CreateReplayCommandHandler, null, null));
+            CommandManager.Instance.RegisterCommand(new PlayerCommand(BotReplayCommands.record_role, "record role", RecordPlayerCommandHandler, null, null));
+            CommandManager.Instance.RegisterCommand(new PlayerCommand(BotReplayCommands.rename_replayset, "rename replay set", RenameCurrentReplaySetCommandHandler, null, null));
+            CommandManager.Instance.RegisterCommand(new PlayerCommand(BotReplayCommands.stoprecord, "stop current recording", StopRecordingCommandHandler, null, null));
         }
 
         public void DeregisterCommands()
         {
-            CommandManager.DeregisterCommand(BotReplayCommands.mimic_menu);
-            CommandManager.DeregisterCommand(BotReplayCommands.replay_menu);
-            CommandManager.DeregisterCommand(BotReplayCommands.store_replay);
-            CommandManager.DeregisterCommand(BotReplayCommands.create_replay);
-            CommandManager.DeregisterCommand(BotReplayCommands.record_role);
-            CommandManager.DeregisterCommand(BotReplayCommands.rename_replayset);
-            CommandManager.DeregisterCommand(BotReplayCommands.stoprecord);
+            CommandManager.Instance.DeregisterCommand(BotReplayCommands.mimic_menu);
+            CommandManager.Instance.DeregisterCommand(BotReplayCommands.replay_menu);
+            CommandManager.Instance.DeregisterCommand(BotReplayCommands.store_replay);
+            CommandManager.Instance.DeregisterCommand(BotReplayCommands.create_replay);
+            CommandManager.Instance.DeregisterCommand(BotReplayCommands.record_role);
+            CommandManager.Instance.DeregisterCommand(BotReplayCommands.rename_replayset);
+            CommandManager.Instance.DeregisterCommand(BotReplayCommands.stoprecord);
         }
     }
 }

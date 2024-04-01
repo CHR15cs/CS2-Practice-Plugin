@@ -18,14 +18,24 @@ namespace CSPracc.Managers
 {
     public class CommandManager : IDisposable
     {
-        CSPraccPlugin Plugin;
+        private static CommandManager? _instance = null;
+        public static CommandManager Instance
+        {
+            get
+            {
+                if(_instance == null)
+                {
+                    _instance = new CommandManager();    
+                }
+                return _instance;
+            }
+        }
         public ConcurrentDictionary<string, PlayerCommand> Commands;
         CommandExecuter CommandExecuter;
-        public CommandManager(ref CSPraccPlugin plugin) 
+        private CommandManager() 
         {
             Commands = new ConcurrentDictionary<string, PlayerCommand>();
-            Plugin = plugin;   
-            CommandExecuter = new CommandExecuter(ref Commands,ref Plugin);
+            CommandExecuter = new CommandExecuter(ref Commands);
         }
         public void RegisterCommand(PlayerCommand command) 
         { 

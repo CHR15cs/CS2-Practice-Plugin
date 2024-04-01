@@ -10,35 +10,20 @@ using CSPracc.DataModules.Constants;
 using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.DataModules;
 using CSPracc.Managers.PracticeManagers.PracticeSettingsMenuManagerFolder;
+using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 
 namespace CSPracc.Managers.PracticeManagers
 {
     public class PracticeSettingsManager
     {
-        GuiManager _guiManager;
-        GuiManager GuiManager
-        {
-            get { return _guiManager; }
-        }
-        CSPraccPlugin _plugin;
-        CSPraccPlugin Plugin
-        {
-            get
-            {
-                return _plugin;
-            }
-        }
         public PracticeSettingsManager(ref CommandManager commandManager, ref GuiManager guiManager, ref CSPraccPlugin plugin) 
         {
-            _guiManager = guiManager;
-            _plugin = plugin;
-            commandManager.RegisterCommand(new DataModules.PlayerCommand(PRACC_COMMAND.settings,"Open Settings Menu", ShowPracticeMenuCommandHandler, null));
+            commandManager.RegisterCommand(new DataModules.PlayerCommand(PRACC_COMMAND.settings,"Open Settings Menu", ShowPracticeMenuCommandHandler, null,null));
         }
         
-
-        public bool ShowPracticeMenuCommandHandler(CCSPlayerController player, List<string> args)
+        public bool ShowPracticeMenuCommandHandler(CCSPlayerController player, PlayerCommandArgument args)
         {
-            GuiManager.AddMenu(player.SteamID, PracticeSettingsMenu.GetPracticeSettingsMenu(player,Plugin));
+            PracticeSettingsMenu.GetPracticeSettingsMenu(player).Show(player);
             return true;
         }
     }

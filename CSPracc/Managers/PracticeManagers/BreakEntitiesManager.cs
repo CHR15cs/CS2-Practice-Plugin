@@ -14,7 +14,7 @@ namespace CSPracc.Managers.PracticeManagers
 {
     public class BreakEntitiesManager : BaseManager
     { 
-        public BreakEntitiesManager(ref CommandManager commandManager)  : base(ref commandManager)
+        public BreakEntitiesManager()  : base()
         {
             Commands.Add(PRACC_COMMAND.breakstuff, new DataModules.PlayerCommand(PRACC_COMMAND.breakstuff, "Break all breakable entities", BreakStuffCommandHandler, null, null));
         }

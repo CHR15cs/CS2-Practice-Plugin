@@ -13,18 +13,16 @@ namespace CSPracc.Managers.PracticeManagers
 {
     public class PlayerBlindManager : BaseManager
     {
-        CSPraccPlugin Plugin;
         ProjectileManager ProjectileManager;
-        public PlayerBlindManager(ref CSPraccPlugin plugin,ref ProjectileManager projectileManager, ref CommandManager commandManager) : base(ref commandManager)
-        {
-            Plugin = plugin;
+        public PlayerBlindManager(ref ProjectileManager projectileManager) : base()
+        {  
             ProjectileManager = projectileManager;
-            Plugin.RegisterEventHandler<EventPlayerBlind>(OnPlayerBlind, HookMode.Post);
+            CSPraccPlugin.Instance.RegisterEventHandler<EventPlayerBlind>(OnPlayerBlind, HookMode.Post);
         }
         public new void Dispose()
         {
             GameEventHandler<EventPlayerBlind> playerblind = OnPlayerBlind;
-            Plugin.DeregisterEventHandler("player_blind", playerblind, false);
+            CSPraccPlugin.Instance.DeregisterEventHandler("player_blind", playerblind, false);
         }
         private HookResult OnPlayerBlind(EventPlayerBlind @event, GameEventInfo info)
         {

@@ -1,0 +1,30 @@
+name: Enhancement
+description: Submit an idea for an enhancement
+title: "[Enhancement]: "
+labels:
+  - enhancement
+projects:
+  - CHR15cs/CS2-Practice-Plugin
+assignees:
+  - CHR15cs
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to submit an enhancement idea!
+  - type: textarea
+    id: idea
+    attributes:
+      label: Explain your idea.
+      description: Tell us, which kind of feature do you want to see implemented?
+      value: "..."
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Does your idea already exist in a csgo plugin?
+      description: Link to any source where more information about your idea is found.
+      value: "..."
+    validations:
+      required: false

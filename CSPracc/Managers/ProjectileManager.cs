@@ -691,11 +691,11 @@ namespace CSPracc
                CSmokeGrenadeProjectile projectile =  Utilities.GetEntityFromIndex<CSmokeGrenadeProjectile>(@event.Entityid);
                 if(projectile != null)
                 {
-                    Utils.ServerMessage($"Smoke thrown by {ChatColors.Blue}{@event.Userid.PlayerName}{ChatColors.White} took {ChatColors.Green}{(DateTime.Now - result).TotalSeconds.ToString("0.00")}{ChatColors.White}s and {ChatColors.Green}{projectile.Bounces}{ChatColors.White} bounces to detonate.");
+                    Utils.ServerMessage($"{ChatColors.Blue}{@event.Userid.PlayerName}{ChatColors.White}'s smoke Airtime: {ChatColors.Green}{(DateTime.Now - result).TotalSeconds.ToString("0.00")}{ChatColors.White}s Bounces: {ChatColors.Green}{projectile.Bounces}{ChatColors.White}");
                 }
                 else
                 {
-                    Utils.ServerMessage($"Smoke thrown by {@event.Userid.PlayerName} took {(DateTime.Now - result).TotalSeconds.ToString("0.00")}s to detonate");
+                    Utils.ServerMessage($"{@event.Userid.PlayerName}'s smoke Airtime: {(DateTime.Now - result).TotalSeconds.ToString("0.00")}s");
                 }
                 
             }

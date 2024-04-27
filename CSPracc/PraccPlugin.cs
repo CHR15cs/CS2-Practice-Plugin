@@ -27,7 +27,7 @@ using static CSPracc.DataModules.Enums;
 using System.Resources;
 using Microsoft.Extensions.Logging;
 
-[MinimumApiVersion(80)]
+[MinimumApiVersion(216)]
 public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
 {
     public static CSPraccPlugin? Instance { get; private set; }
@@ -44,7 +44,7 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
     {
         get
         {
-            return "1.0.0.2";
+            return "1.0.0.3";
         }
     }
 

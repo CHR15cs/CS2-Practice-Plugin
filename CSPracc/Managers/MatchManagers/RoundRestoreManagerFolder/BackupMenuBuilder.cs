@@ -10,8 +10,15 @@ using System.Threading.Tasks;
 
 namespace CSPracc.Managers.MatchManagers.RoundRestoreManagerFolder
 {
+    /// <summary>
+    /// Builder for the backup menu
+    /// </summary>
     public class BackupMenuBuilder
     {
+        /// <summary>
+        /// Get the backup menu
+        /// </summary>
+        /// <returns>Backup Menu</returns>
         public static HtmlMenu GetBackupMenu()
         {
             List<KeyValuePair<string,Action>> htmlMenuOption = new List<KeyValuePair<string,Action>>(); 
@@ -22,7 +29,7 @@ namespace CSPracc.Managers.MatchManagers.RoundRestoreManagerFolder
 
             foreach (var file in Backupfiles)
             {
-                string round = RestoreFileHelper.getScoreOfBackupFile(file);
+                string round = RestoreFileHelper.GetScoreOfBackupFile(file);
                 htmlMenuOption.Add(new KeyValuePair<string,Action>(round, new Action(() => { LoadSelectedBackup(file.Name); })));              
             }
             return new HtmlMenu("Backups", htmlMenuOption);

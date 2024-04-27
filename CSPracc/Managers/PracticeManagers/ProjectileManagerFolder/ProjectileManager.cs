@@ -34,6 +34,9 @@ using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 
 namespace CSPracc
 {
+    /// <summary>
+    /// Manager for handling projectiles
+    /// </summary>
     public class ProjectileManager : BaseManager
     {
         /// <summary>
@@ -103,6 +106,9 @@ namespace CSPracc
             }
         }
 
+        /// <summary>
+        /// Constructor registering the commands
+        /// </summary>
         public ProjectileManager() : base()
         {
             CSPraccPlugin.Instance.RegisterListener<Listeners.OnEntitySpawned>(OnEntitySpawned);
@@ -134,11 +140,23 @@ namespace CSPracc
 
         #region CommandHandlers
 
+        /// <summary>
+        /// Command handler to clear nades
+        /// </summary>
+        /// <param name="player">player who issued the command</param>
+        /// <param name="args">argument passed from the player</param>
+        /// <returns>True if successfull</returns>
         public bool ClearAllNadesCommandHandler(CCSPlayerController player, PlayerCommandArgument args)
         {
             return ClearNades(player, true);
         }
 
+        /// <summary>
+        /// Command handler to clear nades only thrown by the player
+        /// </summary>
+        /// <param name="player">player who issued the command</param>
+        /// <param name="args">argument passed from the player</param>
+        /// <returns>True if successfull</returns>
         public bool ClearPersonalNadesCommandHandler(CCSPlayerController player, PlayerCommandArgument args)
         {
             return ClearNades(player, false);
@@ -158,6 +176,12 @@ namespace CSPracc
             }
         }
 
+        /// <summary>
+        /// Handle .nades command
+        /// </summary>
+        /// <param name="playerController">player who issued the command</param>
+        /// <param name="args">arguments passed from the player</param>
+        /// <returns>True if successfull</returns>
         public bool NadesCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             if (args.ArgumentString.Trim().ToLower() == "all")
@@ -177,6 +201,12 @@ namespace CSPracc
             return true;
         }
 
+        /// <summary>
+        /// Handles command .find 
+        /// </summary>
+        /// <param name="playerController">player who issued the command</param>
+        /// <param name="args">arguments passed from the player</param>
+        /// <returns>True if successfull</returns>
         public bool FindCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             if (args.ArgumentCount < 1)
@@ -191,8 +221,8 @@ namespace CSPracc
         /// <summary>
         /// Add grenade to the list
         /// </summary>
-        /// <param name="player">player who issued the command</param>
-        /// <param name="args">Arguments shall look like <Name> <Description></param>
+        /// <param name="playerController">player who issued the command</param>
+        /// <param name="args">Arguments shall look like Name Description </param>
         public bool SaveSnapshotCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             if (args.ArgumentCount < 1)
@@ -218,7 +248,7 @@ namespace CSPracc
         /// removing grenade
         /// </summary>
         /// <param name="player">player who issued the command</param>
-        /// <param name="args">Arguments shall look like <Name> <Description></param>
+        /// <param name="args">Arguments shall look like "Name Description"</param>
         public bool CommandHandlerRemoveSnapshot(CCSPlayerController player, PlayerCommandArgument args)
         {
             if(args.ArgumentCount == 0)
@@ -260,7 +290,7 @@ namespace CSPracc
         /// Rethrowing last grenade
         /// Smokes are currently not detonating, that why they are disabled for now.
         /// </summary>
-        /// <param name="player">player who issued the command</param>
+        /// <param name="playerController">player who issued the command</param>
         public bool ReThrowCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             List<KeyValuePair<int, ProjectileSnapshot>> nades = getCurrentPlayerNades(playerController);
@@ -349,7 +379,12 @@ namespace CSPracc
             return true;
         }
 
-
+        /// <summary>
+        /// Handle .stop command
+        /// </summary>
+        /// <param name="player">player who issued the command</param>
+        /// <param name="args">arguments passed from the player</param>
+        /// <returns>True if successfull</returns>
         public bool StopCommandHandler(CCSPlayerController player, PlayerCommandArgument args)
         {
             if (FlashPosition.ContainsKey(player.SteamID))
@@ -386,8 +421,8 @@ namespace CSPracc
         /// <summary>
         /// Adds description to your last saved nade
         /// </summary>
-        /// <param name="steamId">player who issued the command</param>
-        /// <param name="description">description</param>
+        /// <param name="playerController">player who issued the command</param>
+        /// <param name="args">description</param>
         public bool AddDescriptionCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             if(args.ArgumentCount == 0)
@@ -413,8 +448,8 @@ namespace CSPracc
         /// <summary>
         /// Adds description to your last saved nade
         /// </summary>
-        /// <param name="steamId">player who issued the command</param>
-        /// <param name="description">description</param>
+        /// <param name="playerController">player who issued the command</param>
+        /// <param name="args">description</param>
         public bool SetDelayCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             if (args.ArgumentCount == 0)
@@ -444,8 +479,8 @@ namespace CSPracc
         /// <summary>
         /// Adds description to your last saved nade
         /// </summary>
-        /// <param name="steamId">player who issued the command</param>
-        /// <param name="title">description</param>
+        /// <param name="playerController">player who issued the command</param>
+        /// <param name="args">description</param>
         public bool RenameLastSnapshotCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             if (args.ArgumentCount == 0)
@@ -471,8 +506,8 @@ namespace CSPracc
         /// <summary>
         /// Adds description to your last saved nade
         /// </summary>
-        /// <param name="steamId">player who issued the command</param>
-        /// <param name="title">description</param>
+        /// <param name="playerController">player who issued the command</param>
+        /// <param name="args">description</param>
         public bool UpdatePositionCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             KeyValuePair<int, ProjectileSnapshot> lastSnapshot = getLastAddedProjectileSnapshot(playerController.SteamID);
@@ -489,6 +524,12 @@ namespace CSPracc
             return false;
         }
 
+        /// <summary>
+        /// Handles .addtag command
+        /// </summary>
+        /// <param name="playerController">player who issued the command</param>
+        /// <param name="args">arguments passed from the player</param>
+        /// <returns>True if successfull</returns>
         public bool AddTagToLastGrenadeCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             if(args.ArgumentCount == 0)
@@ -521,6 +562,12 @@ namespace CSPracc
             return false;
         }
 
+        /// <summary>
+        /// Remove tag from players last grenade
+        /// </summary>
+        /// <param name="playerController">player who issued the command</param>
+        /// <param name="args">argument passed from the player</param>
+        /// <returns>True if successfull</returns>
         public bool RemoveTagFromLastGrenadeCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             if (args.ArgumentCount == 0)
@@ -556,6 +603,12 @@ namespace CSPracc
             return false;
         }
 
+        /// <summary>
+        /// Remove all tags from last grenade
+        /// </summary>
+        /// <param name="playerController">player who issued the command</param>
+        /// <param name="args">arguments passed from the player</param>
+        /// <returns>True if successfull</returns>
         public bool ClearTagsFromLastGrenadeCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             if (args.ArgumentCount == 0)
@@ -577,6 +630,12 @@ namespace CSPracc
             return false;
         }
 
+        /// <summary>
+        /// Remove specific tag from last grenade
+        /// </summary>
+        /// <param name="playerController">player who issued the command</param>
+        /// <param name="args">argument passed from the command</param>
+        /// <returns>True if successfull</returns>
         public bool DeleteTagFromAllNadesCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             if (args.ArgumentCount == 0)
@@ -724,6 +783,9 @@ namespace CSPracc
         }
 
         #endregion
+        /// <summary>
+        /// Disposing the manager
+        /// </summary>
         public new void Dispose()
         {
             Listeners.OnEntitySpawned onEntitySpawned = new Listeners.OnEntitySpawned(OnEntitySpawned);
@@ -985,6 +1047,10 @@ namespace CSPracc
         public static MemoryFunctionWithReturn<IntPtr, IntPtr, IntPtr, IntPtr, IntPtr, IntPtr, IntPtr, int> CSmokeGrenadeProjectile_CreateFuncWindows = new(@"\x48\x89\x5C\x24\x08\x48\x89\x6C\x24\x10\x48\x89\x74\x24\x18\x57\x41\x56\x41\x57\x48\x83\xEC\x50\x4C\x8B\xB4\x24\x90\x00\x00\x00\x49\x8B\xF8");
 
         public static MemoryFunctionWithReturn<IntPtr, IntPtr, IntPtr, IntPtr, IntPtr, IntPtr, IntPtr, int> CSmokeGrenadeProjectile_CreateFuncLinux = new(@"\x55\x4c\x89\xc1\x48\x89\xe5\x41\x57\x41\x56\x49\x89\xd6\x48\x89\xf2\x48\x89\xfe\x41\x55\x45\x89\xcd\x41\x54\x4d\x89\xc4\x53\x48\x83\xec\x28\x48\x89\x7d\xb8\x48");
+        /// <summary>
+        /// Handling entity spawned event
+        /// </summary>
+        /// <param name="entity">entity which spawned</param>
         public void OnEntitySpawned(CEntityInstance entity)
         {
             if(entity == null) return;
@@ -1112,6 +1178,12 @@ namespace CSPracc
             }           
         }
 
+        /// <summary>
+        /// Smoke detonate event
+        /// </summary>
+        /// <param name="event">event</param>
+        /// <param name="info">info</param>
+        /// <returns>hookresult</returns>
         public HookResult OnSmokeDetonate(EventSmokegrenadeDetonate @event, GameEventInfo info)
         {
             if(LastThrownSmoke.TryGetValue(@event.Entityid, out var result)) 
@@ -1131,7 +1203,11 @@ namespace CSPracc
             return HookResult.Continue;
         }
 
-
+        /// <summary>
+        /// Save last thrown grenade
+        /// </summary>
+        /// <param name="playerController">player who issued the command</param>
+        /// <param name="name">name of the grenade</param>
         public void SaveLastGrenade(CCSPlayerController playerController, string name)
         {
             ProjectileSnapshot? snapshot = getLatestProjectileSnapshot(playerController.SteamID);
@@ -1144,6 +1220,12 @@ namespace CSPracc
             playerController.PrintToCenter($"Successfully added grenade {name}");           
         }
 
+        /// <summary>
+        /// Throw grenade projectile
+        /// </summary>
+        /// <param name="projectile">Grenade to be thrown</param>
+        /// <param name="player">player set as thrower</param>
+        /// <returns>True if successfull</returns>
         public bool ThrowGrenadePojectile(ProjectileSnapshot projectile, CCSPlayerController player)
         {
             CBaseCSGrenadeProjectile? cGrenade = null;
@@ -1258,6 +1340,12 @@ namespace CSPracc
 
             player.PlayerPawn.Value!.Teleport(pos.PlayerPosition, pos.PlayerAngle, new Vector(0,0,0));
         }
+        /// <summary>
+        /// Clear all or personal nades
+        /// </summary>
+        /// <param name="player">player who issued the command</param>
+        /// <param name="all">clear all or only personal nades</param>
+        /// <returns>true if successfull</returns>
         public bool ClearNades(CCSPlayerController player, bool all = false)
         {
             var smokes = Utilities.FindAllEntitiesByDesignerName<CSmokeGrenadeProjectile>("smokegrenade_projectile");

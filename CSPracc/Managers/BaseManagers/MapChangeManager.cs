@@ -11,13 +11,25 @@ using System.Threading.Tasks;
 
 namespace CSPracc.Managers.BaseManagers
 {
+    /// <summary>
+    /// Manager for changing the map
+    /// </summary>
     public class MapChangeManager : BaseManager
     {       
+        /// <summary>
+        /// Constructor registering the command
+        /// </summary>
         public MapChangeManager() : base()
         {
             CommandManager.RegisterCommand(new PlayerCommand(BASE_COMMAND.MAP, "Change map to given name", ChangeMapCommandHandler, null,null));
         }
 
+        /// <summary>
+        /// Change map command handler
+        /// </summary>
+        /// <param name="playerController">player who issued the command</param>
+        /// <param name="args">arguments passed form the player, should be map name</param>
+        /// <returns>True is execution is successfull</returns>
         private bool ChangeMapCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args) 
         { 
             if(args.ArgumentCount != 1)

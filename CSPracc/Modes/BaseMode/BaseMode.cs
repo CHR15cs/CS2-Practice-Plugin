@@ -13,36 +13,37 @@ using CSPracc.Managers.BaseManagers;
 
 namespace CSPracc.Modes
 {
+    /// <summary>
+    /// Base class for all modes
+    /// </summary>
     public class BaseMode : IDisposable
     {
-        protected GuiManager GuiManager { get; private set; } = GuiManager.Instance;
-        protected CommandManager CommandManager;
-        public CSPraccPlugin Plugin;
         MapChangeManager MapChangeManager;
-        ModeSwitchManager ModeSwitchManager;
-        
-        public BaseMode(CSPraccPlugin plugin) 
+        ModeSwitchManager ModeSwitchManager;       
+        /// <summary>
+        /// Constuctor for the base mode
+        /// </summary>
+        public BaseMode() 
         {
-            CommandManager = new CommandManager(ref plugin);
-            Plugin = plugin;
-            MapChangeManager = new MapChangeManager(ref CommandManager);
-            ModeSwitchManager = new ModeSwitchManager(ref CommandManager, ref plugin);
-        }
-      
+            MapChangeManager = new MapChangeManager();
+            ModeSwitchManager = new ModeSwitchManager();
+        }     
+        /// <summary>
+        /// Configure the environment
+        /// </summary>
         public  virtual void ConfigureEnvironment()
         {
             DataModules.Constants.Methods.MsgToServer("Restoring default config.");
             Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
             Server.ExecuteCommand("exec server.cfg");      
         }
-
+        /// <summary>
+        /// Dispose the base mode
+        /// </summary>
         public virtual void Dispose()
         {
-            CommandManager.Dispose();
-            GuiManager.Dispose();
+            CommandManager.Instance.Dispose();
+            GuiManager.Instance.Dispose();
         }
-
     }
-
-
 }

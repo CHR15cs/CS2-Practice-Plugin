@@ -27,7 +27,7 @@ namespace CSPracc.Managers
         Dictionary<ulong,PlayerReplay> replays = new Dictionary<ulong, PlayerReplay>();
         Dictionary<ulong,PlayerReplay> replaysToRecord = new Dictionary<ulong,PlayerReplay>();
         Dictionary<int, PlayerReplay> replaysToReplay = new Dictionary<int, PlayerReplay>();
-        public BotReplayManager(ref PracticeBotManager practiceBotManager,ref ProjectileManager projectileManager, ref CommandManager commandManager, ref GuiManager guiManager) 
+        public BotReplayManager(ref PracticeBotManager practiceBotManager,ref ProjectileManager projectileManager) 
         {
             ProjectileManager = projectileManager;
             PracticeBotManager = practiceBotManager;

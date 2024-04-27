@@ -51,10 +51,10 @@ namespace CSPracc.Modes
 
         private void SetupManagers()
         {
-            projectileManager = new ProjectileManager(ref CommandManager, ref GuiManager, ref Plugin);            
-            PracticeBotManager = new PracticeBotManager(ref CommandManager,ref Plugin);
-            SpawnManager = new PracticeSpawnManager(ref base.CommandManager);
-            BotReplayManager = new BotReplayManager(ref PracticeBotManager, ref projectileManager, ref CommandManager,ref GuiManager);
+            projectileManager = new ProjectileManager();            
+            PracticeBotManager = new PracticeBotManager();
+            SpawnManager = new PracticeSpawnManager();
+            BotReplayManager = new BotReplayManager(ref PracticeBotManager, ref projectileManager);
             PlayerBlindManager = new PlayerBlindManager(ref Plugin, ref projectileManager, ref CommandManager);
             PlayerHurtManager = new PlayerHurtManager(ref Plugin, ref CommandManager);
             ToggleImpactManager = new ToggleImpactManager(ref CommandManager);

@@ -7,8 +7,14 @@ using System.Threading.Tasks;
 
 namespace CSPracc.Managers.MatchManagers.RoundRestoreManagerFolder
 {
+    /// <summary>
+    /// Helper class to handle the backup files
+    /// </summary>
     public class RestoreFileHelper
     {
+        /// <summary>
+        /// Cleanup old backup files
+        /// </summary>
         public static void CleanupOldFiles()
         {
             foreach (FileInfo file in GetBackupFiles())
@@ -17,6 +23,10 @@ namespace CSPracc.Managers.MatchManagers.RoundRestoreManagerFolder
             }
         }
 
+        /// <summary>
+        /// Get the last backup file
+        /// </summary>
+        /// <returns>null if no backupfile is found</returns>
         public static string? GetLastBackupFileOrNull()
         {
             List<FileInfo> Backupfiles = GetBackupFiles();
@@ -44,6 +54,10 @@ namespace CSPracc.Managers.MatchManagers.RoundRestoreManagerFolder
             return null;
         }
 
+        /// <summary>
+        /// Get all backup files
+        /// </summary>
+        /// <returns>List of Backup files</returns>
         public static List<FileInfo> GetBackupFiles()
         {
             List<FileInfo> unsortedBackups = CSPraccPlugin.Cs2Dir.GetFiles("backup_round*").ToList();
@@ -57,7 +71,7 @@ namespace CSPracc.Managers.MatchManagers.RoundRestoreManagerFolder
                 {
                     round = Convert.ToInt32(earliestBackup.Name.Substring(earliestBackup.Name.Length - 6, 2));
                 }
-                catch (Exception ex) { }
+                catch (Exception) { }
 
                 foreach (FileInfo file in unsortedBackups)
                 {
@@ -66,7 +80,7 @@ namespace CSPracc.Managers.MatchManagers.RoundRestoreManagerFolder
                     {
                         round2 = Convert.ToInt32(file.Name.Substring(file.Name.Length - 6, 2));
                     }
-                    catch (Exception ex) { }
+                    catch (Exception) { }
                     if (round2 != -1 && round2 < round) { earliestBackup = file; }
                 }
                 unsortedBackups.Remove(earliestBackup);
@@ -75,10 +89,13 @@ namespace CSPracc.Managers.MatchManagers.RoundRestoreManagerFolder
             return sortedbackupFiles;
         }
 
-        public static string getScoreOfBackupFile(FileInfo fileInfo)
+        /// <summary>
+        /// Parse Backupfile and return score
+        /// </summary>
+        /// <param name="fileInfo">backupfile to readout</param>
+        /// <returns>score of file</returns>
+        public static string GetScoreOfBackupFile(FileInfo fileInfo)
         {
-            string score = "0-0";
-
             string content = File.ReadAllText(fileInfo.FullName);
             int startOfScore = content.IndexOf('{', content.IndexOf("FirstHalfScore")) + 1;
             int endOfScore = content.IndexOf('}', startOfScore) - 1;

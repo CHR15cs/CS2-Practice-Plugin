@@ -10,31 +10,39 @@ using CSPracc.Managers.BaseManagers;
 using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.DataModules.Constants;
 using static CounterStrikeSharp.API.Core.BasePlugin;
+using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 
 namespace CSPracc.Managers.MatchManagers
 {
+    /// <summary>
+    /// Class to handle the coach slot
+    /// </summary>
     public class CoachManager : BaseManager
     {
-        CSPraccPlugin Plugin;
-        public CoachManager(ref CommandManager commandManager, ref CSPraccPlugin plugin) : base(ref commandManager)
+        /// <summary>
+        /// Constructor for the coach manager
+        /// </summary>
+        public CoachManager() : base()
         {
-            Plugin = plugin;
-            Commands.Add(MATCH_COMMAND.COACH, new DataModules.PlayerCommand(MATCH_COMMAND.COACH,"Set yourself as coach",AddCoachCommandHandler,null));
-            Commands.Add(MATCH_COMMAND.STOP, new DataModules.PlayerCommand(MATCH_COMMAND.COACH, "Go to player slot", StopCoachCommandHandler, null));
-            plugin.RegisterEventHandler<EventPlayerSpawn>(OnPlayerSpawnHandler, HookMode.Post);
-            plugin.RegisterEventHandler<EventRoundFreezeEnd>(OnFreezeTimeEnd, HookMode.Post);
+            Commands.Add(MATCH_COMMAND.COACH, new DataModules.PlayerCommand(MATCH_COMMAND.COACH,"Set yourself as coach",AddCoachCommandHandler,null,null));
+            Commands.Add(MATCH_COMMAND.STOP, new DataModules.PlayerCommand(MATCH_COMMAND.COACH, "Go to player slot", StopCoachCommandHandler, null,null));
+            CSPraccPlugin.Instance.RegisterEventHandler<EventPlayerSpawn>(OnPlayerSpawnHandler, HookMode.Post);
+            CSPraccPlugin.Instance.RegisterEventHandler<EventRoundFreezeEnd>(OnFreezeTimeEnd, HookMode.Post);
         }
 
+        /// <summary>
+        /// Disposing the object
+        /// </summary>
         public new void Dispose()
         {
             GameEventHandler<EventPlayerSpawn> playerspawn = OnPlayerSpawnHandler;
-            Plugin.DeregisterEventHandler("player_spawn", playerspawn, true);
+            CSPraccPlugin.Instance.DeregisterEventHandler("player_spawn", playerspawn, true);
             GameEventHandler<EventRoundFreezeEnd> freezetimeEnd = OnFreezeTimeEnd;
-            Plugin.DeregisterEventHandler("round_freeze_end", freezetimeEnd, true);
+            CSPraccPlugin.Instance.DeregisterEventHandler("round_freeze_end", freezetimeEnd, true);
             base.Dispose();
         }
 
-        public static List<ulong> ListCoaches { get; set; } = new List<ulong>();
+        private List<ulong> ListCoaches { get; set; } = new List<ulong>();
 
         private HookResult OnPlayerSpawnHandler(EventPlayerSpawn @event, GameEventInfo info)
         {
@@ -48,7 +56,7 @@ namespace CSPracc.Managers.MatchManagers
                         Server.ExecuteCommand("mp_suicide_penalty 0");
                         CCSPlayerController? player = Utilities.GetPlayerFromSteamId(id);
                         if (player == null || !player.IsValid) { return HookResult.Continue; }
-                        CSPraccPlugin.Instance!.AddTimer(0.5f, () => player!.PlayerPawn!.Value!.CommitSuicide(false, true));
+                        CSPraccPlugin.Instance.AddTimer(0.5f, () => player!.PlayerPawn!.Value!.CommitSuicide(false, true));
                         Server.ExecuteCommand("mp_suicide_penalty 1");
                     }
                 }
@@ -56,7 +64,7 @@ namespace CSPracc.Managers.MatchManagers
             }
             return HookResult.Changed;
         }
-        public bool AddCoachCommandHandler(CCSPlayerController playerController, List<string> args)
+        private bool AddCoachCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             if (ListCoaches.Contains(playerController.SteamID))
             {
@@ -69,7 +77,7 @@ namespace CSPracc.Managers.MatchManagers
             return true;
         }
 
-        public bool StopCoachCommandHandler(CCSPlayerController playerController, List<string> args)
+        private bool StopCoachCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             if (ListCoaches.Remove(playerController.SteamID))
             {
@@ -79,7 +87,7 @@ namespace CSPracc.Managers.MatchManagers
             return false;
         }
 
-        public HookResult OnFreezeTimeEnd(EventRoundFreezeEnd @event, GameEventInfo info)
+        private HookResult OnFreezeTimeEnd(EventRoundFreezeEnd @event, GameEventInfo info)
         {
             if (ListCoaches != null && ListCoaches.Count > 0)
             {

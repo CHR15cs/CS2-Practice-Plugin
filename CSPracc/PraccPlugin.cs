@@ -1,30 +1,11 @@
-﻿ using System;
- using System.Collections.Generic;
- using System.IO;
- using System.Linq;
- using System.Net.Http;
- using System.Threading;
- using System.Threading.Tasks;
-using CounterStrikeSharp.API;
+﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes;
-using CounterStrikeSharp.API.Core.Attributes.Registration;
-using CounterStrikeSharp.API.Modules.Commands;
-using CounterStrikeSharp.API.Modules.Entities;
-using CounterStrikeSharp.API.Modules.Events;
-using CounterStrikeSharp.API.Modules.Memory;
-using CounterStrikeSharp.API.Modules.Menu;
-using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc;
 using CSPracc.DataModules;
-using CSPracc.DataModules.Constants;
-using System.Xml;
-using System.Xml.Serialization;
-using CSPracc.Managers;
-using System.Drawing;
-using CSPracc.Modes;
 using static CSPracc.DataModules.Enums;
-using System.Resources;
+using CSPracc.Managers;
+using CSPracc.Modes;
 using Microsoft.Extensions.Logging;
 
 [MinimumApiVersion(216)]

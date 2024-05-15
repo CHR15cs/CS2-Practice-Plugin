@@ -11,15 +11,21 @@ using System.Threading.Tasks;
 
 namespace CSPracc.Managers.PracticeManagers
 {
+    /// <summary>
+    /// Countdown manager
+    /// </summary>
     public class CountdownManager : BaseManager
     {
+        /// <summary>
+        /// Constructor registering the commands
+        /// </summary>
         public CountdownManager() : base()
         { 
             Commands.Add(PRACC_COMMAND.countdown, new DataModules.PlayerCommand(PRACC_COMMAND.countdown, "", CountdownCommandHandler, null, null));
         }
         private bool CountdownCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
-            if (args.ArgumentCount != 1)
+            if (args.ArgumentCount == 1)
             {
                 if (int.TryParse(args.ArgumentString, out int time))
                 {

@@ -2,10 +2,8 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Utils;
-using CSPracc.CommandHandler;
 using CSPracc.DataModules;
 using CSPracc.DataStorages.JsonStorages;
-using CSPracc.EventHandler;
 using CSPracc.Managers;
 using Microsoft.Extensions.Logging;
 using System;
@@ -32,12 +30,12 @@ namespace CSPracc.Modes
         private RetakeModeStatus status;
 
         GunManager GunManager { get; set; }
-        public RetakeMode(CSPraccPlugin plugin) : base(plugin)
+        public RetakeMode() : base()
         {
             //this.SpawnManager = new SpawnManager();
             status = RetakeModeStatus.live;
             CurrentBombsite = "A";
-            GunManager = new GunManager(GuiManager);
+            //GunManager = new GunManager(GuiManager);
         }
 
         public void LoadRetakeMode(CCSPlayerController player)

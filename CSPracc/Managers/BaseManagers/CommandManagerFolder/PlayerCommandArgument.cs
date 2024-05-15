@@ -27,6 +27,9 @@ namespace CSPracc.Managers.BaseManagers.CommandManagerFolder
             }
             if (!argument.Contains(" "))
             {
+                ArgumentString = argument;
+                ArgumentList.Add(argument);
+                ArgumentCount = 1;
                 return;
             }
             else

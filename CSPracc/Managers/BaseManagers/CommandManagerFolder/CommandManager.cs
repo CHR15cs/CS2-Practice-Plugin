@@ -1,6 +1,7 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CSPracc.DataModules;
+using CSPracc.DataModules.Constants;
 using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 using Microsoft.Extensions.Logging;
 using System;
@@ -18,13 +19,15 @@ namespace CSPracc.Managers
 {
     public class CommandManager : IDisposable
     {
+        private static bool _disposed = false;
         private static CommandManager? _instance = null;
         public static CommandManager Instance
         {
             get
             {
-                if(_instance == null)
+                if(_instance == null || _disposed)
                 {
+                    _disposed = false;
                     _instance = new CommandManager();    
                 }
                 return _instance;
@@ -39,6 +42,7 @@ namespace CSPracc.Managers
         }
         public void RegisterCommand(PlayerCommand command) 
         { 
+            CSPraccPlugin.Instance.Logger.LogInformation($"Registering command {command.Name}");
             if(Commands.ContainsKey(command.Name)) return;
             Commands.TryAdd(command.Name,command);
         }
@@ -49,7 +53,9 @@ namespace CSPracc.Managers
 
         public void Dispose()
         {
+            Commands.Clear();
             CommandExecuter.Dispose();
+            _disposed = true;
         }
     }
 }

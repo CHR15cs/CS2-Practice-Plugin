@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.DataModules;
-using CSPracc.CommandHandler;
 using CounterStrikeSharp.API.Modules.Entities;
 using System.Xml.Linq;
 using CSPracc.Extensions;
@@ -184,6 +183,7 @@ namespace CSPracc
         /// <returns>True if successfull</returns>
         public bool NadesCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
+            CSPraccPlugin.Instance.Logger.LogInformation("Nades command handler");
             if (args.ArgumentString.Trim().ToLower() == "all")
             {
                 GuiManager.Instance.AddMenu(playerController.SteamID, GetNadeMenu(playerController));

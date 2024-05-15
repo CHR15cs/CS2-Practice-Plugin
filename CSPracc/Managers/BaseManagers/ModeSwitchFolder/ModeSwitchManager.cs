@@ -26,8 +26,8 @@ namespace CSPracc.Managers.BaseManagers
             ModeMenu = ModeMenuGenerator.GetModeMenu();
             CommandManager.RegisterCommand(new PlayerCommand(BASE_COMMAND.MODE, "Open mode menu", OpenModeMenuCommandHandler, null,null));
             CommandManager.RegisterCommand(new PlayerCommand(BASE_COMMAND.PRACC, "Switch to pracc mode", SwitchPraccCommandHandler, null, null));
-            CommandManager.RegisterCommand(new PlayerCommand(BASE_COMMAND.PRACC, "Switch to match mode", SwitchMatchCommandHandler, null, null));
-            CommandManager.RegisterCommand(new PlayerCommand(BASE_COMMAND.PRACC, "Switch to dry run mode", SwitchDryRunCommandHandler, null, null));
+            CommandManager.RegisterCommand(new PlayerCommand(BASE_COMMAND.MATCH, "Switch to match mode", SwitchMatchCommandHandler, null, null));
+            CommandManager.RegisterCommand(new PlayerCommand(BASE_COMMAND.DryRun, "Switch to dry run mode", SwitchDryRunCommandHandler, null, null));
         }
 
         private bool OpenModeMenuCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)

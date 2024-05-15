@@ -12,13 +12,19 @@ using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 
 namespace CSPracc.Managers.PracticeManagers
 {
+    /// <summary>
+    /// Toggle impacts manager
+    /// </summary>
     public class ToggleImpactManager : BaseManager
     {
+        /// <summary>
+        /// Constructor registering the commands
+        /// </summary>
         public ToggleImpactManager() : base ()
         { 
             Commands.Add(PRACC_COMMAND.impacts, new DataModules.PlayerCommand(PRACC_COMMAND.impacts,"Toggle impacts",ImpactCommandHandler,null, null));
         }
-        public bool ImpactCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
+        private bool ImpactCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             ConVar? showimpacts = ConVar.Find("sv_showimpacts");
             if (showimpacts == null) return false;

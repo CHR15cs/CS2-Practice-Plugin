@@ -23,8 +23,14 @@ using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 
 namespace CSPracc.Managers
 {
+    /// <summary>
+    /// Practice bot manager
+    /// </summary>
     public  class PracticeBotManager : BaseManager
     {
+        /// <summary>
+        /// Constructor for the practice bot manager
+        /// </summary>
         public PracticeBotManager() : base ()
         {
             CSPraccPlugin.Instance.RegisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn, HookMode.Post);
@@ -88,7 +94,7 @@ namespace CSPracc.Managers
         }
         private bool CommandHandlerSwapBot(CCSPlayerController playerController, PlayerCommandArgument args)
         {
-            MoveBot(playerController);
+            SwapBot(playerController);
             return true;
         }
         /// <summary>
@@ -307,7 +313,7 @@ namespace CSPracc.Managers
 
         private void ElevatePlayer(CCSPlayerController player)
         {
-                player.PlayerPawn.Value.Teleport(new Vector(player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.X, player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.Y, player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.Z + 80.0f), player.PlayerPawn.Value.EyeAngles, new Vector(0, 0, 0));
+            player.PlayerPawn.Value!.Teleport(new Vector(player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.X, player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.Y, player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.Z + 80.0f), player.PlayerPawn.Value.EyeAngles, new Vector(0, 0, 0));
             CSPraccPlugin.Instance!.Logger.LogInformation($"boosting player: {player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.X} - {player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.Y} - {player.PlayerPawn.Value.CBodyComponent!.SceneNode!.AbsOrigin.Z + 80.0f}");
         }
 
@@ -335,7 +341,7 @@ namespace CSPracc.Managers
                     {
                         spawnedBots[tempPlayer] = new Dictionary<string, object>();
                     }
-                    Vector pos = new Vector(botOwner.PlayerPawn.Value.CBodyComponent?.SceneNode?.AbsOrigin.X, botOwner.PlayerPawn.Value.CBodyComponent?.SceneNode?.AbsOrigin.Y, botOwner.PlayerPawn.Value.CBodyComponent?.SceneNode?.AbsOrigin.Z);
+                    Vector pos = new Vector(botOwner.PlayerPawn.Value!.CBodyComponent?.SceneNode?.AbsOrigin.X, botOwner.PlayerPawn.Value.CBodyComponent?.SceneNode?.AbsOrigin.Y, botOwner.PlayerPawn.Value.CBodyComponent?.SceneNode?.AbsOrigin.Z);
                     QAngle eyes = new QAngle(botOwner.PlayerPawn.Value.EyeAngles.X, botOwner.PlayerPawn.Value.EyeAngles.Y, botOwner.PlayerPawn.Value.EyeAngles.Z);
                     Position botOwnerPosition = new Position(pos, eyes);
                     // Add key-value pairs to the inner dictionary
@@ -365,16 +371,15 @@ namespace CSPracc.Managers
 
         public HookResult OnPlayerSpawn(EventPlayerSpawn @event, GameEventInfo info)
         {
-            CSPraccPlugin.Instance.Logger.LogInformation("player spawned");
             var player = @event.Userid;
             // Respawing a bot where it was actually spawned during practice session
-            if (player.IsValid && player.IsBot && player.UserId.HasValue)
+            if (player!.IsValid && player.IsBot && player.UserId.HasValue)
             {
                 if (spawnedBots.ContainsKey((player)))
                 {
                     if (spawnedBots[player]["position"] is Position botPosition)
                     {                   
-                        CCSBot bot = player.PlayerPawn.Value.Bot!;
+                        CCSBot bot = player.PlayerPawn.Value!.Bot!;
                         CCSPlayer_MovementServices movementService = new CCSPlayer_MovementServices(player.PlayerPawn.Value.MovementServices!.Handle);
                         player.PlayerPawn.Value.Teleport(botPosition.PlayerPosition, botPosition.PlayerAngle, new Vector(0, 0, 0));
                         if ((bool)spawnedBots[player]["crouchstate"]) player.PlayerPawn.Value.Flags |= (uint)PlayerFlags.FL_DUCKING;
@@ -393,7 +398,7 @@ namespace CSPracc.Managers
         public new void Dispose()
         {
             GameEventHandler<EventPlayerSpawn> onPlayerSpawned = new GameEventHandler<EventPlayerSpawn>(OnPlayerSpawn);
-            CSPraccPlugin.Instance.DeregisterEventHandler("player_spawned", onPlayerSpawned, true);
+            CSPraccPlugin.Instance.DeregisterEventHandler("player_spawn", onPlayerSpawned, true);
             base.Dispose();
         }
 

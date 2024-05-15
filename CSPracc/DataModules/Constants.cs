@@ -19,75 +19,75 @@ namespace CSPracc.DataModules.Constants
 
     public class RETAKE_COMMAND
     {
-        public const string edit = ".edit";
-        public const string stopedit = ".stopedit";
-        public const string addspawna = ".addspawna";
-        public const string addspawnb = ".addspawnb";
+        public const string edit = "edit";
+        public const string stopedit = "stopedit";
+        public const string addspawna = "addspawna";
+        public const string addspawnb = "addspawnb";
     }
 
     public class PREFIRE_COMMAND
     {
-        public const string options = ".options";
-        public const string routes = ".routes";
-        public const string route = ".route";
-        public const string addroute = ".addroute";
-        public const string deleteroute = ".deleteroute";
-        public const string editroute = ".editroute";
-        public const string next = ".next";
-        public const string back = ".back";
-        public const string guns = ".guns";
-        public const string addspawn = ".addspawn";
-        public const string addstartingpoint = ".addstart";
-        public const string savecurrentroute = ".save";
-        public const string restart = ".restart";
+        public const string options = "options";
+        public const string routes = "routes";
+        public const string route = "route";
+        public const string addroute = "addroute";
+        public const string deleteroute = "deleteroute";
+        public const string editroute = "editroute";
+        public const string next = "next";
+        public const string back = "back";
+        public const string guns = "guns";
+        public const string addspawn = "addspawn";
+        public const string addstartingpoint = "addstart";
+        public const string savecurrentroute = "save";
+        public const string restart = "restart";
     }
 
 
     public class BASE_COMMAND
     {
-        public const string MODE = ".menu";
-        public const string PRACC = ".pracc";
-        public const string MATCH = ".match";
-        public const string DryRun = ".dryrun";
-        public const string Prefire = ".prefire";
-        public const string Retake = ".retake";
-        public const string Unload = ".unload";
-        public const string HELP = ".help";
-        public const string FAKERCON = ".rcon";
-        public const string MAP = ".map";
-        public const string GOT = ".t";
-        public const string GOCT = ".ct";
-        public const string GOSPEC = ".spec";
-        public const string SWAP = ".swap";
-        public const string ALIAS = ".alias";
-        public const string REMOVEALIAS = ".ralias";
+        public const string MODE = "menu";
+        public const string PRACC = "pracc";
+        public const string MATCH = "match";
+        public const string DryRun = "dryrun";
+        public const string Prefire = "prefire";
+        public const string Retake = "retake";
+        public const string Unload = "unload";
+        public const string HELP = "help";
+        public const string FAKERCON = "rcon";
+        public const string MAP = "map";
+        public const string GOT = "t";
+        public const string GOCT = "ct";
+        public const string GOSPEC = "spec";
+        public const string SWAP = "swap";
+        public const string ALIAS = "alias";
+        public const string REMOVEALIAS = "ralias";
     }
 
     public class MATCH_COMMAND
     {
-        public const string PAUSE = ".pause";
-        public const string UNPAUSE = ".unpause";
-        public const string READY = ".ready";
-        public const string UNREADY = ".unready";
-        public const string FORCEREADY = ".forceready";
-        public const string STOP = ".stop";
-        public const string WARMUP = ".warmup";
-        public const string RESTART = ".restart";
-        public const string COACH = ".coach";
-        public const string STOPCOACH = ".stopcoach";
-        public const string BACKUPMENU = ".backup";
-        public const string RESTORE = ".restore";
-        public const string FORCEUNPAUSE = ".forceunpause";
-        public const string DEMO = ".demo";
+        public const string PAUSE = "pause";
+        public const string UNPAUSE = "unpause";
+        public const string READY = "ready";
+        public const string UNREADY = "unready";
+        public const string FORCEREADY = "forceready";
+        public const string STOP = "stop";
+        public const string WARMUP = "warmup";
+        public const string RESTART = "restart";
+        public const string COACH = "coach";
+        public const string STOPCOACH = "stopcoach";
+        public const string BACKUPMENU = "backup";
+        public const string RESTORE = "restore";
+        public const string FORCEUNPAUSE = "forceunpause";
+        public const string DEMO = "demo";
     }
 
     public class DRYRUN_COMMAND
     {
-        public const string refill = ".refill";
-        public const string ak = ".ak";
-        public const string m4 = ".m4";
-        public const string awp = ".awp";
-        public const string m4a1 = ".m4a1";
+        public const string refill = "refill";
+        public const string ak = "ak";
+        public const string m4 = "m4";
+        public const string awp = "awp";
+        public const string m4a1 = "m4a1";
     }
 
     public class PROJECTILE_COMMAND

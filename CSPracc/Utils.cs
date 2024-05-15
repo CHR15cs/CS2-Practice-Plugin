@@ -15,6 +15,9 @@ using System.Reflection.Metadata;
 
 namespace CSPracc
 {
+    /// <summary>
+    /// Util class, providing utility functions
+    /// </summary>
     public class Utils
     {
         /// <summary>
@@ -95,6 +98,10 @@ namespace CSPracc
             }
         }
 
+        /// <summary>
+        /// Removing noclip from player
+        /// </summary>
+        /// <param name="player">player to remove noclip from</param>
         public static void RemoveNoClip(CCSPlayerController player)
         {
             if (player == null || !player.IsValid) return;
@@ -105,17 +112,30 @@ namespace CSPracc
             }
         }
 
+        /// <summary>
+        /// Message to all players on server
+        /// </summary>
+        /// <param name="message">message to be sent</param>
         public static void ServerMessage(string message)
         {
-            Server.PrintToChatAll($"{CSPraccPlugin.Instance!.Config.ChatPrefix} {message}");
+            Server.PrintToChatAll($"{CSPraccPlugin.Instance!.Config!.ChatPrefix} {message}");
         }
 
+        /// <summary>
+        /// Message to specific player
+        /// </summary>
+        /// <param name="message">message to be sent</param>
+        /// <param name="player">player to be messaged</param>
         public static void ClientChatMessage(string message, CCSPlayerController player)
         {
-            player.PrintToChat($"{CSPraccPlugin.Instance!.Config.ChatPrefix} {message}");
+            player.PrintToChat($"{CSPraccPlugin.Instance!.Config!.ChatPrefix} {message}");
         }
 
-
+        /// <summary>
+        /// Message to specific player
+        /// </summary>
+        /// <param name="message">message to be sent</param>
+        /// <param name="player">player to be messaged</param>
         public static void ClientChatMessage(string message, ulong steamid)
         {
             CCSPlayerController? player = Utilities.GetPlayerFromSteamId(steamid);
@@ -125,6 +145,11 @@ namespace CSPracc
             }
         }
 
+        /// <summary>
+        /// Get the team color of a player
+        /// </summary>
+        /// <param name="playerController">player</param>
+        /// <returns>Color</returns>
         public static Color GetTeamColor(CCSPlayerController playerController)
         {
             Logging.LogMessage($"Getting Color of player {playerController.CompTeammateColor}");
@@ -145,6 +170,9 @@ namespace CSPracc
             }
         }
 
+        /// <summary>
+        /// Break all breakable props on the map
+        /// </summary>
         public static void BreakAll()
         {
             var props = Utilities.FindAllEntitiesByDesignerName<CBreakable>("prop_dynamic")
@@ -158,6 +186,24 @@ namespace CSPracc
             }
         }
 
+        /// <summary>
+        /// Execute a config
+        /// </summary>
+        /// <param name="configName">config to be executed</param>
+        /// <returns>true if successfull</returns>
+        public static bool ExecuteConfig(string configName)
+        {
+            ///TODO: Implement a check wether config exists
+            Server.ExecuteCommand($"exec {configName}");
+            return true;
+        }   
+
+
+        /// <summary>
+        /// Draw a rectangle around a position
+        /// </summary>
+        /// <param name="position">position</param>
+        /// <param name="color">color of rectangle</param>
         public static void DrawRectanlgeAroundPosition(Vector position, Color color)
         {
             var laserLeftSide = Utilities.CreateEntityByName<CBeam>("beam");

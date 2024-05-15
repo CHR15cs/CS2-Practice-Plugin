@@ -5,8 +5,10 @@ using CounterStrikeSharp.API.Modules.Menu;
 using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.DataModules;
 using CSPracc.Extensions;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime;
 using System.Text;
@@ -16,14 +18,16 @@ namespace CSPracc.Managers
 {
     public class GuiManager : IDisposable
     {
+        private static bool _disposed = false;
         private static GuiManager? _instance = null;
         public static GuiManager Instance 
         { 
             get
             {
-                if(_instance == null)
+                if(_instance == null || _disposed)
                 {
                     _instance = new GuiManager();
+                    _disposed = false;
                 }
                 return _instance;
             }
@@ -113,8 +117,10 @@ namespace CSPracc.Managers
 
         public void Dispose()
         {
+            _disposed = true;
+            CSPraccPlugin.Instance!.Logger.LogInformation($"Disposed GUI Manager");
             Listeners.OnTick onTick = new Listeners.OnTick(OnTick);
-            CSPraccPlugin.Instance!.RemoveListener("OnTick", onTick);
+            CSPraccPlugin.Instance.RemoveListener<Listeners.OnTick>(OnTick);
             CSPraccPlugin.Instance!.RemoveCommand("css_1", Selection);
             CSPraccPlugin.Instance!.RemoveCommand("css_2", Selection);
             CSPraccPlugin.Instance!.RemoveCommand("css_3", Selection);

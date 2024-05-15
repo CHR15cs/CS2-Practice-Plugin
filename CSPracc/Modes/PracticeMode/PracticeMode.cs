@@ -4,10 +4,8 @@ using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Utils;
-using CSPracc.CommandHandler;
 using CSPracc.DataModules;
 using CSPracc.DataModules.Constants;
-using CSPracc.EventHandler;
 using CSPracc.Extensions;
 using CSPracc.Managers;
 using CSPracc.Managers.PracticeManagers;
@@ -24,6 +22,9 @@ using static CSPracc.DataModules.Enums;
 
 namespace CSPracc.Modes
 {
+    /// <summary>
+    /// Class for handling practice mode
+    /// </summary>
     public class PracticeMode : BaseMode
     {
         List<IManager> _managers;
@@ -37,10 +38,17 @@ namespace CSPracc.Modes
         BreakEntitiesManager? BreakEntitiesManager;
         TimerManager? TimerManager;
         CountdownManager? CountdownManager;
-        public PracticeMode(CSPraccPlugin plugin) : base(plugin)
+        CheckpointManager? CheckpointManager;
+        /// <summary>
+        /// Constuctor for the practice mode
+        /// </summary>
+        public PracticeMode() : base()
         {
             _managers = new List<IManager>();
         }
+        /// <summary>
+        /// Configuring the environment for the practice mode
+        /// </summary>
         public override void ConfigureEnvironment()
         {
             SetupManagers();
@@ -55,12 +63,13 @@ namespace CSPracc.Modes
             PracticeBotManager = new PracticeBotManager();
             SpawnManager = new PracticeSpawnManager();
             BotReplayManager = new BotReplayManager(ref PracticeBotManager, ref projectileManager);
-            PlayerBlindManager = new PlayerBlindManager(ref Plugin, ref projectileManager, ref CommandManager);
-            PlayerHurtManager = new PlayerHurtManager(ref Plugin, ref CommandManager);
-            ToggleImpactManager = new ToggleImpactManager(ref CommandManager);
-            BreakEntitiesManager = new BreakEntitiesManager(ref CommandManager);
-            TimerManager = new TimerManager(ref CommandManager, ref GuiManager);
-            CountdownManager = new CountdownManager(ref CommandManager, ref GuiManager);
+            PlayerBlindManager = new PlayerBlindManager(ref projectileManager);
+            PlayerHurtManager = new PlayerHurtManager();
+            ToggleImpactManager = new ToggleImpactManager();
+            BreakEntitiesManager = new BreakEntitiesManager();
+            TimerManager = new TimerManager();
+            CountdownManager = new CountdownManager();
+            CheckpointManager = new CheckpointManager();
 
             _managers.Add(projectileManager);
             _managers.Add(PracticeBotManager);
@@ -72,8 +81,12 @@ namespace CSPracc.Modes
             _managers.Add(BreakEntitiesManager);
             _managers.Add(TimerManager);
             _managers.Add(CountdownManager);
+            _managers.Add(CheckpointManager);
         }
 
+        /// <summary>
+        /// Disposing the practice mode
+        /// </summary>
         public override void Dispose()
         {
             _managers.ForEach(m => m.Dispose());

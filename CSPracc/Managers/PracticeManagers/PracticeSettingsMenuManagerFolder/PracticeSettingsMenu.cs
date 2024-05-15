@@ -8,8 +8,16 @@ using System.Threading.Tasks;
 
 namespace CSPracc.Managers.PracticeManagers.PracticeSettingsMenuManagerFolder
 {
-    public class PracticeSettingsMenu
+    /// <summary>
+    /// Builder for the practice settings menu
+    /// </summary>
+    public static class PracticeSettingsMenuBuilder
     {
+        /// <summary>
+        /// Get the practice settings menu
+        /// </summary>
+        /// <param name="ccsplayerController">player</param>
+        /// <returns>return menu</returns>
         public static HtmlMenu GetPracticeSettingsMenu(CCSPlayerController ccsplayerController)
         {
             HtmlMenu practiceMenu;

@@ -31,6 +31,9 @@ using Microsoft.Extensions.Logging;
 public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
 {
     private static CSPraccPlugin? _instance = null;
+    /// <summary>
+    /// Plugin instance
+    /// </summary>
     public static CSPraccPlugin Instance 
     {
         get
@@ -44,6 +47,9 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
     }
 
     #region properties
+    /// <summary>
+    /// Module Name
+    /// </summary>
     public override string ModuleName
     {
         get
@@ -51,6 +57,9 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
             return "Practice Plugin";
         }
     }
+    /// <summary>
+    /// Module Version
+    /// </summary>
     public override string ModuleVersion
     {
         get
@@ -59,13 +68,23 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
         }
     }
 
-    public override string ModuleAuthor => "CHR15 & Grükan";   
+    /// <summary>
+    /// Author of the module
+    /// </summary>
+    public override string ModuleAuthor => "CHR15";   
 
 
     private static DirectoryInfo? _moduleDir;
+    /// <summary>
+    /// Module Directory
+    /// </summary>
     public static DirectoryInfo ModuleDir => _moduleDir!;
 
     private static DirectoryInfo? _csgoDir = null;
+
+    /// <summary>
+    /// CS2 Directory
+    /// </summary>
     public static DirectoryInfo Cs2Dir
     {
         get
@@ -81,11 +100,21 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
 
     private static FileInfo? configManagerFile = null;
 
+    /// <summary>
+    /// Current config
+    /// </summary>
     public CSPraccConfig? Config { get; set; }
 
+    /// <summary>
+    /// Current plugin mode
+    /// </summary>
     public static BaseMode? PluginMode { get; set; }
     #endregion
 
+    /// <summary>
+    /// Called on plugin load
+    /// </summary>
+    /// <param name="hotReload">is hotreload</param>
     public override void Load(bool hotReload)
     {
         base.Load(hotReload);
@@ -107,6 +136,10 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
         SwitchMode(Config!.ModeToLoad);
     }
 
+    /// <summary>
+    /// Switching the plugin mode
+    /// </summary>
+    /// <param name="pluginMode">Mode in which shall be switched</param>
     public void SwitchMode(PluginMode pluginMode)
     {
         PluginMode?.Dispose();
@@ -114,38 +147,42 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
         {
             case Enums.PluginMode.Base:
                 {
-                    PluginMode = new BaseMode(this);
+                    PluginMode = new BaseMode();
                     break;
                 }
             case Enums.PluginMode.Pracc:
                 {
-                    PluginMode = new PracticeMode(this);
+                    PluginMode = new PracticeMode();
                     break;
                 }       
             case Enums.PluginMode.DryRun:
                 {
-                    PluginMode = new DryRunMode(this);
+                    PluginMode = new DryRunMode();
                     break;
                 }
             case Enums.PluginMode.Retake:
                 {
-                    PluginMode = new RetakeMode(this);
+                    PluginMode = new RetakeMode();
                     break;
                 }
             case Enums.PluginMode.Prefire:
                 {
-                    PluginMode = new PrefireMode(this);
+                    PluginMode = new PrefireMode();
                     break;
                 }
             default:
                 {
-                    PluginMode = new BaseMode(this);
+                    PluginMode = new BaseMode();
                     break;
                 }               
         }
         PluginMode?.ConfigureEnvironment();
     }
 
+    /// <summary>
+    /// Called when the plugin configuration is parsed
+    /// </summary>
+    /// <param name="config"></param>
     public void OnConfigParsed(CSPraccConfig config)
     {
         if(config == null)

@@ -12,8 +12,14 @@ using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 
 namespace CSPracc.Managers.PracticeManagers
 {
+    /// <summary>
+    /// Break entities manager
+    /// </summary>
     public class BreakEntitiesManager : BaseManager
     { 
+        /// <summary>
+        /// Constructor registering the commands
+        /// </summary>
         public BreakEntitiesManager()  : base()
         {
             Commands.Add(PRACC_COMMAND.breakstuff, new DataModules.PlayerCommand(PRACC_COMMAND.breakstuff, "Break all breakable entities", BreakStuffCommandHandler, null, null));

@@ -13,31 +13,35 @@ using System.Threading.Tasks;
 
 namespace CSPracc.Managers.PracticeManagers
 {
+    /// <summary>
+    /// Checkpoint manager
+    /// </summary>
     public class CheckpointManager : BaseManager
     {
-        Dictionary<CCSPlayerController, Position> checkpoints { get; set; }
+        private Dictionary<CCSPlayerController, Position> _checkpoints { get; set; }
+        /// <summary>
+        /// Constructor registering the commands
+        /// </summary>
         public CheckpointManager() : base()
-        { 
-            checkpoints = new Dictionary<CCSPlayerController, Position>();
+        {
+            _checkpoints = new Dictionary<CCSPlayerController, Position>();
             Commands.Add(PRACC_COMMAND.CHECKPOINT, new PlayerCommand(PRACC_COMMAND.CHECKPOINT, "Save current position as checkpoint", CheckpointCommandHandler, null, null));
             Commands.Add(PRACC_COMMAND.TELEPORT, new PlayerCommand(PRACC_COMMAND.TELEPORT, "Teleport to last saved Checkpoint", TeleportCommandHandler, null, null));
         }
-
-        public bool CheckpointCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
+        private bool CheckpointCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
-            checkpoints!.SetOrAdd(playerController, playerController.GetCurrentPosition());
+            _checkpoints!.SetOrAdd(playerController, playerController.GetCurrentPosition());
             playerController.ChatMessage("Saved current position as checkpoint");
             return true;
         }
-
-        public bool TeleportCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
+        private bool TeleportCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
-            if (!checkpoints.ContainsKey(playerController))
+            if (!_checkpoints.ContainsKey(playerController))
             {
                 playerController.ChatMessage($"You dont have a saved checkpoint");
                 return false;
             }
-            playerController.TeleportToPosition(checkpoints[playerController]);
+            playerController.TeleportToPosition(_checkpoints[playerController]);
             playerController.ChatMessage("Teleported to your checkpoint");
             return true;
         }

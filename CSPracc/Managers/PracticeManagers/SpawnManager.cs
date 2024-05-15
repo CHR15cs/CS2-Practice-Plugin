@@ -21,15 +21,21 @@ using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 
 namespace CSPracc
 {
+    /// <summary>
+    /// Manager for handling the spawns
+    /// </summary>
     public  class PracticeSpawnManager : BaseManager
     {
+        /// <summary>
+        /// Constructor registering the commands
+        /// </summary>
         public PracticeSpawnManager() : base()
         {
             Commands.Add(PRACC_COMMAND.SPAWN, new PlayerCommand(PRACC_COMMAND.SPAWN, "Teleport user to given spawn", CommandHandlerSpawn, null, null));
             Commands.Add(PRACC_COMMAND.TSPAWN, new PlayerCommand(PRACC_COMMAND.TSPAWN, "Teleport user to given tspawn", CommandHandlerTSpawn, null, null));
             Commands.Add(PRACC_COMMAND.CTSPAWN, new PlayerCommand(PRACC_COMMAND.CTSPAWN, "Teleport user to given ctspawn", CommandHandlerCTSpawn, null, null));
-            Commands.Add(PRACC_COMMAND.bestspawn, new PlayerCommand(PRACC_COMMAND.bestspawn, "Teleport user to closest spawn of your current team", CommandHandlerCTSpawn, null, null));
-            Commands.Add(PRACC_COMMAND.worstspawn, new PlayerCommand(PRACC_COMMAND.worstspawn, "Teleport user to farest spawn of your current team", CommandHandlerCTSpawn, null, null));
+            Commands.Add(PRACC_COMMAND.bestspawn, new PlayerCommand(PRACC_COMMAND.bestspawn, "Teleport user to closest spawn of your current team", CommandHandlerBestSpawn, null, null));
+            Commands.Add(PRACC_COMMAND.worstspawn, new PlayerCommand(PRACC_COMMAND.worstspawn, "Teleport user to farest spawn of your current team", CommandHandlerWorstSpawn, null, null));
         }
 
         private  string lastMap = String.Empty;
@@ -37,7 +43,7 @@ namespace CSPracc
         /// <summary>
         /// Dictionary to store the spawns of the current map in
         /// </summary>
-        public  Dictionary<byte,List<Position>> Spawns
+        private  Dictionary<byte,List<Position>> Spawns
         {
             get
             {
@@ -179,10 +185,10 @@ namespace CSPracc
             return true;
         }
 
-        public bool TeleportToWorstSpawn(CCSPlayerController player)
+        private bool TeleportToWorstSpawn(CCSPlayerController player)
         {
             List<Position> points = Spawns[player.TeamNum];
-            float maxDistance = absolutDistance(player, points.FirstOrDefault());
+            float maxDistance = absolutDistance(player, points.FirstOrDefault()!);
             int maxIndex = 0;
             for (int i = 0; i < points.Count; i++)
             {

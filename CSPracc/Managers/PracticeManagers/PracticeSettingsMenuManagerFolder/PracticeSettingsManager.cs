@@ -11,19 +11,26 @@ using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.DataModules;
 using CSPracc.Managers.PracticeManagers.PracticeSettingsMenuManagerFolder;
 using CSPracc.Managers.BaseManagers.CommandManagerFolder;
+using CSPracc.Managers.BaseManagers;
 
 namespace CSPracc.Managers.PracticeManagers
 {
-    public class PracticeSettingsManager
+    /// <summary>
+    /// Practice settings manager
+    /// </summary>
+    public class PracticeSettingsManager : BaseManager
     {
-        public PracticeSettingsManager(ref CommandManager commandManager, ref GuiManager guiManager, ref CSPraccPlugin plugin) 
+        /// <summary>
+        /// Constructor for the practice settings manager
+        /// </summary>
+        public PracticeSettingsManager() : base()
         {
-            commandManager.RegisterCommand(new DataModules.PlayerCommand(PRACC_COMMAND.settings,"Open Settings Menu", ShowPracticeMenuCommandHandler, null,null));
+            CommandManager.RegisterCommand(new DataModules.PlayerCommand(PRACC_COMMAND.settings,"Open Settings Menu", ShowPracticeMenuCommandHandler, null,null));
         }
         
-        public bool ShowPracticeMenuCommandHandler(CCSPlayerController player, PlayerCommandArgument args)
+        private bool ShowPracticeMenuCommandHandler(CCSPlayerController player, PlayerCommandArgument args)
         {
-            PracticeSettingsMenu.GetPracticeSettingsMenu(player).Show(player);
+            PracticeSettingsMenuBuilder.GetPracticeSettingsMenu(player).Show(player);
             return true;
         }
     }

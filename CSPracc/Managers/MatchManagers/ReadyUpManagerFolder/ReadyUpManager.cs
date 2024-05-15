@@ -6,6 +6,7 @@ using CSPracc.Managers.BaseManagers;
 using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,6 +33,10 @@ namespace CSPracc.Managers.MatchManagers.ReadyUpManagerFolder
     /// </summary>
     public class ReadyUpManager : BaseManager
     {
+        /// <summary>
+        /// Eventhandler for the teams ready event
+        /// </summary>
+        public event EventHandler<EventArgs>? TeamsReady;
         ReadyUpMode _readyUpMode { get; set; } = ReadyUpMode.Team;
         Dictionary<CsTeam, List<CCSPlayerController>> _readyUpDictionary { get; set; } = new Dictionary<CsTeam, List<CCSPlayerController>>();
         Dictionary<CsTeam, bool> _readyUpTeamDictionary { get; set; } = new Dictionary<CsTeam, bool>();
@@ -92,10 +97,8 @@ namespace CSPracc.Managers.MatchManagers.ReadyUpManagerFolder
             //Check if both teams are ready
             if (_readyUpTeamDictionary[CsTeam.Terrorist] && _readyUpTeamDictionary[CsTeam.Terrorist])
             {
-                Utils.ServerMessage($"Both Teams are ready for the match.");
-                //ToDo fire Teams ready event
+                TeamsReady!.Invoke(this, new EventArgs());
             }
-
             return true;
         }
 

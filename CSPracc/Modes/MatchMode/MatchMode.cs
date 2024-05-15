@@ -13,12 +13,12 @@ using CSPracc.DataModules;
 using System.IO;
 using CSPracc.Managers;
 using CSPracc.DataModules.Constants;
-using CSPracc.EventHandler;
-using CSPracc.CommandHandler;
 using CSPracc.Modes;
 using static CSPracc.DataModules.Enums;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Entities;
+using CSPracc.Managers.MatchManagers.ReadyUpManagerFolder;
+using CSPracc.Managers.MatchManagers;
 
 namespace CSPracc
 {
@@ -36,14 +36,59 @@ namespace CSPracc
         /// </summary>
         public MatchMode() : base()
         {
+            SetupWarmup();
 
         }
 
-/// <inheritdoc/>
+        private void SetupLiveMode()
+        {
+            CoachManager coachManager = new CoachManager();
+            matchManagers.Add(coachManager);
+            state = match_state.live;
+            Utils.ExecuteConfig("5on5.cfg");
+        }
+
+        private void StopLiveMode()
+        {
+            foreach (IManager manager in matchManagers)
+            {
+                manager.Dispose();
+            }
+        }
+
+        private void SetupWarmup()
+        {
+            ReadyUpManager readyUpManager = new ReadyUpManager();
+            readyUpManager.TeamsReady += HandleAllPlayerReady;
+            warmupManagers.Add(readyUpManager);
+            state = match_state.warmup;
+        }
+
+        private void StopWarmup()
+        {
+            foreach (IManager manager in warmupManagers)
+            {
+                manager.Dispose();
+            }
+        }
+
+        /// <inheritdoc/>
         public override void Dispose()
         {
             
         }
        
+        /// <summary>
+        /// Event to be called when all players are ready
+        /// </summary>
+        /// <param name="sender">readyup manager</param>
+        /// <param name="event">info</param>
+        public void HandleAllPlayerReady(object? sender, EventArgs @event)
+        {
+            StopWarmup();
+            Utils.ServerMessage("All players are ready, starting match");
+            SetupLiveMode();
+        }
+
     }
 }

@@ -11,18 +11,29 @@ using static CounterStrikeSharp.API.Core.BasePlugin;
 
 namespace CSPracc.Managers.PracticeManagers
 {
+    /// <summary>
+    /// Player blind manager
+    /// </summary>
     public class PlayerBlindManager : BaseManager
     {
         ProjectileManager ProjectileManager;
+        /// <summary>
+        /// Constructor for the player blind manager
+        /// </summary>
+        /// <param name="projectileManager">projectile manager instance</param>
         public PlayerBlindManager(ref ProjectileManager projectileManager) : base()
         {  
             ProjectileManager = projectileManager;
             CSPraccPlugin.Instance.RegisterEventHandler<EventPlayerBlind>(OnPlayerBlind, HookMode.Post);
         }
+        /// <summary>
+        /// Dispose object
+        /// </summary>
         public new void Dispose()
         {
             GameEventHandler<EventPlayerBlind> playerblind = OnPlayerBlind;
             CSPraccPlugin.Instance.DeregisterEventHandler("player_blind", playerblind, false);
+            base.Dispose();
         }
         private HookResult OnPlayerBlind(EventPlayerBlind @event, GameEventInfo info)
         {

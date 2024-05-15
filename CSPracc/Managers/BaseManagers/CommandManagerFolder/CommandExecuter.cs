@@ -12,21 +12,33 @@ using System.Collections.Concurrent;
 
 namespace CSPracc.Managers.BaseManagers.CommandManagerFolder
 {
+    /// <summary>
+    /// Command executer
+    /// </summary>
     public class CommandExecuter :IDisposable
     {
         ConcurrentDictionary<string, PlayerCommand> Commands;
+        /// <summary>
+        /// Constructor for the command executer
+        /// </summary>
+        /// <param name="commands">command dictionary</param>
         public CommandExecuter(ref ConcurrentDictionary<string, PlayerCommand> commands) 
         { 
             Commands = commands;
             CSPraccPlugin.Instance.RegisterEventHandler<EventPlayerChat>(EventPlayerChat);
         }
+        /// <summary>
+        /// Disposing of the command executer
+        /// </summary>
         public void Dispose()
         {
+            CSPraccPlugin.Instance.Logger.LogInformation($"Disposing CommandExecuter");
             GameEventHandler<EventPlayerChat> playerChat = new GameEventHandler<EventPlayerChat>(EventPlayerChat);
             CSPraccPlugin.Instance.DeregisterEventHandler("player_chat", playerChat, true);
         }
         private HookResult EventPlayerChat(EventPlayerChat @event, GameEventInfo info)
         {
+            CSPraccPlugin.Instance.Logger.LogInformation($"Player chat event");
             CCSPlayerController? player = Utilities.GetPlayerFromUserid(@event.Userid);
             if (player is null)
             {
@@ -41,7 +53,9 @@ namespace CSPracc.Managers.BaseManagers.CommandManagerFolder
                 return HookResult.Continue;
             }
             CommandAliasManager.Instance.ReplaceAlias(player, command, out command);
-            PlayerCommandArgument playerCommandArgument = new (textFromPlayer);
+            string arguments = textFromPlayer.Substring(command.Length+1).Trim();
+            PlayerCommandArgument playerCommandArgument = new (arguments);
+            CSPraccPlugin.Instance!.Logger.LogWarning($"Looking for command '{command}' in {String.Join(" , ",Commands.Keys)}");
             if (!Commands.TryGetValue(command, out PlayerCommand? commandToExecute))
             {
                 CSPraccPlugin.Instance!.Logger.LogWarning($"Could not get command");

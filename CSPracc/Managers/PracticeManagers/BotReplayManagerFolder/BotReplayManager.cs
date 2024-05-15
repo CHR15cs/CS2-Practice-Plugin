@@ -48,7 +48,7 @@ namespace CSPracc.Managers
         {
             HtmlMenu mimic_menu;
             List<KeyValuePair<string, Action>> menuOptions = new List<KeyValuePair<string, Action>>();
-            menuOptions.Add(new KeyValuePair<string, Action>("List existing replay", () => CSPraccPlugin.Instance!.AddTimer(0.5f, () => ShowMimcReplays(ccsplayerController, new List<string>()))));
+            menuOptions.Add(new KeyValuePair<string, Action>("List existing replay", () => CSPraccPlugin.Instance!.AddTimer(0.5f, () => ShowMimcReplays(ccsplayerController, new PlayerCommandArgument("")))));
             menuOptions.Add(new KeyValuePair<string, Action>("Create new replay", new Action(() => CreateReplaySet(ccsplayerController, ""))));
             menuOptions.Add(new KeyValuePair<string, Action>("Delete existing replay", () => CSPraccPlugin.Instance!.AddTimer(0.5f, () => DeleteMimicReplay(ccsplayerController))));
             return mimic_menu = new HtmlMenu("Bot Mimic Menu", menuOptions);
@@ -90,6 +90,12 @@ namespace CSPracc.Managers
             return true;
         }
 
+        /// <summary>
+        /// Delete replay menu
+        /// </summary>
+        /// <param name="playerController">player who issued the command</param>
+        /// <param name="args">args</param>
+        /// <returns>true if successfull</returns>
         public bool ShowDeleteMenuCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             DeleteMimicReplay(playerController);
@@ -99,7 +105,7 @@ namespace CSPracc.Managers
         /// <summary>
         /// Show menu to delete replay
         /// </summary>
-        /// <param name="ccsplayerController">player who issued the commands</param>
+        /// <param name="player">player who issued the commands</param>
         public void DeleteMimicReplay(CCSPlayerController player)
         {
             if (!player.IsAdmin())
@@ -131,7 +137,7 @@ namespace CSPracc.Managers
         /// Create new replay set
         /// </summary>
         /// <param name="player"></param>
-        /// <param name="name"></param>
+        /// <param name="args"></param>
         public bool CreateReplayCommandHandler(CCSPlayerController player, PlayerCommandArgument args)
         {
             string name = "new replayset";

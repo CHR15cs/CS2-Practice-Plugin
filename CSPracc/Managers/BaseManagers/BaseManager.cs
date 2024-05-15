@@ -7,14 +7,36 @@ using System.Threading.Tasks;
 
 namespace CSPracc.Managers.BaseManagers
 {
+    /// <summary>
+    /// Base class for all managers
+    /// </summary>
     public abstract class BaseManager : IManager
     {
-        protected CommandManager CommandManager;
+        /// <summary>
+        /// Command Manager
+        /// </summary>
+        protected CommandManager CommandManager
+        {
+            get
+            {
+                return CommandManager.Instance;
+            }
+        }
+        /// <summary>
+        /// Dictionary of commands
+        /// </summary>
         protected Dictionary<string, PlayerCommand> Commands { get; set; } = new Dictionary<string, PlayerCommand>();
+
+        /// <summary>
+        /// Constructor for the base manager
+        /// </summary>
         public BaseManager() 
         {
-            CommandManager = CommandManager.Instance;
+            
         }
+        /// <summary>
+        /// Deregister all commands
+        /// </summary>
         public void DeregisterCommands()
         {
             foreach (var command in Commands)
@@ -23,11 +45,17 @@ namespace CSPracc.Managers.BaseManagers
             }
         }
 
+        /// <summary>
+        /// Dispose of the manager
+        /// </summary>
         public void Dispose()
         {
             DeregisterCommands();
         }
 
+        /// <summary>
+        /// Register all commands
+        /// </summary>
         public void RegisterCommands()
         {
             foreach (var command in Commands)

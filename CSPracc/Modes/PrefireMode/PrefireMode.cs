@@ -4,10 +4,8 @@ using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Utils;
-using CSPracc.CommandHandler;
 using CSPracc.DataModules;
 using CSPracc.DataStorages.JsonStorages;
-using CSPracc.EventHandler;
 using CSPracc.Extensions;
 using CSPracc.Managers;
 using CSPracc.Managers.PrefireManagers;
@@ -28,10 +26,10 @@ namespace CSPracc.Modes
         GunManager GunManager { get; set; }
         PrefireRouteEditor PrefireRouteEditor { get; set; }
 
-        public PrefireMode(CSPraccPlugin plugin) : base(plugin)
+        public PrefireMode() : base()
         {
-            GunManager = new GunManager(GuiManager);
-            PrefireRouteManager = new PrefireRouteManager(ref plugin);
+            GunManager = new GunManager();
+            //PrefireRouteManager = new PrefireRouteManager(ref CSPraccPlugin.Instance);
         }
 
         public override void ConfigureEnvironment()

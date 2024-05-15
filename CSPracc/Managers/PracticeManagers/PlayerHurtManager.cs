@@ -11,16 +11,26 @@ using static CounterStrikeSharp.API.Core.BasePlugin;
 
 namespace CSPracc.Managers.PracticeManagers
 {
+    /// <summary>
+    /// Player hurt msgs
+    /// </summary>
     public class PlayerHurtManager : BaseManager
     {
+        /// <summary>
+        /// Constructor registering the event
+        /// </summary>
         public PlayerHurtManager() : base() 
         {
             CSPraccPlugin.Instance.RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt, HookMode.Post);
         }
+        /// <summary>
+        /// Disposing the object
+        /// </summary>
         public new void Dispose()
         {
             GameEventHandler<EventPlayerHurt> playerHurt = OnPlayerHurt;
             CSPraccPlugin.Instance.DeregisterEventHandler("player_hurt", playerHurt, false);
+            base.Dispose();
         }
 
         private HookResult OnPlayerHurt(EventPlayerHurt @event, GameEventInfo info)

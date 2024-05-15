@@ -13,14 +13,19 @@ using CSPracc.Managers.BaseManagers.CommandManagerFolder;
 
 namespace CSPracc.Managers.PracticeManagers
 {
+    /// <summary>
+    /// Watch me manager
+    /// </summary>
     public class WatchMeManager : BaseManager
     {
+        /// <summary>
+        /// Constructor registering the commands
+        /// </summary>
         public WatchMeManager() : base()
         { 
             Commands.Add(PRACC_COMMAND.WATCHME,new DataModules.PlayerCommand(PRACC_COMMAND.WATCHME,"Break all breakable entities", WatchMeCommandHandler, null, null));
         }
-
-        public bool WatchMeCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
+        private bool WatchMeCommandHandler(CCSPlayerController playerController, PlayerCommandArgument args)
         {
             var playerEntities = Utilities.GetPlayers();
             foreach (var playerEnt in playerEntities)
@@ -34,6 +39,5 @@ namespace CSPracc.Managers.PracticeManagers
             }
             return true;
         }
-
     }
 }

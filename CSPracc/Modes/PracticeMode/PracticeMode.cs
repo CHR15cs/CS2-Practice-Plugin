@@ -247,7 +247,7 @@ namespace CSPracc.Modes
         public override void ConfigureEnvironment()
         {
             DataModules.Constants.Methods.MsgToServer("Loading practice mode.");
-            Server.ExecuteCommand("exec CSPRACC\\pracc.cfg");
+            Server.ExecuteCommand("exec CSPracc\\pracc.cfg");
             EventHandler?.Dispose();
             EventHandler = new PracticeEventHandler(CSPraccPlugin.Instance!, new PracticeCommandHandler(this, ref projectileManager,ref PracticeBotManager, ref SpawnManager),ref projectileManager, ref PracticeBotManager);
         }
@@ -275,7 +275,7 @@ namespace CSPracc.Modes
         }
         public override void Dispose()
         {
-            Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
+            Server.ExecuteCommand("exec CSPracc\\undo_pracc.cfg");
             projectileManager.Dispose();
             base.Dispose();
         }

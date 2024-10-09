@@ -45,9 +45,9 @@ namespace CSPracc
             Server.ExecuteCommand("mp_warmup_end 1");
         }
 
-        public override void ConfigureEnvironment(bool hotReload = false)
+        public override void ConfigureEnvironment(bool hotReload = true)
         {
-            if(!hotReload)
+            if(hotReload)
             {
                 DataModules.Constants.Methods.MsgToServer("Starting Dryrun Mode");
                 Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");

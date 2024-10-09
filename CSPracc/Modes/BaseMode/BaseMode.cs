@@ -31,9 +31,9 @@ namespace CSPracc.Modes
         protected GuiManager GuiManager { get; set; }
 
         protected  BaseEventHandler EventHandler { get; set; }
-        public  virtual void ConfigureEnvironment(bool hotReload = false)
+        public  virtual void ConfigureEnvironment(bool hotReload = true)
         {
-            if(!hotReload)
+            if(hotReload)
             {
                 DataModules.Constants.Methods.MsgToServer("Restoring default config.");
                 Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");

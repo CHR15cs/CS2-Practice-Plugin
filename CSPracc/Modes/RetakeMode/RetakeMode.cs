@@ -117,9 +117,9 @@ namespace CSPracc.Modes
             return HookResult.Continue;
         }
 
-        public override void ConfigureEnvironment(bool hotReload = false)
+        public override void ConfigureEnvironment(bool hotReload = true)
         {
-            if(!hotReload)
+            if(hotReload)
             {
                 DataModules.Constants.Methods.MsgToServer("Loading retakes mode.");
                 Server.ExecuteCommand("exec CSPRACC\\retake.cfg");

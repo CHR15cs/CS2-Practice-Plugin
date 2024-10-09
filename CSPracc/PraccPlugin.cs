@@ -84,7 +84,7 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
             Reset();
         });
         Instance = this;
-        SwitchMode(Config!.ModeToLoad);
+        SwitchMode(Config!.ModeToLoad, hotReload);
         Logger.LogInformation("Pracitce Plugin loaded.");
     }
 
@@ -96,7 +96,7 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
         SwitchMode(Config!.ModeToLoad);
     }
 
-    public static void SwitchMode(PluginMode pluginMode)
+    public static void SwitchMode(PluginMode pluginMode, bool hotReload = true)
     {
         PluginMode?.Dispose();
         switch (pluginMode)
@@ -137,7 +137,7 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
                     break;
                 }               
         }
-        PluginMode?.ConfigureEnvironment(true);
+        PluginMode?.ConfigureEnvironment(hotReload);
     }
 
     public void OnConfigParsed(CSPraccConfig config)

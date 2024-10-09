@@ -306,9 +306,9 @@ namespace CSPracc
             }
         }
 
-        public override void ConfigureEnvironment(bool hotReload = false)
+        public override void ConfigureEnvironment(bool hotReload = true)
         {
-            if(!hotReload)
+            if(hotReload)
             {
                 DataModules.Constants.Methods.MsgToServer("Loading match mode.");
                 Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");

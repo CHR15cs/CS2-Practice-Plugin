@@ -244,9 +244,9 @@ namespace CSPracc.Modes
             GuiManager.AddMenu(player.SteamID, projectileManager.GetNadeMenu(player));
         }
 
-        public override void ConfigureEnvironment(bool hotReload = false)
+        public override void ConfigureEnvironment(bool hotReload = true)
         {
-            if(!hotReload)
+            if(hotReload)
             {
                 DataModules.Constants.Methods.MsgToServer("Loading practice mode.");
                 Server.ExecuteCommand("exec CSPRACC\\pracc.cfg");

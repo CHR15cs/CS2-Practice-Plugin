@@ -137,7 +137,7 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
                     break;
                 }               
         }
-        PluginMode?.ConfigureEnvironment();
+        PluginMode?.ConfigureEnvironment(true);
     }
 
     public void OnConfigParsed(CSPraccConfig config)

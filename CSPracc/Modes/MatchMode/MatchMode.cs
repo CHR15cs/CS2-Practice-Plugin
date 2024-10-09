@@ -306,11 +306,14 @@ namespace CSPracc
             }
         }
 
-        public override void ConfigureEnvironment()
+        public override void ConfigureEnvironment(bool hotReload = false)
         {
-            DataModules.Constants.Methods.MsgToServer("Loading match mode.");
-            Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
-            Server.ExecuteCommand("exec CSPRACC\\5on5_warmup.cfg");
+            if(!hotReload)
+            {
+                DataModules.Constants.Methods.MsgToServer("Loading match mode.");
+                Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
+                Server.ExecuteCommand("exec CSPRACC\\5on5_warmup.cfg");
+            }
             EventHandler?.Dispose();
             EventHandler = new MatchEventHandler(CSPraccPlugin.Instance!, new MatchCommandHandler(this),this);
             state = Enums.match_state.warmup;

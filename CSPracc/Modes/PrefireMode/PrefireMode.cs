@@ -253,20 +253,24 @@ namespace CSPracc.Modes
             }
         }
 
-        public override void ConfigureEnvironment()
+        public override void ConfigureEnvironment(bool hotReload = false)
         {
-            DataModules.Constants.Methods.MsgToServer("Loading prefire mode.");
-            Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
-            Server.ExecuteCommand("exec CSPRACC\\prefire.cfg");
+            if(!hotReload)
+            {
+                DataModules.Constants.Methods.MsgToServer("Loading prefire mode.");
+                Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
+                Server.ExecuteCommand("exec CSPRACC\\prefire.cfg");
+
+                Utils.ServerMessage($"Use {ChatColors.Green}.routes{ChatColors.White} to show menu of routes.");
+                Utils.ServerMessage($"Use {ChatColors.Green}.addroute (routename){ChatColors.White} to add a empty route.");
+                Utils.ServerMessage($"Use {ChatColors.Green}.editroute (routename){ChatColors.White} to edit given route.");
+                Utils.ServerMessage($"Use {ChatColors.Green}.addspawn{ChatColors.White} to add spawn to current route.");
+                Utils.ServerMessage($"Use {ChatColors.Green}.startpoint{ChatColors.White} to set startpoint of current route.");
+                Utils.ServerMessage($"Use {ChatColors.Green}.next{ChatColors.White} to select next route of current map.");
+                Utils.ServerMessage($"Use {ChatColors.Green}.back{ChatColors.White} to go back to last route.");
+            }
             EventHandler?.Dispose();
             EventHandler = new PrefireEventHandler(CSPraccPlugin.Instance!, new PrefireCommandHandler(this),this);
-            Utils.ServerMessage($"Use {ChatColors.Green}.routes{ChatColors.White} to show menu of routes.");
-            Utils.ServerMessage($"Use {ChatColors.Green}.addroute (routename){ChatColors.White} to add a empty route.");
-            Utils.ServerMessage($"Use {ChatColors.Green}.editroute (routename){ChatColors.White} to edit given route.");
-            Utils.ServerMessage($"Use {ChatColors.Green}.addspawn{ChatColors.White} to add spawn to current route.");
-            Utils.ServerMessage($"Use {ChatColors.Green}.startpoint{ChatColors.White} to set startpoint of current route.");
-            Utils.ServerMessage($"Use {ChatColors.Green}.next{ChatColors.White} to select next route of current map.");
-            Utils.ServerMessage($"Use {ChatColors.Green}.back{ChatColors.White} to go back to last route.");
         }
     }
 }

@@ -117,10 +117,13 @@ namespace CSPracc.Modes
             return HookResult.Continue;
         }
 
-        public override void ConfigureEnvironment()
+        public override void ConfigureEnvironment(bool hotReload = false)
         {
-            DataModules.Constants.Methods.MsgToServer("Loading retakes mode.");
-            Server.ExecuteCommand("exec CSPRACC\\retake.cfg");
+            if(!hotReload)
+            {
+                DataModules.Constants.Methods.MsgToServer("Loading retakes mode.");
+                Server.ExecuteCommand("exec CSPRACC\\retake.cfg");
+            }
             EventHandler?.Dispose();
             EventHandler = new RetakeEventHandler(CSPraccPlugin.Instance!, new RetakeCommandHandler(this),this);
         }

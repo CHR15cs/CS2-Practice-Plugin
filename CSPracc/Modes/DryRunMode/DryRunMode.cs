@@ -45,11 +45,14 @@ namespace CSPracc
             Server.ExecuteCommand("mp_warmup_end 1");
         }
 
-        public override void ConfigureEnvironment()
+        public override void ConfigureEnvironment(bool hotReload = false)
         {
-            DataModules.Constants.Methods.MsgToServer("Starting Dryrun Mode");
-            Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
-            Server.ExecuteCommand("exec CSPRACC\\5on5_warmup.cfg");
+            if(!hotReload)
+            {
+                DataModules.Constants.Methods.MsgToServer("Starting Dryrun Mode");
+                Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
+                Server.ExecuteCommand("exec CSPRACC\\5on5_warmup.cfg");
+            }
             EventHandler?.Dispose();
             EventHandler = new DryRunEventHandler(CSPraccPlugin.Instance!, new DryRunCommandHandler(this),this);
         }    

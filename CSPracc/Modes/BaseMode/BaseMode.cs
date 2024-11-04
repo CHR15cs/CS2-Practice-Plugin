@@ -31,11 +31,14 @@ namespace CSPracc.Modes
         protected GuiManager GuiManager { get; set; }
 
         protected  BaseEventHandler EventHandler { get; set; }
-        public  virtual void ConfigureEnvironment()
+        public  virtual void ConfigureEnvironment(bool hotReload = true)
         {
-            DataModules.Constants.Methods.MsgToServer("Restoring default config.");
-            Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
-            Server.ExecuteCommand("exec server.cfg");
+            if(hotReload)
+            {
+                DataModules.Constants.Methods.MsgToServer("Restoring default config.");
+                Server.ExecuteCommand("exec CSPRACC\\undo_pracc.cfg");
+                Server.ExecuteCommand("exec server.cfg");
+            }
             EventHandler = new BaseEventHandler(CSPraccPlugin.Instance!, new BaseCommandHandler(this));           
         }
         public static void ChangeMap(CCSPlayerController player, string mapName)

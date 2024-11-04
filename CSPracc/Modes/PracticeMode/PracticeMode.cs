@@ -244,10 +244,13 @@ namespace CSPracc.Modes
             GuiManager.AddMenu(player.SteamID, projectileManager.GetNadeMenu(player));
         }
 
-        public override void ConfigureEnvironment()
+        public override void ConfigureEnvironment(bool hotReload = true)
         {
-            DataModules.Constants.Methods.MsgToServer("Loading practice mode.");
-            Server.ExecuteCommand("exec CSPRACC\\pracc.cfg");
+            if(hotReload)
+            {
+                DataModules.Constants.Methods.MsgToServer("Loading practice mode.");
+                Server.ExecuteCommand("exec CSPRACC\\pracc.cfg");
+            }
             EventHandler?.Dispose();
             EventHandler = new PracticeEventHandler(CSPraccPlugin.Instance!, new PracticeCommandHandler(this, ref projectileManager,ref PracticeBotManager, ref SpawnManager),ref projectileManager, ref PracticeBotManager);
         }
